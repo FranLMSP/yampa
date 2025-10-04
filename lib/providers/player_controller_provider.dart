@@ -12,5 +12,7 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
 
   void play() => state.play();
   void pause() => state.pause();
+  void next() => state.next();
+  void prev() => state.prev();
   void stop() => state.stop();
 }

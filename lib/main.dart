@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/widgets/player/buttons/play_and_pause.dart';
+import 'package:music_player/widgets/player/player_buttons.dart';
 
 void main() {
   runApp(ProviderScope(child: const MyApp()));
@@ -33,7 +33,7 @@ class MyHomePage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            PlayAndPauseButton()
+            PlayerButtons(),
           ],
         ),
       ),

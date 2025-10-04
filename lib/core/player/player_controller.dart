@@ -27,6 +27,12 @@ class PlayerController {
     state = PlayerState.stopped;
   }
 
+  void next() {
+  }
+
+  void prev() {
+  }
+
   void seek(Duration position) {
     // Implement seek logic
   }
