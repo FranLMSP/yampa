@@ -10,7 +10,6 @@ class PrevButton extends ConsumerWidget {
     final playerNotifierController = ref.read(playerControllerProvider.notifier);
     return ElevatedButton(
       onPressed: () {
-        ref.invalidate(playerControllerProvider);
         playerNotifierController.prev();
       },
       style: ElevatedButton.styleFrom(
@@ -21,4 +20,3 @@ class PrevButton extends ConsumerWidget {
     );
   }
 }
-

@@ -6,6 +6,7 @@ class Track {
   final String artist;
   final String album;
   final String genre;
+  final String path;
   final int trackNumber;
   final Duration duration;
   final Uint8List? imageBytes;
@@ -16,6 +17,7 @@ class Track {
     required this.artist,
     required this.album,
     required this.genre,
+    required this.path,
     required this.trackNumber,
     required this.duration,
     this.imageBytes,

@@ -10,7 +10,6 @@ class NextButton extends ConsumerWidget {
     final playerNotifierController = ref.read(playerControllerProvider.notifier);
     return ElevatedButton(
       onPressed: () {
-        ref.invalidate(playerControllerProvider);
         playerNotifierController.next();
       },
       style: ElevatedButton.styleFrom(
