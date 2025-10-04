@@ -3,6 +3,7 @@ import 'package:music_player/core/player/player_state.dart';
 
 class PlayerController {
   Track? currentTrack;
+  List<Track> trackQueue = [];
   Duration currentPosition = Duration.zero;
   PlayerState state = PlayerState.stopped;
 
