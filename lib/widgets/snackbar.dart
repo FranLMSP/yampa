@@ -5,7 +5,7 @@ void showSnackBarMessage(
   String message,
   {
     Color backgroundColor = Colors.red,
-    Color textColor = Colors.red,
+    Color actionTextColor = Colors.white,
     String label = 'Dismiss',
     void Function()? onPressed,
   }
@@ -16,7 +16,7 @@ void showSnackBarMessage(
       backgroundColor: backgroundColor,
       action: SnackBarAction(
         label: label,
-        textColor: textColor,
+        textColor: actionTextColor,
         onPressed: onPressed ?? () {},
       ),
     ),
