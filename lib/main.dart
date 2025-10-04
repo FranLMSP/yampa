@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/widgets/player/player_buttons.dart';
+import 'package:music_player/widgets/track_pickers/local_path_picker.dart';
 
 void main() {
   runApp(ProviderScope(child: const MyApp()));
@@ -31,9 +32,19 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            PlayerButtons(),
+            // temp file picker here
+            SizedBox(
+              width: 300,
+              child: LocalPathPicker(),
+            ),
+            // main player here?
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                PlayerButtons(),
+              ],
+            ),
           ],
         ),
       ),
