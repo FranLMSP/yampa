@@ -10,6 +10,7 @@ class PauseButton extends ConsumerWidget {
     final playerNotifierController = ref.read(playerControllerProvider.notifier);
     return ElevatedButton(
       onPressed: () {
+        ref.invalidate(playerControllerProvider);
         playerNotifierController.pause();
       },
       style: ElevatedButton.styleFrom(
