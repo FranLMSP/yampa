@@ -1,40 +1,86 @@
+import 'package:music_player/core/track_players/interface.dart';
 import 'package:music_player/models/track.dart';
-import 'package:music_player/core/player/player_state.dart';
+import 'package:music_player/core/player/enums.dart';
 
 class PlayerController {
   Track? currentTrack;
   List<Track> trackQueue = [];
   Duration currentPosition = Duration.zero;
   PlayerState state = PlayerState.stopped;
+  LoopMode loopMode = LoopMode.startToEnd;
+  NextTrackMode nextTrackMode = NextTrackMode.randomBasedOnHistory;
+  TrackPlayer? trackPlayer;
 
   PlayerController();
+  PlayerController._clone({
+    required this.currentTrack,
+    required this.trackQueue,
+    required this.currentPosition,
+    required this.state,
+    required this.loopMode,
+    required this.nextTrackMode,
+    required this.trackPlayer,
+  });
 
-  void play() {
-    // TODO: uncomment this once we have a way to load a track
-    // if (currentTrack != null) {
-    //   state = PlayerState.playing;
-    // }
-    state = PlayerState.playing;
+  Future<void> play() async {
+    if (state != PlayerState.playing && trackPlayer != null) {
+      if (state == PlayerState.stopped && currentTrack != null) {
+        await trackPlayer!.setTrack(currentTrack!);
+      }
+      await trackPlayer!.play();
+      state = PlayerState.playing;
+    }
   }
 
-  void pause() {
-    // if (currentTrack != null && state != PlayerState.playing) {
-    //   state = PlayerState.paused;
-    // }
-    state = PlayerState.paused;
+  Future<void> pause() async {
+    if (state != PlayerState.paused && trackPlayer != null) {
+      await trackPlayer!.pause();
+      state = PlayerState.paused;
+    }
   }
 
-  void stop() {
+  Future<void> stop() async {
+    if (state != PlayerState.stopped && trackPlayer != null) {
+      await trackPlayer!.stop();
+      currentPosition = Duration.zero;
+      state = PlayerState.stopped;
+    }
+  }
+
+  Future<void> next() async {
+  }
+
+  Future<void> prev() async {
+  }
+
+  void suffleTrackQueue() {
+  }
+
+  void seek(Duration position) async {
+    if (trackPlayer != null) {
+      await trackPlayer!.seek(position);
+    }
+  }
+
+  void setTrackPlayer(TrackPlayer trackPlayer) {
     state = PlayerState.stopped;
+    currentPosition = Duration.zero;
+    this.trackPlayer = trackPlayer;
   }
 
-  void next() {
+  void setCurrentTrack(Track track) {
+    currentTrack = track;
   }
 
-  void prev() {
-  }
-
-  void seek(Duration position) {
-    // Implement seek logic
+  PlayerController clone() {
+    return PlayerController._clone(
+      currentTrack: currentTrack,
+      trackQueue: List<Track>.from(trackQueue),
+      currentPosition: currentPosition,
+      state: state,
+      loopMode: loopMode,
+      nextTrackMode: nextTrackMode,
+      trackPlayer: trackPlayer,
+    );
   }
 }

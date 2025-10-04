@@ -5,14 +5,15 @@ import 'package:music_player/providers/player_controller_provider.dart';
 class PauseButton extends ConsumerWidget {
   const PauseButton({super.key});
 
+  void _onPressed(PlayerControllerNotifier playerControllerNotifier) async {
+    await playerControllerNotifier.pause();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerNotifierController = ref.read(playerControllerProvider.notifier);
+    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
     return ElevatedButton(
-      onPressed: () {
-        ref.invalidate(playerControllerProvider);
-        playerNotifierController.pause();
-      },
+      onPressed: () => _onPressed(playerControllerNotifier),
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(20),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/player/player_state.dart';
+import 'package:music_player/core/player/enums.dart';
 import 'package:music_player/widgets/player/buttons/play.dart';
 import 'package:music_player/widgets/player/buttons/pause.dart';
 import 'package:music_player/providers/player_controller_provider.dart';
@@ -14,7 +14,6 @@ class PlayAndPauseButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerController = ref.watch(playerControllerProvider);
-    print("updating?");
 
     return playerController.state == PlayerState.playing
       ? PauseButton()
