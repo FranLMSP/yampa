@@ -7,7 +7,8 @@ import 'package:music_player/providers/player_controller_provider.dart';
 class PlayButton extends ConsumerWidget {
   const PlayButton({super.key});
 
-  void _onPressed(PlayerControllerNotifier playerControllerNotifier) async {
+  void _onPressed(BuildContext context, PlayerControllerNotifier playerControllerNotifier) async {
+    await playerControllerNotifier.stop();
     playerControllerNotifier.setTrackPlayer(JustAudioProvider());
     playerControllerNotifier.setCurrentTrack(Track(
       id: '1',
@@ -17,8 +18,9 @@ class PlayButton extends ConsumerWidget {
       genre: 'Unknown Genre',
       trackNumber: 0,
       duration: Duration(minutes: 3, seconds: 30),
-      path: 'file://home/fran/Music/sample.mp3',
+      path: 'file:///home/fran/Music/sample.mp3',
     ));
+    // TODO: show snackbar if error occurs
     await playerControllerNotifier.play();
   }
 
@@ -26,7 +28,7 @@ class PlayButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
     return ElevatedButton(
-      onPressed: () => _onPressed(playerControllerNotifier),
+      onPressed: () => _onPressed(context, playerControllerNotifier),
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(20),

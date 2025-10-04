@@ -1,9 +1,20 @@
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:music_player/models/track.dart';
 import 'interface.dart';
 
 class JustAudioProvider implements TrackPlayer {
   final AudioPlayer _player = AudioPlayer();
+
+  JustAudioProvider() {
+    JustAudioMediaKit.ensureInitialized(
+      linux: true,
+      windows: true,
+      android: true,
+      iOS: true,
+      macOS: true,
+    );
+  }
 
   @override
   Future<List<Track>> fetchTracks() async {
