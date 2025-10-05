@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter_media_metadata/flutter_media_metadata.dart';
+import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:music_player/models/path.dart';
@@ -21,32 +22,59 @@ class JustAudioProvider implements TrackPlayer {
   }
 
   @override
-  Future<List<Track>> fetchTracks(List<GenericPath> paths) async {
-    final result = [];
+  List<Track> fetchTracks(List<GenericPath> paths) {
+    final List<Track> result = [];
     for (final path in paths) {
       if (path.filename != null) {
         try {
-          final metadata = await MetadataRetriever.fromFile(File(path.filename!));
-          final track = Track(
-            id: path.id,
-            name: metadata.trackName ?? "Unknown Title",
-            artist: metadata.trackArtistNames?.join(", ") ?? "Unknown Artist",
-            album: metadata.albumName ?? "Unknown Album",
-            genre: metadata.albumName ?? "Unknown Genre",
-            trackNumber: metadata.trackNumber ?? 0,
-            path: path.filename!,
-            duration: Duration(milliseconds: metadata.trackDuration!),
-            imageBytes: metadata.albumArt,
-          );
-          result.add(track);
+          result.add(_getTrackMetadataFromGenericPath(path));
         } catch (e) {
           // handle error
         }
       } else if (path.folder != null) {
-        // find all files in folder, and get valid audio files to convert them to Track
+        final files = Directory(path.folder!)
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((file) =>
+              file.path.endsWith(".mp4") ||
+              file.path.endsWith(".m4a") ||
+              file.path.endsWith(".mp3") ||
+              file.path.endsWith(".ogg") ||
+              file.path.endsWith(".ogg") ||
+              file.path.endsWith(".opus") ||
+              file.path.endsWith(".wav") ||
+              file.path.endsWith(".flac"))
+          .toList();
+        for (final file in files) {
+          try {
+            final effectivePath = GenericPath(
+              id: path.id,
+              folder: path.folder,
+              filename: file.path,
+            );
+            result.add(_getTrackMetadataFromGenericPath(effectivePath));
+          } catch (e) {
+            // handle error
+          }
+        }
       }
     }
-    return [];
+    return result;
+  }
+
+  Track _getTrackMetadataFromGenericPath(GenericPath path) {
+    final metadata = readMetadata(File(path.filename!), getImage: true);
+    return Track(
+      id: path.id,
+      name: metadata.title ?? "Unknown Title",
+      artist: metadata.artist ?? "Unknown Artist",
+      album: metadata.album ?? "Unknown Album",
+      genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "Unknown Genre",
+      trackNumber: metadata.trackNumber ?? 0,
+      path: path.filename!,
+      duration: metadata.duration ?? Duration.zero,
+      imageBytes: metadata.pictures.isNotEmpty ? metadata.pictures.first.bytes : null,
+    );
   }
 
   @override

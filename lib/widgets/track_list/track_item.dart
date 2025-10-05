@@ -8,6 +8,12 @@ class TrackItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(track.name);
+    return Card(
+      child: ListTile(
+        title: Text(track.name),
+        subtitle: Text(track.artist),
+        trailing: Text('${track.duration.inMinutes}:${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}'),
+      ),
+    );
   }
 }

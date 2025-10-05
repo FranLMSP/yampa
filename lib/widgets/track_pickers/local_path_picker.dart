@@ -3,8 +3,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/core/repositories/stored_paths/factory.dart';
+import 'package:music_player/core/track_players/factory.dart';
 import 'package:music_player/models/path.dart';
 import 'package:music_player/providers/local_paths_provider.dart';
+import 'package:music_player/providers/tracks_provider.dart';
 import 'package:music_player/widgets/track_list/track_list.dart';
 
 class LocalPathPicker extends ConsumerStatefulWidget {
@@ -50,7 +52,11 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       });
       await storedPathsRepository.addPath(genericPath);
       final storedPaths = await storedPathsRepository.getStoredPaths();
+
+      // TODO: write a function with these three lines of code to reuse it
       ref.read(localPathsProvider.notifier).setPaths(storedPaths);
+      final tracksPlayer = getTrackPlayer();
+      ref.read(tracksProvider.notifier).setTracks(tracksPlayer.fetchTracks(storedPaths));
       setState(() {
         _isLoading = false;
       });
@@ -76,10 +82,13 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
         await storedPathsRepository.addPath(path);
       }
       final storedPaths = await storedPathsRepository.getStoredPaths();
+      // TODO: write a function with these three lines of code to reuse it
+      ref.read(localPathsProvider.notifier).setPaths(storedPaths);
+      final tracksPlayer = getTrackPlayer();
+      ref.read(tracksProvider.notifier).setTracks(tracksPlayer.fetchTracks(storedPaths));
       setState(() {
         _isLoading = false;
       });
-      ref.read(localPathsProvider.notifier).setPaths(storedPaths);
     }
   }
 
