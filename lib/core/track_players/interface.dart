@@ -1,7 +1,8 @@
+import 'package:music_player/models/path.dart';
 import 'package:music_player/models/track.dart';
 
 abstract class TrackPlayer {
-  Future<List<Track>> fetchTracks();
+  Future<List<Track>> fetchTracks(List<GenericPath> paths);
   Future<void> setTrack(Track track);
   Future<void> play();
   Future<void> pause();
