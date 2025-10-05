@@ -1,9 +1,10 @@
 
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/core/repositories/stored_paths/factory.dart';
+import 'package:music_player/models/path.dart';
+import 'package:music_player/providers/local_paths_provider.dart';
 import 'package:music_player/widgets/track_list/track_list.dart';
 
 class LocalPathPicker extends ConsumerStatefulWidget {
@@ -36,23 +37,49 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
   }
 
   void _pickDirectory() async {
-
-    // Simulate a delay for picking directory
-    // FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
     String? result = await FilePicker.platform.getDirectoryPath();
     if (result != null) {
-      print(result);
+      final genericPath = GenericPath(
+        id: "temp-id",
+        folder: result,
+        filename: null,
+      );
+      final storedPathsRepository = getStoredPathsRepository();
+      setState(() {
+        _isLoading = true;
+      });
+      await storedPathsRepository.addPath(genericPath);
+      final storedPaths = await storedPathsRepository.getStoredPaths();
+      ref.read(localPathsProvider.notifier).setPaths(storedPaths);
+      setState(() {
+        _isLoading = false;
+      });
     }
-
-    // setState(() {
-    //   _isLoading = false;
-    // });
   }
 
   void _pickIndividualFiles() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result != null) {
-      print(result);
+      final genericPaths = result.files.map((file) {
+        return GenericPath(
+          id: "temp-id-${file.name}",
+          folder: null,
+          filename: file.path,
+        );
+      }).toList();
+      final storedPathsRepository = getStoredPathsRepository();
+      setState(() {
+        _isLoading = true;
+      });
+      // TODO: implement a batch insert in the repository
+      for (final path in genericPaths) {
+        await storedPathsRepository.addPath(path);
+      }
+      final storedPaths = await storedPathsRepository.getStoredPaths();
+      setState(() {
+        _isLoading = false;
+      });
+      ref.read(localPathsProvider.notifier).setPaths(storedPaths);
     }
   }
 
@@ -83,7 +110,8 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       ),
       body: Column(
         children: [
-          TrackList(),
+          // TODO: maybe add a loader or spinner here?
+          _isLoading ? Text("Loading...") : TrackList(),
         ],
       ),
     );

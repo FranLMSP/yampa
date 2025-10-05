@@ -18,5 +18,6 @@ samples, guidance on mobile development, and a full API reference.
 
 ### Dependencies
 ```
-apt install libmpv-dev
+apt install libmpv-dev libsqlite3-0 libsqlite3-dev
 ```
+for Windows, the executable has to be packed with `sqlite3.dll`.

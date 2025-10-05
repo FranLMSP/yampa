@@ -1,11 +1,13 @@
 import 'dart:io';
 
 class GenericPath {
-  final Directory directory;
-  final File? file;
+  final String id;
+  final String? folder;
+  final String? filename;
 
   GenericPath({
-    required this.directory,
-    required this.file,
+    required this.id,
+    required this.folder,
+    required this.filename,
   });
 }

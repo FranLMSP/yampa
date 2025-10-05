@@ -9,4 +9,8 @@ final localPathsProvider = NotifierProvider<LocalPathsNotifier, List<GenericPath
 class LocalPathsNotifier extends Notifier<List<GenericPath>> {
   @override
   List<GenericPath> build() => [];
+
+  void setPaths(List<GenericPath> paths) {
+    state = paths;
+  }
 }
