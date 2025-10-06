@@ -16,7 +16,7 @@ class NextButton extends ConsumerWidget {
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(20),
       ),
-      child: const Icon(Icons.skip_next, size: 30),
+      child: const Icon(Icons.skip_next, size: 20),
     );
   }
 }

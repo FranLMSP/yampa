@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/widgets/player/big_player.dart';
 import 'package:music_player/widgets/player/player_buttons.dart';
 import 'package:music_player/widgets/track_pickers/local_path_picker.dart';
 
@@ -39,12 +40,8 @@ class MyHomePage extends StatelessWidget {
               child: LocalPathPicker(),
             ),
             // main player here?
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                PlayerButtons(),
-              ],
-            ),
+            // TODO: pass current track from provider
+            BigPlayer(),
           ],
         ),
       ),
