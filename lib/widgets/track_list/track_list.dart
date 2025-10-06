@@ -4,7 +4,9 @@ import 'package:music_player/providers/tracks_provider.dart';
 import 'package:music_player/widgets/track_list/track_item.dart';
 
 class TrackList extends ConsumerWidget {
-  const TrackList({super.key});
+  const TrackList({super.key, this.onTap});
+
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,6 +16,7 @@ class TrackList extends ConsumerWidget {
         children: tracks .map(
           (track) => TrackItem(
             track: track,
+            onTap: onTap,
           )).toList()
       ),
     );

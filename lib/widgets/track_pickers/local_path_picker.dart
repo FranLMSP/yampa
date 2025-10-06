@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/core/repositories/stored_paths/factory.dart';
 import 'package:music_player/core/track_players/factory.dart';
+import 'package:music_player/core/track_players/just_audio.dart';
 import 'package:music_player/models/path.dart';
 import 'package:music_player/providers/local_paths_provider.dart';
+import 'package:music_player/providers/player_controller_provider.dart';
 import 'package:music_player/providers/tracks_provider.dart';
 import 'package:music_player/widgets/track_list/track_list.dart';
 
@@ -129,7 +131,9 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
 
   @override
   Widget build(BuildContext context) {
-  _loadInitialPaths();
+    _loadInitialPaths();
+    final playerController = ref.watch(playerControllerProvider);
+    final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
     return Scaffold(
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
@@ -139,7 +143,12 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       body: Column(
         children: [
           // TODO: maybe add a loader or spinner here?
-          _isLoading ? Text("Loading...") : TrackList(),
+          _isLoading ? Text("Loading...") : TrackList(onTap: () {
+            final isInstance = playerController.trackPlayer is JustAudioProvider;
+            if (!isInstance) {
+              playerControllerNotifier.setTrackPlayer(JustAudioProvider());
+            }
+          }),
         ],
       ),
     );

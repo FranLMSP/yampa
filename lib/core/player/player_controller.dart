@@ -63,8 +63,7 @@ class PlayerController {
   }
 
   void setTrackPlayer(TrackPlayer trackPlayer) {
-    state = PlayerState.stopped;
-    currentPosition = Duration.zero;
+    stop();
     this.trackPlayer = trackPlayer;
   }
 
