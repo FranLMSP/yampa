@@ -109,8 +109,27 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     ];
   }
 
+  Future<void> _loadInitialPaths() async {
+    final initialLoadDone = ref.read(localPathsProvider.notifier).initialLoadDone();
+    if (initialLoadDone) {
+      return;
+    }
+    setState(() {
+      _isLoading = true;
+    });
+    final storedPathsRepository = getStoredPathsRepository();
+    final storedPaths = await storedPathsRepository.getStoredPaths();
+    ref.read(localPathsProvider.notifier).setPaths(storedPaths);
+    final tracksPlayer = getTrackPlayer();
+    ref.read(tracksProvider.notifier).setTracks(tracksPlayer.fetchTracks(storedPaths));
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+  _loadInitialPaths();
     return Scaffold(
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
