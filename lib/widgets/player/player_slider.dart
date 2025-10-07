@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/core/player/enums.dart';
 import 'package:music_player/providers/player_controller_provider.dart';
 
 class PlayerSlider extends ConsumerStatefulWidget {
@@ -30,21 +31,19 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
       return;
     }
     final player = ref.read(playerControllerProvider);
-    if (player.currentTrack == null || player.currentTrack!.duration == Duration.zero) {
+    if (player.currentTrack == null || player.currentTrack!.duration == Duration.zero || player.state != PlayerState.playing) {
       _currentSliderValue = 0;
       return;
     }
     final totalDuration = player.currentTrack!.duration;
     final currentDuration = await player.getCurrentPosition();
     final currentPosition = (currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100;
-    print("Total duration: $totalDuration | Current duration: $currentDuration | Current position: $currentPosition");
     setState(() {
       _currentSliderValue = currentPosition;
     });
   }
 
   Future<void> _setPlayerCurrentPosition(double value) async {
-    print("changing?");
     final player = ref.read(playerControllerProvider);
     if (player.currentTrack == null || player.currentTrack!.duration == Duration.zero) {
       return;
