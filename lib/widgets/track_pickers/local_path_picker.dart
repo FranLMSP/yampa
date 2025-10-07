@@ -58,7 +58,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       // TODO: write a function with these three lines of code to reuse it
       ref.read(localPathsProvider.notifier).setPaths(storedPaths);
       final tracksPlayer = getTrackPlayer();
-      ref.read(tracksProvider.notifier).setTracks(tracksPlayer.fetchTracks(storedPaths));
+      ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
       setState(() {
         _isLoading = false;
       });
@@ -87,7 +87,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       // TODO: write a function with these three lines of code to reuse it
       ref.read(localPathsProvider.notifier).setPaths(storedPaths);
       final tracksPlayer = getTrackPlayer();
-      ref.read(tracksProvider.notifier).setTracks(tracksPlayer.fetchTracks(storedPaths));
+      ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
       setState(() {
         _isLoading = false;
       });
@@ -123,7 +123,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     final storedPaths = await storedPathsRepository.getStoredPaths();
     ref.read(localPathsProvider.notifier).setPaths(storedPaths);
     final tracksPlayer = getTrackPlayer();
-    ref.read(tracksProvider.notifier).setTracks(tracksPlayer.fetchTracks(storedPaths));
+    ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
     setState(() {
       _isLoading = false;
     });

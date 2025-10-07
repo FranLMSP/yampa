@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/providers/player_controller_provider.dart';
 import 'package:music_player/widgets/player/player_buttons.dart';
 import 'package:music_player/widgets/player/player_image.dart';
+import 'package:music_player/widgets/player/player_slider.dart';
 
 class BigPlayer extends ConsumerWidget {
 
@@ -31,6 +32,7 @@ class BigPlayer extends ConsumerWidget {
         ),
         const SizedBox(height: 30),
         const PlayerButtons(),
+        const PlayerSlider(),
       ],
     );
   }
