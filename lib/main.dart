@@ -62,7 +62,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             // main player here?
             // TODO: pass current track from provider
-            BigPlayer(),
+            Expanded(
+              child: Center(
+                child: BigPlayer(),
+              ),
+            ),
           ],
         ),
       ),

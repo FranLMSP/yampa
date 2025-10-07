@@ -65,7 +65,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   @override
   Widget build(BuildContext context) {
     return Slider(
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       value: _currentSliderValue,
       onChanged: _setPlayerCurrentPosition,
       onChangeStart: (value) {
