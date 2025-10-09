@@ -1,15 +1,12 @@
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/core/repositories/stored_paths/factory.dart';
 import 'package:music_player/core/track_players/factory.dart';
-import 'package:music_player/core/track_players/just_audio.dart';
 import 'package:music_player/models/path.dart';
 import 'package:music_player/providers/local_paths_provider.dart';
-import 'package:music_player/providers/player_controller_provider.dart';
 import 'package:music_player/providers/tracks_provider.dart';
-import 'package:music_player/widgets/track_list/track_list.dart';
+import 'package:music_player/widgets/main_browser/local_path_picker/path_item.dart';
 
 class LocalPathPicker extends ConsumerStatefulWidget {
   const LocalPathPicker({super.key});
@@ -19,8 +16,29 @@ class LocalPathPicker extends ConsumerStatefulWidget {
 }
 
 class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
+  bool _isActive = true;
   bool _isLoading = false;
   bool _showActions = false;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _isActive = false;
+  }
+
+  void _setIsLoading(bool value) {
+    if (!_isActive) return;
+    setState(() {
+      _isLoading = value;
+    });
+  }
+
+  void _showActionsToggle() {
+    if (!_isActive) return;
+    setState(() {
+      _showActions = !_showActions;
+    });
+  }
 
   Widget _buildActionWidgets(IconData icon, VoidCallback onPressed) {
     return Container(
@@ -34,12 +52,6 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     );
   }
 
-  void _showActionsToggle() {
-    setState(() {
-      _showActions = !_showActions;
-    });
-  }
-
   void _pickDirectory() async {
     String? result = await FilePicker.platform.getDirectoryPath();
     if (result != null) {
@@ -49,9 +61,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
         filename: null,
       );
       final storedPathsRepository = getStoredPathsRepository();
-      setState(() {
-        _isLoading = true;
-      });
+      _setIsLoading(true);
       await storedPathsRepository.addPath(genericPath);
       final storedPaths = await storedPathsRepository.getStoredPaths();
 
@@ -59,9 +69,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       ref.read(localPathsProvider.notifier).setPaths(storedPaths);
       final tracksPlayer = getTrackPlayer();
       ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
-      setState(() {
-        _isLoading = false;
-      });
+      _setIsLoading(false);
     }
   }
 
@@ -76,9 +84,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
         );
       }).toList();
       final storedPathsRepository = getStoredPathsRepository();
-      setState(() {
-        _isLoading = true;
-      });
+      _setIsLoading(true);
       // TODO: implement a batch insert in the repository
       for (final path in genericPaths) {
         await storedPathsRepository.addPath(path);
@@ -88,9 +94,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       ref.read(localPathsProvider.notifier).setPaths(storedPaths);
       final tracksPlayer = getTrackPlayer();
       ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
-      setState(() {
-        _isLoading = false;
-      });
+      _setIsLoading(false);
     }
   }
 
@@ -100,8 +104,6 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
         _buildActionWidgets(Icons.file_present, _pickIndividualFiles),
         SizedBox(height: 10),
         _buildActionWidgets(Icons.folder, _pickDirectory),
-        SizedBox(height: 10),
-        _buildActionWidgets(Icons.edit, () {}),
         SizedBox(height: 10),
       ],
       FloatingActionButton(
@@ -116,24 +118,27 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     if (initialLoadDone) {
       return;
     }
-    setState(() {
-      _isLoading = true;
-    });
+    _setIsLoading(true);
     final storedPathsRepository = getStoredPathsRepository();
     final storedPaths = await storedPathsRepository.getStoredPaths();
     ref.read(localPathsProvider.notifier).setPaths(storedPaths);
     final tracksPlayer = getTrackPlayer();
     ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
-    setState(() {
-      _isLoading = false;
-    });
+    _setIsLoading(false);
+  }
+
+  Widget _buildPathsList(List<GenericPath> paths) {
+    return Expanded(
+      child: ListView(
+        children: paths.map((path) => PathItem(path: path)).toList()
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     _loadInitialPaths();
-    final playerController = ref.watch(playerControllerProvider);
-    final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
+    final localPaths = ref.watch(localPathsProvider);
     return Scaffold(
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
@@ -143,12 +148,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       body: Column(
         children: [
           // TODO: maybe add a loader or spinner here?
-          _isLoading ? Text("Loading...") : TrackList(onTap: () {
-            final isInstance = playerController.trackPlayer is JustAudioProvider;
-            if (!isInstance) {
-              playerControllerNotifier.setTrackPlayer(JustAudioProvider());
-            }
-          }),
+          _isLoading ? Text("Loading...") : _buildPathsList(localPaths.paths),
         ],
       ),
     );
