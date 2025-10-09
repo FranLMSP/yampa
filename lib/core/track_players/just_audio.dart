@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
@@ -23,11 +24,12 @@ class JustAudioProvider implements TrackPlayer {
 
   @override
   Future<List<Track>> fetchTracks(List<GenericPath> paths) async {
-    final List<Track> result = [];
+    final Map<String, Track> result = HashMap();
     for (final path in paths) {
       if (path.filename != null) {
         try {
-          result.add(await _getTrackMetadataFromGenericPath(path));
+          final track = await _getTrackMetadataFromGenericPath(path);
+          result[track.path] = track;
         } catch (e) {
           // handle error
         }
@@ -52,14 +54,15 @@ class JustAudioProvider implements TrackPlayer {
               folder: path.folder,
               filename: file.path,
             );
-            result.add(await _getTrackMetadataFromGenericPath(effectivePath));
+            final track = await _getTrackMetadataFromGenericPath(effectivePath);
+            result[track.path] = track;
           } catch (e) {
             // handle error
           }
         }
       }
     }
-    return result;
+    return result.values.toList();
   }
 
   Future<Track> _getTrackMetadataFromGenericPath(GenericPath path) async {
