@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
@@ -23,11 +24,12 @@ class JustAudioProvider implements TrackPlayer {
 
   @override
   Future<List<Track>> fetchTracks(List<GenericPath> paths) async {
-    final List<Track> result = [];
+    final Map<String, Track> result = HashMap();
     for (final path in paths) {
       if (path.filename != null) {
         try {
-          result.add(await _getTrackMetadataFromGenericPath(path));
+          final track = await _getTrackMetadataFromGenericPath(path);
+          result[track.path] = track;
         } catch (e) {
           // handle error
         }
@@ -52,14 +54,15 @@ class JustAudioProvider implements TrackPlayer {
               folder: path.folder,
               filename: file.path,
             );
-            result.add(await _getTrackMetadataFromGenericPath(effectivePath));
+            final track = await _getTrackMetadataFromGenericPath(effectivePath);
+            result[track.path] = track;
           } catch (e) {
             // handle error
           }
         }
       }
     }
-    return result;
+    return result.values.toList();
   }
 
   Future<Track> _getTrackMetadataFromGenericPath(GenericPath path) async {
@@ -68,10 +71,10 @@ class JustAudioProvider implements TrackPlayer {
     final duration = await tempPlayer.setFilePath(path.filename!);
     return Track(
       id: path.id,
-      name: metadata.title ?? "Unknown Title",
-      artist: metadata.artist ?? "Unknown Artist",
-      album: metadata.album ?? "Unknown Album",
-      genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "Unknown Genre",
+      name: metadata.title ?? "",
+      artist: metadata.artist ?? "",
+      album: metadata.album ?? "",
+      genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
       trackNumber: metadata.trackNumber ?? 0,
       path: path.filename!,
       duration: duration ?? Duration.zero,
@@ -81,7 +84,9 @@ class JustAudioProvider implements TrackPlayer {
 
   @override
   Future<void> setTrack(Track track) async {
-    await _player.setUrl(track.path);
+    // TODO: maybe detect here if the path is an URL or not
+    // and call setUrl if that's the case
+    await _player.setFilePath(track.path);
   }
 
   @override

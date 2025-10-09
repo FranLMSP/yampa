@@ -46,10 +46,30 @@ class StoredPathsSqlite extends StoredPaths {
     )).toList();
   }
 
+  Future <bool> _doesPathAlreadyExist(GenericPath path, Database db) async {
+    if (path.filename != null) {
+      final foundPathsByFilename = await db.rawQuery(
+        'SELECT * FROM $storedPathsTableName WHERE filename = ?',
+        [path.filename]
+      );
+      return foundPathsByFilename.isNotEmpty;
+    } else if (path.folder != null ) {
+      final foundPathsByFolder = await db.rawQuery(
+        'SELECT * FROM $storedPathsTableName WHERE folder = ?',
+        [path.folder]
+      );
+      return foundPathsByFolder.isNotEmpty;
+    }
+    return false;
+  }
+
   @override
   Future<void> addPath(GenericPath path) async {
     var db = await _openDatabase();
-    // TODO: check if path or folder already exists
+    if (await _doesPathAlreadyExist(path, db)) {
+      return;
+    }
+
     await db.insert(
       'added_paths',
       {
