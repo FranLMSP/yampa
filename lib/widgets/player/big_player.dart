@@ -32,8 +32,9 @@ class BigPlayer extends ConsumerWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 30),
-        const PlayerButtons(),
         const PlayerSlider(),
+        const PlayerButtons(),
+        const SizedBox(height: 10),
         const PlayerTotalMinutes(),
       ],
     );

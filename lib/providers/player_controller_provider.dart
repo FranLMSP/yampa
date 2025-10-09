@@ -37,6 +37,11 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = state.clone();
   }
 
+  Future<void> seek(Duration duration) async {
+    await state.seek(duration);
+    state = state.clone();
+  }
+
   void setTrackPlayer(TrackPlayer trackPlayer) {
     state.setTrackPlayer(trackPlayer);
     state = state.clone();

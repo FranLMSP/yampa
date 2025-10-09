@@ -57,7 +57,7 @@ class PlayerController {
   }
 
   Future<void> seek(Duration position) async {
-    if (trackPlayer != null) {
+    if (trackPlayer != null && currentTrack != null) {
       await trackPlayer!.seek(position);
     }
   }
