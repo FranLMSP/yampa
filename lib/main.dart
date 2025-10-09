@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/widgets/main_browser/main.dart';
 import 'package:music_player/widgets/main_page_loader.dart';
 import 'package:music_player/widgets/player/big_player.dart';
-import 'package:music_player/widgets/track_pickers/local_path_picker.dart';
 
 void main() {
   runApp(ProviderScope(child: const MyApp()));
@@ -57,9 +57,13 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             // temp file picker here
             SizedBox(
-              width: 300,
-              child: LocalPathPicker(),
+              width: 500,
+              child: MainBrowser(),
             ),
+            // SizedBox(
+            //   width: 300,
+            //   child: LocalPathPicker(),
+            // ),
             // main player here?
             // TODO: pass current track from provider
             Expanded(
