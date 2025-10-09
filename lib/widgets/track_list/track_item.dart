@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/core/utils/filename_utils.dart';
 import 'package:music_player/models/track.dart';
 import 'package:music_player/providers/player_controller_provider.dart';
 
@@ -24,7 +25,7 @@ class TrackItem extends ConsumerWidget {
       // TODO: highlight the currently playing track
       child: Card(
         child: ListTile(
-          title: Text(track.name),
+          title: Text(track.name.isNotEmpty ? track.name : extractFilenameFromFullPath(track.path)),
           subtitle: Text(track.artist),
           trailing: Text('${track.duration.inMinutes}:${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}'),
         ),

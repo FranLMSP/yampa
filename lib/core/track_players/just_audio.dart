@@ -68,10 +68,10 @@ class JustAudioProvider implements TrackPlayer {
     final duration = await tempPlayer.setFilePath(path.filename!);
     return Track(
       id: path.id,
-      name: metadata.title ?? "Unknown Title",
-      artist: metadata.artist ?? "Unknown Artist",
-      album: metadata.album ?? "Unknown Album",
-      genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "Unknown Genre",
+      name: metadata.title ?? "",
+      artist: metadata.artist ?? "",
+      album: metadata.album ?? "",
+      genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
       trackNumber: metadata.trackNumber ?? 0,
       path: path.filename!,
       duration: duration ?? Duration.zero,
@@ -81,7 +81,9 @@ class JustAudioProvider implements TrackPlayer {
 
   @override
   Future<void> setTrack(Track track) async {
-    await _player.setUrl(track.path);
+    // TODO: maybe detect here if the path is an URL or not
+    // and call setUrl if that's the case
+    await _player.setFilePath(track.path);
   }
 
   @override

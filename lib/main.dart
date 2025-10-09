@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _isLoading = true;
     });
     // Simulate loading delay
-    await Future.delayed(const Duration(seconds: 2));
+    // await Future.delayed(const Duration(seconds: 2));
     setState(() {
       _isLoading = false;
       _hasFinishedLoading = true;
