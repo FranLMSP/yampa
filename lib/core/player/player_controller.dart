@@ -56,15 +56,14 @@ class PlayerController {
   void suffleTrackQueue() {
   }
 
-  void seek(Duration position) async {
-    if (trackPlayer != null) {
+  Future<void> seek(Duration position) async {
+    if (trackPlayer != null && currentTrack != null) {
       await trackPlayer!.seek(position);
     }
   }
 
   void setTrackPlayer(TrackPlayer trackPlayer) {
-    state = PlayerState.stopped;
-    currentPosition = Duration.zero;
+    stop();
     this.trackPlayer = trackPlayer;
   }
 
@@ -82,5 +81,12 @@ class PlayerController {
       nextTrackMode: nextTrackMode,
       trackPlayer: trackPlayer,
     );
+  }
+
+  Future<Duration> getCurrentPosition() async {
+    if (trackPlayer != null) {
+      return await trackPlayer!.getCurrentPosition();
+    }
+    return Duration.zero;
   }
 }

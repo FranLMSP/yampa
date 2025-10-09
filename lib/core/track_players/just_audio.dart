@@ -22,12 +22,12 @@ class JustAudioProvider implements TrackPlayer {
   }
 
   @override
-  List<Track> fetchTracks(List<GenericPath> paths) {
+  Future<List<Track>> fetchTracks(List<GenericPath> paths) async {
     final List<Track> result = [];
     for (final path in paths) {
       if (path.filename != null) {
         try {
-          result.add(_getTrackMetadataFromGenericPath(path));
+          result.add(await _getTrackMetadataFromGenericPath(path));
         } catch (e) {
           // handle error
         }
@@ -52,7 +52,7 @@ class JustAudioProvider implements TrackPlayer {
               folder: path.folder,
               filename: file.path,
             );
-            result.add(_getTrackMetadataFromGenericPath(effectivePath));
+            result.add(await _getTrackMetadataFromGenericPath(effectivePath));
           } catch (e) {
             // handle error
           }
@@ -62,8 +62,10 @@ class JustAudioProvider implements TrackPlayer {
     return result;
   }
 
-  Track _getTrackMetadataFromGenericPath(GenericPath path) {
+  Future<Track> _getTrackMetadataFromGenericPath(GenericPath path) async {
     final metadata = readMetadata(File(path.filename!), getImage: true);
+    final tempPlayer = AudioPlayer();
+    final duration = await tempPlayer.setFilePath(path.filename!);
     return Track(
       id: path.id,
       name: metadata.title ?? "Unknown Title",
@@ -72,7 +74,7 @@ class JustAudioProvider implements TrackPlayer {
       genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "Unknown Genre",
       trackNumber: metadata.trackNumber ?? 0,
       path: path.filename!,
-      duration: metadata.duration ?? Duration.zero,
+      duration: duration ?? Duration.zero,
       imageBytes: metadata.pictures.isNotEmpty ? metadata.pictures.first.bytes : null,
     );
   }
@@ -110,5 +112,10 @@ class JustAudioProvider implements TrackPlayer {
   @override
   Future<void> setVolume(double volume) async {
     await _player.setVolume(volume);
+  }
+
+  @override
+  Future<Duration> getCurrentPosition() async {
+    return _player.position;
   }
 }
