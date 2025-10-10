@@ -59,15 +59,21 @@ class _PlaylistListState extends ConsumerState<PlaylistList> {
             playlist: _curentlyEditedPlaylist!,
             isNew: _isNew,
             onSaveNew: (Playlist newPlaylist) {
-              _isNew = false;
-              _curentlyEditedPlaylist = newPlaylist;
+              setState(() {
+                _isNew = false;
+                _curentlyEditedPlaylist = newPlaylist;
+              });
             },
             onEdit: (Playlist editedPlaylist) {
-              _curentlyEditedPlaylist = editedPlaylist;
+              setState(() {
+                _curentlyEditedPlaylist = editedPlaylist;
+              });
             },
             onGoBack: () {
-              _isBeingEdited = false;
-              _curentlyEditedPlaylist = null;
+              setState(() {
+                _isBeingEdited = false;
+                _curentlyEditedPlaylist = null;
+              });
             },
           )
         : _buildList(playlists),

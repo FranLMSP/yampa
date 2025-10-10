@@ -81,6 +81,14 @@ class _PlaylistEditFormState extends ConsumerState<PlaylistEditForm> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => widget.onGoBack(),
+              icon: const Icon(Icons.arrow_back),
+              label: const Text('Back'),
+            ),
+          ),
           GestureDetector(
             onTap: _changeImage,
             child: CircleAvatar(
@@ -97,13 +105,15 @@ class _PlaylistEditFormState extends ConsumerState<PlaylistEditForm> {
             controller: _titleController,
             decoration: const InputDecoration(labelText: 'Title'),
             onEditingComplete: () {
-              widget.onEdit(Playlist(
+              final editedPlaylist = Playlist(
                 id: widget.playlist.id,
                 name: _titleController.text,
                 description: widget.playlist.id,
                 tracks: widget.playlist.tracks,
                 imagePath: widget.playlist.imagePath,
-              ));
+              );
+              widget.onEdit(editedPlaylist);
+              if (!widget.isNew) playlistProviderNotifier.updatePlaylist(editedPlaylist);
             },
           ),
           const SizedBox(height: 8),
@@ -111,13 +121,15 @@ class _PlaylistEditFormState extends ConsumerState<PlaylistEditForm> {
             controller: _descriptionController,
             decoration: const InputDecoration(labelText: 'Description'),
             onChanged: (text) {
-              widget.onEdit(Playlist(
+              final editedPlaylist = Playlist(
                 id: widget.playlist.id,
                 name: widget.playlist.name,
                 description: _descriptionController.text,
                 tracks: widget.playlist.tracks,
                 imagePath: widget.playlist.imagePath,
-              ));
+              );
+              widget.onEdit(editedPlaylist);
+              if (!widget.isNew) playlistProviderNotifier.updatePlaylist(editedPlaylist);
             },
           ),
           const SizedBox(height: 24),
