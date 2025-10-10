@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:music_player/models/track.dart';
 
 class Playlist {
@@ -16,4 +14,14 @@ class Playlist {
     required this.tracks,
     this.imagePath,
   });
+
+  Playlist clone() {
+    return Playlist(
+      id: id,
+      name: name,
+      description: description,
+      tracks: tracks,
+      imagePath: imagePath
+    );
+  }
 }

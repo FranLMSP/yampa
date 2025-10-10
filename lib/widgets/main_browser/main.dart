@@ -6,7 +6,7 @@ import 'package:music_player/providers/local_paths_provider.dart';
 import 'package:music_player/providers/tracks_provider.dart';
 import 'package:music_player/widgets/main_browser/all_tracks/main.dart';
 import 'package:music_player/widgets/main_browser/local_path_picker/main.dart';
-import 'package:music_player/widgets/main_browser/playlists/playlist_list.dart';
+import 'package:music_player/widgets/main_browser/playlists/main.dart';
 
 class MainBrowser extends ConsumerWidget {
 
@@ -43,7 +43,7 @@ class MainBrowser extends ConsumerWidget {
         body: TabBarView(
           children: [
             AllTracksPicker(),
-            PlaylistList(),
+            Playlists(),
             LocalPathPicker(),
             Icon(Icons.settings),
           ],
