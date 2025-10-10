@@ -26,6 +26,8 @@ class StoredPathsSqlite extends StoredPaths {
   }
 
   Future<Database> _openDatabase() async {
+    // TODO: for Linux, use ~/.local/share/yampa
+    // For Windows we could use %AppData%
     final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
     final String dbPath = p.join(appDocumentsDir.path, "databases", storedPathsFilename);
     var databaseFactory = databaseFactoryFfi;
