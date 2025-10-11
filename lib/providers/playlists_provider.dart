@@ -19,6 +19,7 @@ class PlaylistNotifier extends Notifier<List<Playlist>> {
     for (final (index, e) in state.indexed) {
       if (e.id == playlist.id) {
         state[index] = playlist;
+        break;
       }
     }
     state = state.toList();
