@@ -17,12 +17,13 @@ class MainBrowser extends ConsumerWidget {
   });
 
   Future<void> _loadInitialPaths(WidgetRef ref) async {
-    final initialLoadDone = ref.read(localPathsProvider.notifier).initialLoadDone();
+    final initialLoadDone = ref.read(localPathsProvider).initialLoadDone;
     if (initialLoadDone) {
       return;
     }
     final storedPathsRepository = getStoredPathsRepository();
     final storedPaths = await storedPathsRepository.getStoredPaths();
+    await Future.delayed(const Duration(seconds: 5));
     ref.read(localPathsProvider.notifier).setPaths(storedPaths);
     final tracksPlayer = getTrackPlayer();
     final tracks = await tracksPlayer.fetchTracks(storedPaths);

@@ -7,6 +7,7 @@ import 'package:music_player/models/path.dart';
 import 'package:music_player/providers/local_paths_provider.dart';
 import 'package:music_player/providers/tracks_provider.dart';
 import 'package:music_player/widgets/main_browser/local_path_picker/path_item.dart';
+import 'package:music_player/widgets/misc/loader.dart';
 
 class LocalPathPicker extends ConsumerStatefulWidget {
   const LocalPathPicker({super.key});
@@ -17,20 +18,12 @@ class LocalPathPicker extends ConsumerStatefulWidget {
 
 class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
   bool _isActive = true;
-  bool _isLoading = false;
   bool _showActions = false;
 
   @override
   void dispose() {
     super.dispose();
     _isActive = false;
-  }
-
-  void _setIsLoading(bool value) {
-    if (!_isActive) return;
-    setState(() {
-      _isLoading = value;
-    });
   }
 
   void _showActionsToggle() {
@@ -61,7 +54,6 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
         filename: null,
       );
       final storedPathsRepository = getStoredPathsRepository();
-      _setIsLoading(true);
       await storedPathsRepository.addPath(genericPath);
       final storedPaths = await storedPathsRepository.getStoredPaths();
 
@@ -69,7 +61,6 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       ref.read(localPathsProvider.notifier).setPaths(storedPaths);
       final tracksPlayer = getTrackPlayer();
       ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
-      _setIsLoading(false);
     }
   }
 
@@ -84,7 +75,6 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
         );
       }).toList();
       final storedPathsRepository = getStoredPathsRepository();
-      _setIsLoading(true);
       // TODO: implement a batch insert in the repository
       for (final path in genericPaths) {
         await storedPathsRepository.addPath(path);
@@ -94,7 +84,6 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       ref.read(localPathsProvider.notifier).setPaths(storedPaths);
       final tracksPlayer = getTrackPlayer();
       ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
-      _setIsLoading(false);
     }
   }
 
@@ -114,20 +103,22 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
   }
 
   Future<void> _loadInitialPaths() async {
-    final initialLoadDone = ref.read(localPathsProvider.notifier).initialLoadDone();
+    final initialLoadDone = ref.read(localPathsProvider).initialLoadDone;
     if (initialLoadDone) {
       return;
     }
-    _setIsLoading(true);
     final storedPathsRepository = getStoredPathsRepository();
     final storedPaths = await storedPathsRepository.getStoredPaths();
+    await Future.delayed(const Duration(seconds: 5));
     ref.read(localPathsProvider.notifier).setPaths(storedPaths);
     final tracksPlayer = getTrackPlayer();
     ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
-    _setIsLoading(false);
   }
 
   Widget _buildPathsList(List<GenericPath> paths) {
+    if (paths.isEmpty) {
+      return Text("No paths being tracked. Hit the + button to add some!");
+    }
     return Expanded(
       child: ListView(
         children: paths.map((path) => PathItem(path: path)).toList()
@@ -139,18 +130,16 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
   Widget build(BuildContext context) {
     _loadInitialPaths();
     final localPaths = ref.watch(localPathsProvider);
+    if (!localPaths.initialLoadDone) {
+      return CustomLoader();
+    }
     return Scaffold(
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
         children: _buildShowActionsWidgets(),
       ),
-      body: Column(
-        children: [
-          // TODO: maybe add a loader or spinner here?
-          _isLoading ? Text("Loading...") : _buildPathsList(localPaths.paths),
-        ],
-      ),
+      body: _buildPathsList(localPaths.paths),
     );
   }
 }
