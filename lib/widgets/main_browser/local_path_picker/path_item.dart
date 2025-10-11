@@ -17,8 +17,6 @@ class PathItem extends ConsumerStatefulWidget {
 
 class _PathItemState extends ConsumerState<PathItem> {
 
-  bool _isLoading = false;
-
   Widget _buildDeleteButton(BuildContext context, List<GenericPath> paths, LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) {
     return IconButton(
       onPressed: () async {

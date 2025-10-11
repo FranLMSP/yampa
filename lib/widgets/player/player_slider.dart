@@ -31,7 +31,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
       return;
     }
     final player = ref.read(playerControllerProvider);
-    if (player.currentTrack == null || player.currentTrack!.duration == Duration.zero || player.state != PlayerState.playing) {
+    if (player.currentTrack == null || player.currentTrack!.duration == Duration.zero || player.state == PlayerState.stopped) {
       _currentSliderValue = 0;
       return;
     }
