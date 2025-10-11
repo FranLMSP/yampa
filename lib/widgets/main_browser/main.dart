@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/repositories/playlists/factory.dart';
-import 'package:music_player/core/repositories/stored_paths/factory.dart';
-import 'package:music_player/core/track_players/factory.dart';
+import 'package:music_player/providers/initial_load_provider.dart';
 import 'package:music_player/providers/local_paths_provider.dart';
 import 'package:music_player/providers/playlists_provider.dart';
 import 'package:music_player/providers/tracks_provider.dart';
+import 'package:music_player/providers/utils.dart';
 import 'package:music_player/widgets/main_browser/all_tracks/main.dart';
 import 'package:music_player/widgets/main_browser/local_path_picker/main.dart';
 import 'package:music_player/widgets/main_browser/playlists/main.dart';
@@ -16,25 +15,20 @@ class MainBrowser extends ConsumerWidget {
     super.key,
   });
 
-  Future<void> _loadInitialPaths(WidgetRef ref) async {
-    final initialLoadDone = ref.read(localPathsProvider).initialLoadDone;
-    if (initialLoadDone) {
-      return;
-    }
-    final storedPathsRepository = getStoredPathsRepository();
-    final storedPaths = await storedPathsRepository.getStoredPaths();
-    ref.read(localPathsProvider.notifier).setPaths(storedPaths);
-    final tracksPlayer = getTrackPlayer();
-    final tracks = await tracksPlayer.fetchTracks(storedPaths);
-    ref.read(tracksProvider.notifier).setTracks(tracks);
-    final playlistsRepo = getPlaylistRepository();
-    final playlists = await playlistsRepo.getPlaylists(tracks);
-    ref.read(playlistsProvider.notifier).setPlaylists(playlists);
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    _loadInitialPaths(ref);
+    final initialLoadDone = ref.watch(initialLoadProvider);
+    final initialLoadNotifier = ref.read(initialLoadProvider.notifier);
+    final localPathsNotifier = ref.read(localPathsProvider.notifier);
+    final tracksNotifier = ref.read(tracksProvider.notifier);
+    final playlistsNotifier = ref.read(playlistsProvider.notifier);
+    doInitialLoad(
+      initialLoadDone,
+      initialLoadNotifier,
+      localPathsNotifier,
+      tracksNotifier,
+      playlistsNotifier,
+    );
     return DefaultTabController(
       length: 4,
       child: Scaffold(

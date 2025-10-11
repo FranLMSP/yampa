@@ -32,6 +32,7 @@ class _PlaylistListState extends ConsumerState<PlaylistList> {
       itemBuilder: (context, index) {
         final playlist = playlists[index];
         return PlaylistItemBig(
+          key: Key(playlist.id),
           playlist: playlist,
           onTap: () {
             setState(() {

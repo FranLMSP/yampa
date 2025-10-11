@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/core/repositories/stored_paths/factory.dart';
 import 'package:music_player/core/track_players/factory.dart';
 import 'package:music_player/models/path.dart';
+import 'package:music_player/providers/initial_load_provider.dart';
 import 'package:music_player/providers/local_paths_provider.dart';
 import 'package:music_player/providers/tracks_provider.dart';
 import 'package:music_player/widgets/main_browser/local_path_picker/path_item.dart';
@@ -102,34 +103,21 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     ];
   }
 
-  Future<void> _loadInitialPaths() async {
-    final initialLoadDone = ref.read(localPathsProvider).initialLoadDone;
-    if (initialLoadDone) {
-      return;
-    }
-    final storedPathsRepository = getStoredPathsRepository();
-    final storedPaths = await storedPathsRepository.getStoredPaths();
-    ref.read(localPathsProvider.notifier).setPaths(storedPaths);
-    final tracksPlayer = getTrackPlayer();
-    ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
-  }
-
   Widget _buildPathsList(List<GenericPath> paths) {
     if (paths.isEmpty) {
       return Center(child:Text("No paths being tracked. Hit the + button to add some!"));
     }
-    return Expanded(
-      child: ListView(
-        children: paths.map((path) => PathItem(path: path)).toList()
-      ),
+    return ListView(
+      children: paths.map((path) => PathItem(path: path)).toList()
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    _loadInitialPaths();
+    final initialLoadDone = ref.watch(initialLoadProvider);
     final localPaths = ref.watch(localPathsProvider);
-    if (!localPaths.initialLoadDone) {
+
+    if (!initialLoadDone) {
       return CustomLoader();
     }
     return Scaffold(
@@ -138,7 +126,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: _buildShowActionsWidgets(),
       ),
-      body: _buildPathsList(localPaths.paths),
+      body: _buildPathsList(localPaths),
     );
   }
 }

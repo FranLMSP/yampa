@@ -1,30 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/models/path.dart';
 
-class GenericPaths {
-  GenericPaths({
-    this.initialLoadDone = false,
-    this.paths = const [],
-  });
-
-  bool initialLoadDone = false;
-  List<GenericPath> paths = [];
-}
-
-
-final localPathsProvider = NotifierProvider<LocalPathsNotifier, GenericPaths>(
+final localPathsProvider = NotifierProvider<LocalPathsNotifier, List<GenericPath>>(
   () => LocalPathsNotifier(),
 );
 
-class LocalPathsNotifier extends Notifier<GenericPaths> {
+class LocalPathsNotifier extends Notifier<List<GenericPath>> {
   @override
-  GenericPaths build() => GenericPaths();
+  List<GenericPath> build() => [];
 
   void setPaths(List<GenericPath> paths) {
-    state = GenericPaths(initialLoadDone: true, paths: paths);
-  }
-
-  bool initialLoadDone() {
-    return state.initialLoadDone;
+    state = paths;
   }
 }

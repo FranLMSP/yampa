@@ -55,6 +55,7 @@ class _PathItemState extends ConsumerState<PathItem> {
 
   Widget _buildCard(BuildContext context, IconData icon, String name, List<GenericPath> paths, LocalPathsNotifier localPathsNotifier) {
     return ListTile(
+      key: Key(widget.path.id),
       leading: Icon(icon),
       title: Text(extractFilenameFromFullPath(name)),
       subtitle: Text(getParentFolder(name)),
@@ -74,8 +75,8 @@ class _PathItemState extends ConsumerState<PathItem> {
     final paths = ref.read(localPathsProvider);
     final localPathsNotifier = ref.read(localPathsProvider.notifier);
     return widget.path.filename != null 
-      ? _buildFileCard(context, paths.paths, localPathsNotifier)
-      : _buildFolderCard(context, paths.paths, localPathsNotifier);
+      ? _buildFileCard(context, paths, localPathsNotifier)
+      : _buildFolderCard(context, paths, localPathsNotifier);
   }
 }
 
