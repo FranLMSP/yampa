@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/core/player/player_controller.dart';
 import 'package:music_player/core/track_players/just_audio.dart';
-import 'package:music_player/core/utils/filename_utils.dart';
 import 'package:music_player/models/track.dart';
 import 'package:music_player/providers/player_controller_provider.dart';
 
@@ -42,6 +41,10 @@ class TrackItem extends ConsumerWidget {
     );
   }
 
+  Widget _buildDuration(Duration duration) {
+    return Text('${track.duration.inMinutes}:${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}');
+  }
+
   bool _isTrackCurrentlyPlaying(PlayerController playerController) {
     return (
       playerController.currentTrack != null
@@ -70,12 +73,26 @@ class TrackItem extends ConsumerWidget {
         playerProviderNotifier.setCurrentTrack(track);
         await playerProviderNotifier.play();
       },
+      onLongPress: () => {
+        // TODO: implement functionality to select multiple tracks
+      },
       child: Card(
         child: ListTile(
           leading: _buildTrackIcon(playerController),
-          title: Text(track.name.isNotEmpty ? track.name : extractFilenameFromFullPath(track.path)),
-          subtitle: Text(track.artist),
-          trailing: Text('${track.duration.inMinutes}:${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}'),
+          title: Text(track.displayName()),
+          subtitle: Row(
+            children: [
+              Text(track.artist),
+              Spacer(),
+              _buildDuration(track.duration),
+            ],
+          ),
+          trailing: IconButton(
+            icon: Icon(Icons.more_horiz),
+            onPressed: () {
+              // TODO: popup menu button
+            },
+          ),
         ),
       ),
     );

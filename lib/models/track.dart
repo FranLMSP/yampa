@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:music_player/core/utils/filename_utils.dart';
+
 class Track {
   final String id;
   final String name;
@@ -22,4 +24,6 @@ class Track {
     required this.duration,
     this.imageBytes,
   });
+
+  String displayName() => name.isNotEmpty ? name : extractFilenameFromFullPath(path);
 }

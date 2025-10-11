@@ -14,4 +14,3 @@ class TracksNotifier extends Notifier<List<Track>> {
     state = tracks;
   }
 }
-

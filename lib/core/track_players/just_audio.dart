@@ -70,7 +70,8 @@ class JustAudioProvider implements TrackPlayer {
     final tempPlayer = AudioPlayer();
     final duration = await tempPlayer.setFilePath(path.filename!);
     return Track(
-      id: path.id,
+      // id: path.id,
+      id: path.filename!, // TODO: find a better way to give these an actual ID
       name: metadata.title ?? "",
       artist: metadata.artist ?? "",
       album: metadata.album ?? "",
