@@ -18,6 +18,26 @@ class _PlaylistListState extends ConsumerState<PlaylistList> {
   Playlist? _curentlyEditedPlaylist;
 
   Widget _buildList(List<Playlist> playlists) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 1,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: playlists.length,
+      itemBuilder: (context, index) {
+        final playlist = playlists[index];
+        return PlaylistItemBig(
+          playlist: playlist,
+          onTap: () {
+            // Open playlist details
+          },
+        );
+      },
+    );
+    /*
     return ListView(
       children: playlists.map((playlist) => PlaylistItemBig(
         playlist: playlist,
@@ -27,6 +47,7 @@ class _PlaylistListState extends ConsumerState<PlaylistList> {
         }),
       )).toList()
     );
+    */
   }
 
   @override
