@@ -25,14 +25,10 @@ class JustAudioProvider implements TrackPlayer {
   @override
   Future<List<Track>> fetchTracks(List<GenericPath> paths) async {
     final Map<String, Track> result = HashMap();
+    final List<Future<Track?>> futures = [];
     for (final path in paths) {
       if (path.filename != null) {
-        try {
-          final track = await _getTrackMetadataFromGenericPath(path);
-          result[track.path] = track;
-        } catch (e) {
-          // handle error
-        }
+        futures.add(_getTrackMetadataFromGenericPath(path));
       } else if (path.folder != null) {
         final files = Directory(path.folder!)
           .listSync(recursive: true)
@@ -48,45 +44,51 @@ class JustAudioProvider implements TrackPlayer {
               file.path.endsWith(".flac"))
           .toList();
         for (final file in files) {
-          try {
-            final effectivePath = GenericPath(
-              id: path.id,
-              folder: path.folder,
-              filename: file.path,
-            );
-            final track = await _getTrackMetadataFromGenericPath(effectivePath);
-            result[track.path] = track;
-          } catch (e) {
-            // handle error
-          }
+          final effectivePath = GenericPath(
+            id: path.id,
+            folder: path.folder,
+            filename: file.path,
+          );
+          futures.add(_getTrackMetadataFromGenericPath(effectivePath));
         }
       }
+    }
+    final tracks = await Future.wait(futures);
+    for (final track in tracks) {
+      if (track == null) {
+        continue;
+      }
+      result[track.path] = track;
     }
     return result.values.toList();
   }
 
-  Future<Track> _getTrackMetadataFromGenericPath(GenericPath path) async {
-    final metadata = readMetadata(File(path.filename!), getImage: true);
-    final tempPlayer = AudioPlayer();
-    final duration = await tempPlayer.setFilePath(path.filename!);
-    return Track(
-      // id: path.id,
-      id: path.filename!, // TODO: find a better way to give these an actual ID
-      name: metadata.title ?? "",
-      artist: metadata.artist ?? "",
-      album: metadata.album ?? "",
-      genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
-      trackNumber: metadata.trackNumber ?? 0,
-      path: path.filename!,
-      duration: duration ?? Duration.zero,
-      imageBytes: metadata.pictures.isNotEmpty ? metadata.pictures.first.bytes : null,
-    );
+  Future<Track?> _getTrackMetadataFromGenericPath(GenericPath path) async {
+    try {
+      final metadata = readMetadata(File(path.filename!), getImage: false);
+      final tempPlayer = AudioPlayer();
+      final duration = await tempPlayer.setFilePath(path.filename!);
+      return Track(
+        // id: path.id,
+        id: path.filename!, // TODO: find a better way to give these an actual ID
+        name: metadata.title ?? "",
+        artist: metadata.artist ?? "",
+        album: metadata.album ?? "",
+        genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
+        trackNumber: metadata.trackNumber ?? 0,
+        path: path.filename!,
+        duration: duration ?? Duration.zero,
+        imageBytes: null,
+      );
+    } catch(e) {
+      print(e);
+    }
+    return null;
   }
 
   @override
   Future<void> setTrack(Track track) async {
-    // TODO: maybe detect here if the path is an URL or not
-    // and call setUrl if that's the case
+    // TODO: maybe detect here if the path is an URL or not, and call setUrl if that's the case
     await _player.setFilePath(track.path);
   }
 

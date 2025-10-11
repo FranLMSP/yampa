@@ -109,7 +109,6 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     }
     final storedPathsRepository = getStoredPathsRepository();
     final storedPaths = await storedPathsRepository.getStoredPaths();
-    await Future.delayed(const Duration(seconds: 5));
     ref.read(localPathsProvider.notifier).setPaths(storedPaths);
     final tracksPlayer = getTrackPlayer();
     ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
@@ -117,7 +116,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
 
   Widget _buildPathsList(List<GenericPath> paths) {
     if (paths.isEmpty) {
-      return Text("No paths being tracked. Hit the + button to add some!");
+      return Center(child:Text("No paths being tracked. Hit the + button to add some!"));
     }
     return Expanded(
       child: ListView(

@@ -23,7 +23,6 @@ class MainBrowser extends ConsumerWidget {
     }
     final storedPathsRepository = getStoredPathsRepository();
     final storedPaths = await storedPathsRepository.getStoredPaths();
-    await Future.delayed(const Duration(seconds: 5));
     ref.read(localPathsProvider.notifier).setPaths(storedPaths);
     final tracksPlayer = getTrackPlayer();
     final tracks = await tracksPlayer.fetchTracks(storedPaths);

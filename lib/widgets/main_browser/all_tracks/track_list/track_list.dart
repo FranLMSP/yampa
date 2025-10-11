@@ -18,7 +18,7 @@ class TrackList extends ConsumerWidget {
       return CustomLoader();
     }
     if (initialLoadDone && tracks.isEmpty) {
-      return Text("No tracks found. Go to the Added Paths tab to add some!");
+      return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));
     }
     return ListView(
       children: tracks .map(
