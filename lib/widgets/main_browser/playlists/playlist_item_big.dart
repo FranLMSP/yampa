@@ -13,7 +13,7 @@ class PlaylistItemBig extends StatelessWidget {
       width: 50,
       height: 50,
       child: InkWell(
-        onTap: () {},
+        onTap: () => onTap!(),
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

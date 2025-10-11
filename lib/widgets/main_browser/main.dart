@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/core/repositories/playlists/factory.dart';
 import 'package:music_player/core/repositories/stored_paths/factory.dart';
 import 'package:music_player/core/track_players/factory.dart';
 import 'package:music_player/providers/local_paths_provider.dart';
+import 'package:music_player/providers/playlists_provider.dart';
 import 'package:music_player/providers/tracks_provider.dart';
 import 'package:music_player/widgets/main_browser/all_tracks/main.dart';
 import 'package:music_player/widgets/main_browser/local_path_picker/main.dart';
@@ -23,7 +25,11 @@ class MainBrowser extends ConsumerWidget {
     final storedPaths = await storedPathsRepository.getStoredPaths();
     ref.read(localPathsProvider.notifier).setPaths(storedPaths);
     final tracksPlayer = getTrackPlayer();
-    ref.read(tracksProvider.notifier).setTracks(await tracksPlayer.fetchTracks(storedPaths));
+    final tracks = await tracksPlayer.fetchTracks(storedPaths);
+    ref.read(tracksProvider.notifier).setTracks(tracks);
+    final playlistsRepo = getPlaylistRepository();
+    final playlists = await playlistsRepo.getPlaylists(tracks);
+    ref.read(playlistsProvider.notifier).setPlaylists(playlists);
   }
 
   @override

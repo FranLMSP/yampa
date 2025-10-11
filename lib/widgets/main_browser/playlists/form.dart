@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/models/playlist.dart';
 import 'package:music_player/models/track.dart';
 
-// TODO: this widget is an absolute mess but I don't care (for now)
 
 class PlaylistEditForm extends ConsumerStatefulWidget {
+  final bool isNew;
   final Playlist playlist;
   final Function(Playlist newPlaylist) onSaveNew;
   final Function(Playlist editedPlaylist) onEdit;
@@ -13,6 +13,7 @@ class PlaylistEditForm extends ConsumerStatefulWidget {
 
   const PlaylistEditForm({
     super.key,
+    required this.isNew,
     required this.playlist,
     required this.onSaveNew,
     required this.onEdit,
@@ -131,6 +132,23 @@ class _PlaylistEditFormState extends ConsumerState<PlaylistEditForm> {
               );
             }).toList(),
           ),
+          if (widget.isNew)
+            ...[
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => widget.onSaveNew(Playlist(
+                  id: "temp-id",
+                  name: _titleController.text,
+                  description: _descriptionController.text,
+                  tracks: widget.playlist.tracks,
+                  imagePath: null,
+                )),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(20),
+                ),
+                child: const Icon(Icons.save, size: 30),
+              )
+            ]
         ],
       ),
     );

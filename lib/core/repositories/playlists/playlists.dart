@@ -2,7 +2,7 @@ import 'package:music_player/models/playlist.dart';
 import 'package:music_player/models/track.dart';
 
 abstract class PlaylistsRepository {
-  Future<List<Playlist>> getPlaylists();
+  Future<List<Playlist>> getPlaylists(List<Track> tracks);
   Future<String> addPlaylist(Playlist playlist);
   Future<void> updatePlaylist(Playlist playlist);
   Future<void> addTrackToPlaylist(Playlist playlist, Track track);

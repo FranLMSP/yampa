@@ -9,7 +9,7 @@ final playlistsProvider = NotifierProvider<PlaylistNotifier, List<Playlist>>(
 
 class PlaylistNotifier extends Notifier<List<Playlist>> {
   @override
-  List<Playlist> build() => [Playlist(id: "temp-id", description: "", name: "temp name", tracks: [])];
+  List<Playlist> build() => [];
 
   void setPlaylists(List<Playlist> playlists) {
     state = playlists;

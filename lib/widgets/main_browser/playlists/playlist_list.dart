@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/core/repositories/playlists/factory.dart';
 import 'package:music_player/models/playlist.dart';
 import 'package:music_player/providers/playlists_provider.dart';
 import 'package:music_player/widgets/main_browser/playlists/form.dart';
@@ -15,6 +16,7 @@ class PlaylistList extends ConsumerStatefulWidget {
 class _PlaylistListState extends ConsumerState<PlaylistList> {
 
   bool _isBeingEdited = false;
+  bool _isNew = false;
   Playlist? _curentlyEditedPlaylist;
 
   Widget _buildList(List<Playlist> playlists) {
@@ -32,27 +34,21 @@ class _PlaylistListState extends ConsumerState<PlaylistList> {
         return PlaylistItemBig(
           playlist: playlist,
           onTap: () {
-            // Open playlist details
+            setState(() {
+              _curentlyEditedPlaylist = playlist;
+              _isBeingEdited = true;
+              _isNew = false;
+            });
           },
         );
       },
     );
-    /*
-    return ListView(
-      children: playlists.map((playlist) => PlaylistItemBig(
-        playlist: playlist,
-        onSelect: () => setState(() {
-          _isBeingEdited = true;
-          _curentlyEditedPlaylist = playlist;
-        }),
-      )).toList()
-    );
-    */
   }
 
   @override
   Widget build(BuildContext context) {
     final playlists = ref.watch(playlistsProvider);
+    final playlistsNotifier = ref.watch(playlistsProvider.notifier);
     return Scaffold(
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
@@ -69,22 +65,39 @@ class _PlaylistListState extends ConsumerState<PlaylistList> {
                   tracks: [],
                 );
                 _isBeingEdited = true;
+                _isNew = true;
               }),
             ),
         ]
       ),
       body: _isBeingEdited && _curentlyEditedPlaylist != null
         ? PlaylistEditForm(
+            isNew: _isNew,
             playlist: _curentlyEditedPlaylist!,
-            onSaveNew: (Playlist newPlaylist) {
+            onSaveNew: (Playlist newPlaylist) async {
+              final playlistRepo = getPlaylistRepository();
+              final id = await playlistRepo.addPlaylist(newPlaylist);
+              playlistsNotifier.addPlaylist(
+                Playlist(
+                  id: id,
+                  name: newPlaylist.name,
+                  description: newPlaylist.description,
+                  imagePath: newPlaylist.imagePath,
+                  tracks: newPlaylist.tracks,
+                )
+              );
               setState(() {
-                _curentlyEditedPlaylist = newPlaylist;
+                _isBeingEdited = false;
+                _isNew = false;
+                _curentlyEditedPlaylist = null;
               });
             },
             onEdit: (Playlist editedPlaylist) {
               setState(() {
                 _curentlyEditedPlaylist = editedPlaylist;
               });
+              final playlistRepo = getPlaylistRepository();
+              playlistRepo.updatePlaylist(editedPlaylist);
             },
             onGoBack: () {
               setState(() {
