@@ -15,7 +15,6 @@ class PlaylistList extends ConsumerStatefulWidget {
 class _PlaylistListState extends ConsumerState<PlaylistList> {
 
   bool _isBeingEdited = false;
-  bool _isNew = false;
   Playlist? _curentlyEditedPlaylist;
 
   Widget _buildList(List<Playlist> playlists) {
@@ -49,7 +48,6 @@ class _PlaylistListState extends ConsumerState<PlaylistList> {
                   tracks: [],
                 );
                 _isBeingEdited = true;
-                _isNew = true;
               }),
             ),
         ]
@@ -57,10 +55,8 @@ class _PlaylistListState extends ConsumerState<PlaylistList> {
       body: _isBeingEdited && _curentlyEditedPlaylist != null
         ? PlaylistEditForm(
             playlist: _curentlyEditedPlaylist!,
-            isNew: _isNew,
             onSaveNew: (Playlist newPlaylist) {
               setState(() {
-                _isNew = false;
                 _curentlyEditedPlaylist = newPlaylist;
               });
             },

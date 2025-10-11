@@ -2,15 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/models/playlist.dart';
 import 'package:music_player/models/track.dart';
-import 'package:music_player/providers/playlists_provider.dart';
-import 'package:music_player/providers/tracks_provider.dart';
-import 'package:ulid/ulid.dart';
 
 // TODO: this widget is an absolute mess but I don't care (for now)
 
 class PlaylistEditForm extends ConsumerStatefulWidget {
   final Playlist playlist;
-  final bool isNew;
   final Function(Playlist newPlaylist) onSaveNew;
   final Function(Playlist editedPlaylist) onEdit;
   final Function onGoBack;
@@ -18,7 +14,6 @@ class PlaylistEditForm extends ConsumerStatefulWidget {
   const PlaylistEditForm({
     super.key,
     required this.playlist,
-    required this.isNew,
     required this.onSaveNew,
     required this.onEdit,
     required this.onGoBack,
@@ -31,9 +26,6 @@ class PlaylistEditForm extends ConsumerStatefulWidget {
 class _PlaylistEditFormState extends ConsumerState<PlaylistEditForm> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
-
-  bool _addedTracksExpanded = true;
-  bool _otherTracksExpanded = false;
 
   @override
   void initState() {
@@ -65,17 +57,9 @@ class _PlaylistEditFormState extends ConsumerState<PlaylistEditForm> {
     }
   }
 
-  List<Track> _getOtherTracks(List<Track> allTracks) {
-    final currentTracksIds = widget.playlist.tracks.map((e) => e.id).toList();
-    return allTracks.where((e) => !currentTracksIds.contains(e.id)).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     final imagePath = widget.playlist.imagePath;
-    final playlistProviderNotifier = ref.watch(playlistsProvider.notifier);
-    final allTracks = ref.watch(tracksProvider);
-    final otherTracks = _getOtherTracks(allTracks);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -113,7 +97,6 @@ class _PlaylistEditFormState extends ConsumerState<PlaylistEditForm> {
                 imagePath: widget.playlist.imagePath,
               );
               widget.onEdit(editedPlaylist);
-              if (!widget.isNew) playlistProviderNotifier.updatePlaylist(editedPlaylist);
             },
           ),
           const SizedBox(height: 8),
@@ -129,100 +112,25 @@ class _PlaylistEditFormState extends ConsumerState<PlaylistEditForm> {
                 imagePath: widget.playlist.imagePath,
               );
               widget.onEdit(editedPlaylist);
-              if (!widget.isNew) playlistProviderNotifier.updatePlaylist(editedPlaylist);
             },
           ),
           const SizedBox(height: 24),
-          ExpansionPanelList(
-            expansionCallback: (_, isExpanded) {
-              setState(() {
-                _addedTracksExpanded = isExpanded;
-                if (isExpanded) _otherTracksExpanded = false;
-              });
-            },
-            children: [
-              ExpansionPanel(
-                headerBuilder: (_, __) => const ListTile(title: Text('Added Tracks')),
-                body: widget.playlist.tracks.isEmpty
-                    ? const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Text('No tracks added'),
-                      )
-                    : Column(
-                        children: widget.playlist.tracks.map((track) {
-                          return ListTile(
-                            leading: _buildTrackImage(track),
-                            title: Text(track.displayName()),
-                            subtitle: Text(track.artist),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () => setState(() {
-                                if (!widget.isNew) {
-                                  playlistProviderNotifier.removeTrack(widget.playlist, track);
-                                } else {
-                                  widget.playlist.tracks.removeWhere((e) => e.id == track.id);
-                                }
-                                widget.onEdit(widget.playlist);
-                              }),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                isExpanded: _addedTracksExpanded,
-              ),
-            ],
+          Column(
+            children: widget.playlist.tracks.map((track) {
+              return ListTile(
+                leading: _buildTrackImage(track),
+                title: Text(track.displayName()),
+                subtitle: Text(track.artist),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () => setState(() {
+                    widget.playlist.tracks.removeWhere((e) => e.id == track.id);
+                    widget.onEdit(widget.playlist);
+                  }),
+                ),
+              );
+            }).toList(),
           ),
-          ExpansionPanelList(
-            expansionCallback: (_, isExpanded) {
-              setState(() {
-                _otherTracksExpanded = isExpanded;
-                if (isExpanded) _addedTracksExpanded = false;
-              });
-            },
-            children: [
-              ExpansionPanel(
-                headerBuilder: (_, __) => const ListTile(title: Text('Other Tracks')),
-                body: otherTracks.isEmpty
-                    ? const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Text('No other tracks available'),
-                      )
-                    : Column(
-                        children: otherTracks.map((track) {
-                          return ListTile(
-                            leading: _buildTrackImage(track),
-                            title: Text(track.displayName()),
-                            subtitle: Text(track.artist),
-                            onTap: () => setState(() {
-                              if (!widget.isNew) {
-                                playlistProviderNotifier.addTrack(widget.playlist, track);
-                              } else {
-                                widget.playlist.tracks.add(track);
-                              }
-                              widget.onEdit(widget.playlist);
-                            }),
-                          );
-                        }).toList(),
-                      ),
-                isExpanded: _otherTracksExpanded,
-              ),
-            ],
-          ),
-          if (widget.isNew)
-            ElevatedButton(
-              onPressed: () {
-                final newPlaylist = Playlist(
-                  id: Ulid().toString(),
-                  name: widget.playlist.name,
-                  description: widget.playlist.description,
-                  tracks: widget.playlist.tracks,
-                  imagePath: widget.playlist.imagePath,
-                );
-                playlistProviderNotifier.addPlaylist(newPlaylist);
-                widget.onSaveNew(newPlaylist);
-              },
-              child: const Text('Save new playlist'),
-            ),
         ],
       ),
     );
