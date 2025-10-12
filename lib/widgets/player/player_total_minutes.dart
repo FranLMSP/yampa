@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/core/player/enums.dart';
+import 'package:music_player/core/utils/format_utils.dart';
 import 'package:music_player/providers/player_controller_provider.dart';
 
 class PlayerTotalMinutes extends ConsumerStatefulWidget {
@@ -46,13 +47,6 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
     }
   }
 
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    return "$minutes:$seconds";
-  }
-
   @override
   void dispose() {
     _timer?.cancel();
@@ -62,6 +56,6 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
   @override
   Widget build(BuildContext context) {
     _updateDurations();
-    return Text("${_formatDuration(_currentDuration)} / ${_formatDuration(_totalDuration)}");
+    return Text("${formatDuration(_currentDuration)} / ${formatDuration(_totalDuration)}");
   }
 }

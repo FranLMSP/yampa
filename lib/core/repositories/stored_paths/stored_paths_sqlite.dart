@@ -18,16 +18,27 @@ Future<void> _initializeDatabase(Database db) async {
 }
 
 class StoredPathsSqlite extends StoredPaths {
+  Database? _db;
   StoredPathsSqlite() {
     sqfliteFfiInit();
   }
 
+  Future<Database> _getdb() async {
+    Database? db;
+    if (_db != null) {
+      db = _db;
+    } else {
+      db = await openSqliteDatabase();
+      await _initializeDatabase(db);
+    }
+
+    return db!;
+  }
+
   @override
   Future<List<GenericPath>> getStoredPaths() async {
-    var db = await openSqliteDatabase();
-    await _initializeDatabase(db);
+    final db = await _getdb();
     final results = await db.rawQuery('SELECT * FROM $storedPathsTableName');
-    await db.close();
     return results.map((row) => GenericPath(
       id: row['id'].toString(),
       folder: row['folder']?.toString(),
@@ -53,35 +64,42 @@ class StoredPathsSqlite extends StoredPaths {
   }
 
   @override
-  Future<void> addPath(GenericPath path) async {
-    var db = await openSqliteDatabase();
-    await _initializeDatabase(db);
+  Future<String> addPath(GenericPath path) async {
+    final db = await _getdb();
     if (await _doesPathAlreadyExist(path, db)) {
-      return;
+      return "";
     }
 
+    final id = Ulid().toString();
     await db.insert(
       storedPathsTableName,
       {
-        'id': Ulid().toString(),
+        'id': id,
         'folder': path.folder,
         'filename': path.filename,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    await db.close();
+
+    return id;
   }
 
   @override
   Future<void> removePath(GenericPath path) async {
     if (path.id.trim().isEmpty) return;
-    var db = await openSqliteDatabase();
-    await _initializeDatabase(db);
+    final db = await _getdb();
     await db.delete(
       storedPathsTableName,
       where: 'id = ?',
       whereArgs: [path.id],
     );
-    await db.close();
+  }
+
+  @override
+  Future<void> close() async {
+    if (_db != null) {
+      await _db!.close();
+      _db = null;
+    }
   }
 }

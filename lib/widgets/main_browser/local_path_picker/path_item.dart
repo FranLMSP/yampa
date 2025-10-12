@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/repositories/stored_paths/factory.dart';
 import 'package:music_player/core/utils/filename_utils.dart';
 import 'package:music_player/models/path.dart';
 import 'package:music_player/providers/local_paths_provider.dart';
+import 'package:music_player/providers/tracks_provider.dart';
+import 'package:music_player/providers/utils.dart';
 
 class PathItem extends ConsumerStatefulWidget {
   const PathItem({super.key, required this.path});
@@ -16,13 +17,7 @@ class PathItem extends ConsumerStatefulWidget {
 
 class _PathItemState extends ConsumerState<PathItem> {
 
-  Future<void> _doDelete(List<GenericPath> paths, LocalPathsNotifier localPathsNotifier) async {
-    final storedPathsRepository = getStoredPathsRepository();
-    storedPathsRepository.removePath(widget.path);
-    localPathsNotifier.setPaths(paths.where((e) => e.id != widget.path.id).toList());
-  }
-
-  Widget _buildDeleteButton(BuildContext context, List<GenericPath> paths, LocalPathsNotifier localPathsNotifier) {
+  Widget _buildDeleteButton(BuildContext context, List<GenericPath> paths, LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) {
     return IconButton(
       onPressed: () async {
         showDialog(
@@ -40,7 +35,7 @@ class _PathItemState extends ConsumerState<PathItem> {
               ),
               TextButton(
                 onPressed: () {
-                  _doDelete(paths, localPathsNotifier);
+                  handlePathsRemoved([widget.path], localPathsNotifier, tracksNotifier);
                   Navigator.of(context).pop();
                 },
                 child: const Text('Yes')
@@ -53,29 +48,30 @@ class _PathItemState extends ConsumerState<PathItem> {
     );
   }
 
-  Widget _buildCard(BuildContext context, IconData icon, String name, List<GenericPath> paths, LocalPathsNotifier localPathsNotifier) {
+  Widget _buildCard(BuildContext context, IconData icon, String name, List<GenericPath> paths, LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) {
     return ListTile(
+      key: Key(widget.path.id),
       leading: Icon(icon),
       title: Text(extractFilenameFromFullPath(name)),
       subtitle: Text(getParentFolder(name)),
-      trailing: _buildDeleteButton(context, paths, localPathsNotifier),
+      trailing: _buildDeleteButton(context, paths, localPathsNotifier, tracksNotifier),
     );
   }
 
-  Widget _buildFolderCard(BuildContext context, List<GenericPath> paths, LocalPathsNotifier localPathsNotifier) {
-    return _buildCard(context, Icons.folder, widget.path.folder!, paths, localPathsNotifier);
+  Widget _buildFolderCard(BuildContext context, List<GenericPath> paths, LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) {
+    return _buildCard(context, Icons.folder, widget.path.folder!, paths, localPathsNotifier, tracksNotifier);
   }
 
-  Widget _buildFileCard(BuildContext context, List<GenericPath> paths,  LocalPathsNotifier localPathsNotifier) {
-    return _buildCard(context, Icons.file_present, widget.path.filename!, paths, localPathsNotifier);
+  Widget _buildFileCard(BuildContext context, List<GenericPath> paths,  LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) {
+    return _buildCard(context, Icons.file_present, widget.path.filename!, paths, localPathsNotifier, tracksNotifier);
   }
 @override
   Widget build(BuildContext context) {
     final paths = ref.read(localPathsProvider);
     final localPathsNotifier = ref.read(localPathsProvider.notifier);
+    final tracksNotifier = ref.read(tracksProvider.notifier);
     return widget.path.filename != null 
-      ? _buildFileCard(context, paths.paths, localPathsNotifier)
-      : _buildFolderCard(context, paths.paths, localPathsNotifier);
+      ? _buildFileCard(context, paths, localPathsNotifier, tracksNotifier)
+      : _buildFolderCard(context, paths, localPathsNotifier, tracksNotifier);
   }
 }
-

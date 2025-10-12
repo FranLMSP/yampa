@@ -1,0 +1,105 @@
+import 'dart:collection';
+
+import 'package:music_player/core/repositories/playlists/factory.dart';
+import 'package:music_player/core/repositories/stored_paths/factory.dart';
+import 'package:music_player/core/track_players/factory.dart';
+import 'package:music_player/core/utils/filename_utils.dart';
+import 'package:music_player/models/path.dart';
+import 'package:music_player/providers/initial_load_provider.dart';
+import 'package:music_player/providers/local_paths_provider.dart';
+import 'package:music_player/providers/playlists_provider.dart';
+import 'package:music_player/providers/tracks_provider.dart';
+
+Future<void> doInitialLoad(
+  bool initialLoadDone,
+  InitialLoadNotifier initialLoadNotifier,
+  LocalPathsNotifier localPathsNotifier,
+  TracksNotifier tracksNotifier,
+  PlaylistNotifier playlistNotifier,
+) async {
+  if (initialLoadDone) return;
+
+  final storedPathsRepository = getStoredPathsRepository();
+  final storedPaths = await storedPathsRepository.getStoredPaths();
+  await storedPathsRepository.close();
+  localPathsNotifier.setPaths(storedPaths);
+  final tracksPlayer = getTrackPlayer();
+  final tracks = await tracksPlayer.fetchTracks(storedPaths);
+  tracksNotifier.setTracks(tracks);
+  final playlistsRepo = getPlaylistRepository();
+  final playlists = await playlistsRepo.getPlaylists(tracks);
+  await playlistsRepo.close();
+  playlistNotifier.setPlaylists(playlists);
+
+  initialLoadNotifier.setInitialLoadDone();
+}
+
+Future<void> _fetchAndSetTracks(
+  List<GenericPath> paths,
+  TracksNotifier tracksNotifier,
+) async {
+  final tracksPlayer = getTrackPlayer();
+  final newTracks = await tracksPlayer.fetchTracks(paths);
+  tracksNotifier.addTracks(newTracks);
+}
+
+Future<void> handlePathsAdded(
+  List<GenericPath> paths,
+  LocalPathsNotifier localPathsNotifier,
+  TracksNotifier tracksNotifier,
+) async {
+  // Try to add to the provider only the tracks related to the paths
+  final List<GenericPath> actuallyAddedPaths = [];
+  final storedPathsRepository = getStoredPathsRepository();
+  for (final path in paths) {
+    final id = await storedPathsRepository.addPath(path);
+    if (id.isEmpty) continue;
+    final newPath = GenericPath(id: id, folder: path.folder, filename: path.filename);
+    localPathsNotifier.addPaths([newPath]);
+    actuallyAddedPaths.add(newPath);
+  }
+  await _fetchAndSetTracks(actuallyAddedPaths, tracksNotifier);
+  await storedPathsRepository.close();
+}
+
+Future<void> handlePathsRemoved(
+  List<GenericPath> removedPaths,
+  LocalPathsNotifier localPathsNotifier,
+  TracksNotifier tracksNotifier,
+) async {
+  // Try to remove from the provider only the tracks related to the removed paths
+  final storedPathsRepository = getStoredPathsRepository();
+  localPathsNotifier.removePaths(removedPaths);
+  final currentTracks = tracksNotifier.getTracks();
+  Map<String, String> removedFolders = HashMap();
+  Map<String, String> removedFiles = HashMap();
+  for (final path in removedPaths) {
+    if (path.filename != null) {
+      removedFiles[path.filename!] = path.filename!;
+    } else if (path.folder != null) {
+      removedFolders[path.folder!] = path.folder!;
+    }
+  }
+  final filteredTracks = [...currentTracks];
+  filteredTracks.removeWhere((track) {
+    return (
+      removedFiles[track.path] != null
+      || (
+        removedFiles[track.path] == null
+        && removedFolders[getParentFolder(track.path)] != null
+      )
+    );
+  });
+  tracksNotifier.setTracks(filteredTracks);
+  final List<Future> removePathsFutures = [];
+  for (final path in removedPaths) {
+    removePathsFutures.add(storedPathsRepository.removePath(path));
+  }
+  await Future.wait(removePathsFutures);
+
+  final newPaths = await storedPathsRepository.getStoredPaths();
+  final tracksPlayer = getTrackPlayer();
+  final newTracks = await tracksPlayer.fetchTracks(newPaths);
+  tracksNotifier.setTracks(newTracks);
+  await storedPathsRepository.close();
+}

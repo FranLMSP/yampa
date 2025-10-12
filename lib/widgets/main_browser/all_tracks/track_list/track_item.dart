@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/core/player/player_controller.dart';
 import 'package:music_player/core/track_players/just_audio.dart';
+import 'package:music_player/core/utils/format_utils.dart';
 import 'package:music_player/models/track.dart';
 import 'package:music_player/providers/player_controller_provider.dart';
 
@@ -42,7 +43,7 @@ class TrackItem extends ConsumerWidget {
   }
 
   Widget _buildDuration(Duration duration) {
-    return Text('${track.duration.inMinutes}:${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}');
+    return Text(formatDuration(duration));
   }
 
   bool _isTrackCurrentlyPlaying(PlayerController playerController) {
