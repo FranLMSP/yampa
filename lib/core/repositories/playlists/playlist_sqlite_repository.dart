@@ -38,17 +38,28 @@ Future<void> _initializeDatabase(Database db) async {
 }
 
 class PlaylistSqliteRepository extends PlaylistsRepository {
+  Database? _db;
   PlaylistSqliteRepository() {
     sqfliteFfiInit();
   }
 
+  Future<Database> _getdb() async {
+    Database? db;
+    if (_db != null) {
+      db = _db;
+    } else {
+      db = await openSqliteDatabase();
+      await _initializeDatabase(db);
+    }
+
+    return db!;
+  }
+
   @override
   Future<List<Playlist>> getPlaylists(List<Track> tracks) async {
-    var db = await openSqliteDatabase();
-    await _initializeDatabase(db);
+    final db = await _getdb();
     final playlists = await db.rawQuery('SELECT * FROM $playlistsTableName');
     final playlistTracks = await db.rawQuery('SELECT * FROM $playlistsTracksRelationsTableName');
-    await db.close();
     final Map<String, List<String>?> playlistTracksMap = HashMap();
     for (final row in playlistTracks) {
       if (playlistTracksMap[row["playlist_id"]] == null) {
@@ -87,8 +98,7 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
 
   @override
   Future<String> addPlaylist(Playlist playlist) async {
-    var db = await openSqliteDatabase();
-    await _initializeDatabase(db);
+    final db = await _getdb();
 
     final id = Ulid().toString();
     await db.insert(
@@ -101,14 +111,12 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    await db.close();
     return id;
   }
 
   @override
   Future<void> updatePlaylist(Playlist playlist) async {
-    var db = await openSqliteDatabase();
-    await _initializeDatabase(db);
+    final db = await _getdb();
     await db.update(
       playlistsTableName,
       {
@@ -119,13 +127,11 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
       where: 'id = ?',
       whereArgs: [playlist.id],
     );
-    await db.close();
   }
 
   @override
   Future<void> addTrackToPlaylist(Playlist playlist, Track track) async {
-    var db = await openSqliteDatabase();
-    await _initializeDatabase(db);
+    final db = await _getdb();
 
     final id = Ulid().toString();
     await db.insert(
@@ -137,25 +143,21 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    await db.close();
   }
 
   @override
   Future<void> removeTrackFromPlaylist(Playlist playlist, Track track) async {
-    var db = await openSqliteDatabase();
-    await _initializeDatabase(db);
+    final db = await _getdb();
     await db.delete(
       playlistsTracksRelationsTableName,
       where: 'playlist_id = ? and track_id = ?',
       whereArgs: [playlist.id, track.id],
     );
-    await db.close();
   }
 
   @override
   Future<void> removePlaylist(Playlist playlist) async {
-    var db = await openSqliteDatabase();
-    await _initializeDatabase(db);
+    final db = await _getdb();
     final futures = [
       db.delete(
         playlistsTableName,
@@ -169,6 +171,13 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
       ),
     ];
     await Future.wait(futures);
-    await db.close();
+  }
+
+  @override
+  Future<void> close() async {
+    if (_db != null) {
+      await _db!.close();
+      _db = null;
+    }
   }
 }

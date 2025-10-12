@@ -78,6 +78,7 @@ class _PlaylistListState extends ConsumerState<PlaylistList> {
             onSaveNew: (Playlist newPlaylist) async {
               final playlistRepo = getPlaylistRepository();
               final id = await playlistRepo.addPlaylist(newPlaylist);
+              await playlistRepo.close();
               playlistsNotifier.addPlaylist(
                 Playlist(
                   id: id,
@@ -93,12 +94,13 @@ class _PlaylistListState extends ConsumerState<PlaylistList> {
                 _curentlyEditedPlaylist = null;
               });
             },
-            onEdit: (Playlist editedPlaylist) {
+            onEdit: (Playlist editedPlaylist) async {
               setState(() {
                 _curentlyEditedPlaylist = editedPlaylist;
               });
               final playlistRepo = getPlaylistRepository();
-              playlistRepo.updatePlaylist(editedPlaylist);
+              await playlistRepo.updatePlaylist(editedPlaylist);
+              await playlistRepo.close();
             },
             onGoBack: () {
               setState(() {

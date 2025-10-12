@@ -35,7 +35,7 @@ class _PathItemState extends ConsumerState<PathItem> {
               ),
               TextButton(
                 onPressed: () {
-                  handlePathsRemoved(paths, localPathsNotifier, tracksNotifier);
+                  handlePathsRemoved([widget.path], localPathsNotifier, tracksNotifier);
                   Navigator.of(context).pop();
                 },
                 child: const Text('Yes')

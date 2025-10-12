@@ -14,6 +14,10 @@ class TracksNotifier extends Notifier<List<Track>> {
     state = tracks;
   }
 
+  List<Track> getTracks() {
+    return state;
+  }
+
   void addTracks(List<Track> tracks) {
     state = [
       ...state,
