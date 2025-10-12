@@ -5,6 +5,7 @@ import 'package:music_player/core/repositories/stored_paths/factory.dart';
 import 'package:music_player/core/track_players/factory.dart';
 import 'package:music_player/core/utils/filename_utils.dart';
 import 'package:music_player/models/path.dart';
+import 'package:music_player/models/playlist.dart';
 import 'package:music_player/providers/initial_load_provider.dart';
 import 'package:music_player/providers/local_paths_provider.dart';
 import 'package:music_player/providers/playlists_provider.dart';
@@ -102,4 +103,18 @@ Future<void> handlePathsRemoved(
   final newTracks = await tracksPlayer.fetchTracks(newPaths);
   tracksNotifier.setTracks(newTracks);
   await storedPathsRepository.close();
+}
+
+Future<void> handlePlaylistCreated(Playlist playlist, PlaylistNotifier playlistNotifier) async {
+  final playlistRepository = getPlaylistRepository();
+  final id = await playlistRepository.addPlaylist(playlist);
+  playlistNotifier.addPlaylist(
+    Playlist(
+      id: id,
+      name: playlist.name,
+      description: playlist.description,
+      imagePath: playlist.imagePath,
+      tracks: playlist.tracks,
+    )
+  );
 }
