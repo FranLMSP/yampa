@@ -65,7 +65,7 @@ class JustAudioProvider implements TrackPlayer {
 
   Future<Track?> _getTrackMetadataFromGenericPath(GenericPath path) async {
     try {
-      final metadata = readMetadata(File(path.filename!), getImage: false);
+      final metadata = readMetadata(File(path.filename!), getImage: true);
       final tempPlayer = AudioPlayer();
       final duration = await tempPlayer.setFilePath(path.filename!);
       return Track(
@@ -78,7 +78,7 @@ class JustAudioProvider implements TrackPlayer {
         trackNumber: metadata.trackNumber ?? 0,
         path: path.filename!,
         duration: duration ?? Duration.zero,
-        imageBytes: null,
+        imageBytes: metadata.pictures.isNotEmpty ? metadata.pictures.first.bytes : null,
       );
     } catch(e) {
       print(e);
