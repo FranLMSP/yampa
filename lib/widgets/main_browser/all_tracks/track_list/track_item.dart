@@ -2,9 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/core/player/player_controller.dart';
 import 'package:music_player/core/utils/format_utils.dart';
+import 'package:music_player/models/playlist.dart';
 import 'package:music_player/models/track.dart';
 import 'package:music_player/providers/player_controller_provider.dart';
+import 'package:music_player/providers/playlists_provider.dart';
 import 'package:music_player/widgets/main_browser/all_tracks/track_list/common.dart';
+import 'package:music_player/widgets/main_browser/playlists/add_to_playlist_modal.dart';
+
+enum OptionSelected {
+  select,
+  addToPlaylists,
+  info,
+}
 
 class TrackItem extends ConsumerWidget {
   const TrackItem({super.key, required this.track, this.onTap});
@@ -46,9 +55,30 @@ class TrackItem extends ConsumerWidget {
     return Text(formatDuration(duration));
   }
 
+  void _handleOptionSelected(BuildContext context, OptionSelected? optionSelected, List<Playlist> playlists) {
+    if (optionSelected == OptionSelected.addToPlaylists) {
+      addToPlaylistsModal(context, playlists);
+    }
+  }
+
+  Widget _buildPopupMenuButton(BuildContext context, List<Playlist> playlists) {
+    return PopupMenuButton<OptionSelected>(
+      initialValue: null,
+      onSelected: (OptionSelected item) {
+        _handleOptionSelected(context, item, playlists);
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
+        const PopupMenuItem<OptionSelected>(value: OptionSelected.select, child: Text('Select')),
+        const PopupMenuItem<OptionSelected>(value: OptionSelected.addToPlaylists, child: Text('Add to playlists')),
+        const PopupMenuItem<OptionSelected>(value: OptionSelected.info, child: Text('Info')),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerController = ref.watch(playerControllerProvider);
+    final playlists = ref.read(playlistsProvider);
     return InkWell(
       onTap: () {
         if (onTap != null) {
@@ -69,12 +99,7 @@ class TrackItem extends ConsumerWidget {
               _buildDuration(track.duration),
             ],
           ),
-          trailing: IconButton(
-            icon: Icon(Icons.more_horiz),
-            onPressed: () {
-              // TODO: popup menu button
-            },
-          ),
+          trailing: _buildPopupMenuButton(context, playlists),
         ),
       ),
     );

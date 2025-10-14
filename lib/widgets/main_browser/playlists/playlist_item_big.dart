@@ -5,7 +5,7 @@ class PlaylistItemBig extends StatelessWidget {
   const PlaylistItemBig({super.key, required this.playlist, this.onTap});
 
   final Playlist playlist;
-  final Function? onTap;
+  final Function(Playlist playlist)? onTap;
 
 @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class PlaylistItemBig extends StatelessWidget {
       width: 50,
       height: 50,
       child: InkWell(
-        onTap: () => onTap != null ? onTap!() : () {},
+        onTap: () => onTap != null ? onTap!(playlist) : () {},
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

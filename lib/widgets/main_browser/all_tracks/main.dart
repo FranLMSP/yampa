@@ -17,8 +17,7 @@ class AllTracksPicker extends ConsumerWidget {
       return;
     }
     if (playerController.trackPlayer == null) {
-      // TODO: here we want to set the track player type depending on the
-      // source type of the track
+      // TODO: here we want to set the track player type depending on the source type of the track
       playerController.setTrackPlayer(JustAudioProvider());
     }
     await playerControllerNotifier.stop();
@@ -32,14 +31,28 @@ class AllTracksPicker extends ConsumerWidget {
     final tracks = ref.watch(tracksProvider);
     final playerController = ref.read(playerControllerProvider);
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+
     if (initialLoadDone && tracks.isEmpty) {
       return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));
     }
-    return TrackList(
-      tracks: tracks,
-      onTap: (Track track) {
-        _playSelectedTrack(track, playerController, playerControllerNotifier);
-      },
+    return Scaffold(
+      appBar: null,
+      body: TrackList(
+        tracks: tracks,
+        onTap: (Track track) {
+          _playSelectedTrack(track, playerController, playerControllerNotifier);
+        },
+      ),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {},
+            child: Icon(Icons.search),
+          ),
+        ],
+      ),
     );
   }
 }

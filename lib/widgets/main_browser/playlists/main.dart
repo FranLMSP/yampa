@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/providers/playlists_provider.dart';
 import 'package:music_player/providers/utils.dart';
 import 'package:music_player/widgets/main_browser/playlists/new_playlist_dialog.dart';
-import 'package:music_player/widgets/main_browser/playlists/playlist_list.dart';
+import 'package:music_player/widgets/main_browser/playlists/playlist_list_big.dart';
 
 class Playlists extends ConsumerWidget {
   const Playlists({super.key});
@@ -37,7 +37,7 @@ class Playlists extends ConsumerWidget {
     final playlistNotifier = ref.read(playlistsProvider.notifier);
     return Scaffold(
       floatingActionButton: _buildFloatingActionButton(context, playlistNotifier),
-      body: PlaylistList(),
+      body: PlaylistListBig(),
     );
   }
 }
