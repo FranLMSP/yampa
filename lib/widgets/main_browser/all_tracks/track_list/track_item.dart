@@ -6,6 +6,7 @@ import 'package:music_player/models/playlist.dart';
 import 'package:music_player/models/track.dart';
 import 'package:music_player/providers/player_controller_provider.dart';
 import 'package:music_player/providers/playlists_provider.dart';
+import 'package:music_player/providers/selected_playlists_provider.dart';
 import 'package:music_player/widgets/main_browser/all_tracks/track_list/common.dart';
 import 'package:music_player/widgets/main_browser/playlists/add_to_playlist_modal.dart';
 
@@ -55,17 +56,17 @@ class TrackItem extends ConsumerWidget {
     return Text(formatDuration(duration));
   }
 
-  void _handleOptionSelected(BuildContext context, OptionSelected? optionSelected, List<Playlist> playlists) {
+  void _handleOptionSelected(BuildContext context, OptionSelected? optionSelected, List<Playlist> playlists, SelectedPlaylistNotifier selectedPlaylistsNotifier) {
     if (optionSelected == OptionSelected.addToPlaylists) {
-      addToPlaylistsModal(context, playlists);
+      addToPlaylistsModal(context, playlists, selectedPlaylistsNotifier);
     }
   }
 
-  Widget _buildPopupMenuButton(BuildContext context, List<Playlist> playlists) {
+  Widget _buildPopupMenuButton(BuildContext context, List<Playlist> playlists, SelectedPlaylistNotifier selectedPlaylistsNotifier) {
     return PopupMenuButton<OptionSelected>(
       initialValue: null,
       onSelected: (OptionSelected item) {
-        _handleOptionSelected(context, item, playlists);
+        _handleOptionSelected(context, item, playlists, selectedPlaylistsNotifier);
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
         const PopupMenuItem<OptionSelected>(value: OptionSelected.select, child: Text('Select')),
@@ -79,6 +80,7 @@ class TrackItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playerController = ref.watch(playerControllerProvider);
     final playlists = ref.read(playlistsProvider);
+    final selectedPlaylistsNotifier = ref.read(selectedPlaylistsProvider.notifier);
     return InkWell(
       onTap: () {
         if (onTap != null) {
@@ -99,7 +101,7 @@ class TrackItem extends ConsumerWidget {
               _buildDuration(track.duration),
             ],
           ),
-          trailing: _buildPopupMenuButton(context, playlists),
+          trailing: _buildPopupMenuButton(context, playlists, selectedPlaylistsNotifier),
         ),
       ),
     );

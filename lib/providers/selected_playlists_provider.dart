@@ -26,4 +26,8 @@ class SelectedPlaylistNotifier extends Notifier<List<String>> {
     stateCopy.removeWhere((element) => element == playlist.id);
     state = stateCopy.toList();
   }
+
+  List<String> getPlaylists() {
+    return state;
+  }
 }
