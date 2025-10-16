@@ -27,7 +27,7 @@ class SelectedPlaylistNotifier extends Notifier<List<String>> {
     state = stateCopy.toList();
   }
 
-  List<String> getPlaylists() {
-    return state;
+  List<String> getPlaylistIds() {
+    return state.toList();
   }
 }

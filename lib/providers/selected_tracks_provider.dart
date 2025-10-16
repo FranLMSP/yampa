@@ -26,4 +26,8 @@ class SelectedTracksNotifier extends Notifier<List<String>> {
     stateCopy.removeWhere((element) => element == track.id);
     state = stateCopy.toList();
   }
+
+  List<String> getTrackIds() {
+    return state.toList();
+  }
 }

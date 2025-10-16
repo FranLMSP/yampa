@@ -6,9 +6,12 @@ import 'package:music_player/core/track_players/factory.dart';
 import 'package:music_player/core/utils/filename_utils.dart';
 import 'package:music_player/models/path.dart';
 import 'package:music_player/models/playlist.dart';
+import 'package:music_player/models/track.dart';
 import 'package:music_player/providers/initial_load_provider.dart';
 import 'package:music_player/providers/local_paths_provider.dart';
 import 'package:music_player/providers/playlists_provider.dart';
+import 'package:music_player/providers/selected_playlists_provider.dart';
+import 'package:music_player/providers/selected_tracks_provider.dart';
 import 'package:music_player/providers/tracks_provider.dart';
 
 Future<void> doInitialLoad(
@@ -117,4 +120,44 @@ Future<void> handlePlaylistCreated(Playlist playlist, PlaylistNotifier playlistN
       tracks: playlist.tracks,
     )
   );
+}
+
+Future<void> handleTracksAddedToPlaylist(
+  List<Track> tracks,
+  List<Playlist> playlists,
+  PlaylistNotifier playlistNotifier,
+  SelectedPlaylistNotifier selectedPlaylistsNotifier,
+  SelectedTracksNotifier selectedTracksNotifier,
+) async {
+  final selectedPlaylistIds = selectedPlaylistsNotifier.getPlaylistIds();
+  final selectedTrackIds = selectedTracksNotifier.getTrackIds();
+  final playlistRepository = getPlaylistRepository();
+
+  final Map<String, Track> trackMap = HashMap();
+  final Map<String, Playlist> playlistMap = HashMap();
+
+  for (final track in tracks) {
+    trackMap[track.id] = track;
+  }
+  for (final playlist in playlists) {
+    playlistMap[playlist.id] = playlist;
+  }
+
+  final List<Map<String, String>> mapping = [];
+  for (final playlistId in selectedPlaylistIds) {
+    for (final trackId in selectedTrackIds) {
+      final track = trackMap[trackId];
+      final playlist = playlistMap[playlistId];
+      if (track != null && playlist != null) {
+        playlistNotifier.addTrack(playlist, track);
+      }
+      mapping.add({
+        "playlist_id": playlistId,
+        "track_id": trackId,
+      });
+    }
+  }
+
+  await playlistRepository.linkTracksWithPlaylists(mapping);
+  await playlistRepository.close();
 }
