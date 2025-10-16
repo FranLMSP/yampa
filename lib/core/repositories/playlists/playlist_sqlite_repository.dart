@@ -180,4 +180,26 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
       _db = null;
     }
   }
+
+  @override
+  Future<void> linkTracksWithPlaylists(List<Map<String, String>> playlistAndTrackMapping) async {
+    final db = await _getdb();
+
+    final batch = db.batch();
+
+    for (final row in playlistAndTrackMapping) {
+      final id = Ulid().toString();
+      batch.insert(
+        playlistsTracksRelationsTableName,
+        {
+          'id': id,
+          'playlist_id': row["playlist_id"],
+          'track_id': row["track_id"],
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    await batch.commit();
+  }
 }

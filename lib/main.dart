@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/providers/initial_load_provider.dart';
+import 'package:music_player/providers/local_paths_provider.dart';
+import 'package:music_player/providers/playlists_provider.dart';
+import 'package:music_player/providers/tracks_provider.dart';
+import 'package:music_player/providers/utils.dart';
 import 'package:music_player/widgets/main_browser/main.dart';
 import 'package:music_player/widgets/main_page_loader.dart';
 import 'package:music_player/widgets/player/big_player.dart';
@@ -23,27 +28,28 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  bool _isLoading = false;
-  bool _hasFinishedLoading = false;
-
-  Future<void> _load() async {
-    setState(() {
-      _isLoading = true;
-    });
-    // Simulate loading delay
-    // await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      _isLoading = false;
-      _hasFinishedLoading = true;
-    });
+class _MyHomePageState extends ConsumerState<MyHomePage> {
+  Future<void> _load(
+    bool initialLoadDone,
+    InitialLoadNotifier initialLoadNotifier,
+    LocalPathsNotifier localPathsNotifier,
+    TracksNotifier tracksNotifier,
+    PlaylistNotifier playlistNotifier,
+  ) async {
+    await doInitialLoad(
+      initialLoadDone,
+      initialLoadNotifier,
+      localPathsNotifier,
+      tracksNotifier,
+      playlistNotifier,
+    );
   }
 
   Widget _buildMainPageLoader() {
@@ -55,17 +61,10 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Row(
           children: [
-            // temp file picker here
             SizedBox(
               width: 500,
               child: MainBrowser(),
             ),
-            // SizedBox(
-            //   width: 300,
-            //   child: LocalPathPicker(),
-            // ),
-            // main player here?
-            // TODO: pass current track from provider
             Expanded(
               child: Center(
                 child: BigPlayer(),
@@ -79,11 +78,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_hasFinishedLoading) {
-      _load();
+    final initialLoadDone = ref.watch(initialLoadProvider);
+    if (!initialLoadDone) {
+      final initialLoadNotifier = ref.read(initialLoadProvider.notifier);
+      final localPathsNotifier = ref.read(localPathsProvider.notifier);
+      final tracksNotifier = ref.read(tracksProvider.notifier);
+      final playlistsNotifier = ref.read(playlistsProvider.notifier);
+      _load(
+        initialLoadDone,
+        initialLoadNotifier,
+        localPathsNotifier,
+        tracksNotifier,
+        playlistsNotifier,
+      );
     }
-    return _isLoading
-        ? _buildMainPageLoader()
-        : _buildMainContent();
+    return initialLoadDone
+        ? _buildMainContent()
+        : _buildMainPageLoader();
   }
 }
