@@ -5,7 +5,9 @@ import 'package:music_player/providers/playlists_provider.dart';
 import 'package:music_player/widgets/main_browser/playlists/playlist_item_big.dart';
 
 class PlaylistListBig extends ConsumerWidget {
-  const PlaylistListBig({super.key});
+  const PlaylistListBig({super.key, this.onTap});
+
+  final Function(Playlist playlist)? onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,6 +29,9 @@ class PlaylistListBig extends ConsumerWidget {
             key: Key(playlist.id),
             playlist: playlist,
             onTap: (Playlist playlist) {
+              if (onTap != null) {
+                onTap!(playlist);
+              }
             },
           );
         },

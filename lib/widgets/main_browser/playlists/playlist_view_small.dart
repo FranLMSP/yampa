@@ -4,27 +4,23 @@ import 'package:music_player/models/playlist.dart';
 import 'package:music_player/models/track.dart';
 
 
-class PlaylistEditForm extends ConsumerStatefulWidget {
-  final bool isNew;
+class PlaylistViewSmall extends ConsumerStatefulWidget {
   final Playlist playlist;
-  final Function(Playlist newPlaylist) onSaveNew;
   final Function(Playlist editedPlaylist) onEdit;
   final Function onGoBack;
 
-  const PlaylistEditForm({
+  const PlaylistViewSmall({
     super.key,
-    required this.isNew,
     required this.playlist,
-    required this.onSaveNew,
     required this.onEdit,
     required this.onGoBack,
   });
 
   @override
-  ConsumerState<PlaylistEditForm> createState() => _PlaylistEditFormState();
+  ConsumerState<PlaylistViewSmall> createState() => _PlaylistViewSmallState();
 }
 
-class _PlaylistEditFormState extends ConsumerState<PlaylistEditForm> {
+class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
 
@@ -132,23 +128,6 @@ class _PlaylistEditFormState extends ConsumerState<PlaylistEditForm> {
               );
             }).toList(),
           ),
-          if (widget.isNew)
-            ...[
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => widget.onSaveNew(Playlist(
-                  id: "temp-id",
-                  name: _titleController.text,
-                  description: _descriptionController.text,
-                  tracks: widget.playlist.tracks,
-                  imagePath: null,
-                )),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(20),
-                ),
-                child: const Icon(Icons.save, size: 30),
-              )
-            ]
         ],
       ),
     );
@@ -171,3 +150,4 @@ class _PlaylistEditFormState extends ConsumerState<PlaylistEditForm> {
     super.dispose();
   }
 }
+
