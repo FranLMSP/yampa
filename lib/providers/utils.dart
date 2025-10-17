@@ -158,6 +158,9 @@ Future<void> handleTracksAddedToPlaylist(
     }
   }
 
+  selectedTracksNotifier.clear();
+  selectedPlaylistsNotifier.clear();
+
   await playlistRepository.linkTracksWithPlaylists(mapping);
   await playlistRepository.close();
 }
