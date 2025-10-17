@@ -89,4 +89,8 @@ class PlayerController {
     }
     return Duration.zero;
   }
+
+  void setQueue(List<Track> tracks) {
+    trackQueue = tracks;
+  }
 }

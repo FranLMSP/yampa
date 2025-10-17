@@ -164,3 +164,14 @@ Future<void> handleTracksAddedToPlaylist(
   await playlistRepository.linkTracksWithPlaylists(mapping);
   await playlistRepository.close();
 }
+
+Future<void> handleTrackRemovedFromPlaylist(
+  Playlist playlist,
+  Track track,
+  PlaylistNotifier playlistNotifier,
+) async {
+  playlistNotifier.removeTrack(playlist, track);
+  final playlistRepository = getPlaylistRepository();
+  await playlistRepository.removeTrackFromPlaylist(playlist, track);
+  await playlistRepository.close();
+}
