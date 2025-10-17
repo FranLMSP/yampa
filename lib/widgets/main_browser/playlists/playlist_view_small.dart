@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/core/track_players/just_audio.dart';
 import 'package:music_player/models/playlist.dart';
 import 'package:music_player/models/track.dart';
+import 'package:music_player/providers/player_controller_provider.dart';
+import 'package:music_player/providers/playlists_provider.dart';
+import 'package:music_player/providers/utils.dart';
 
 
 class PlaylistViewSmall extends ConsumerStatefulWidget {
@@ -57,6 +61,8 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
   @override
   Widget build(BuildContext context) {
     final imagePath = widget.playlist.imagePath;
+    final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
+    final playlistNotifier = ref.watch(playlistsProvider.notifier);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -112,6 +118,27 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             },
           ),
           const SizedBox(height: 24),
+          SizedBox(
+            width: 100,
+            child: ElevatedButton(
+              onPressed: () async {
+                if (widget.playlist.tracks.isNotEmpty) {
+                  await playerControllerNotifier.stop();
+                  playerControllerNotifier.setTrackPlayer(JustAudioProvider());
+                  playerControllerNotifier.setQueue(widget.playlist.tracks);
+                  playerControllerNotifier.setCurrentTrack(widget.playlist.tracks.first);
+                  await playerControllerNotifier.play();
+                }
+              },
+              child: Row(
+                children: [
+                  Icon(Icons.play_arrow),
+                  Text("Play"),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
           Column(
             children: widget.playlist.tracks.map((track) {
               return ListTile(
@@ -120,10 +147,14 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 subtitle: Text(track.artist),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete),
-                  onPressed: () => setState(() {
-                    widget.playlist.tracks.removeWhere((e) => e.id == track.id);
-                    widget.onEdit(widget.playlist);
-                  }),
+                  onPressed: () async {
+                    // TODO: scaffold with an "undo" button
+                    setState(() {
+                      widget.playlist.tracks.removeWhere((e) => e.id == track.id);
+                      widget.onEdit(widget.playlist);
+                    });
+                    await handleTrackRemovedFromPlaylist(widget.playlist, track, playlistNotifier);
+                  },
                 ),
               );
             }).toList(),

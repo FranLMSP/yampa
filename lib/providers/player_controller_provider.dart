@@ -51,4 +51,9 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state.setCurrentTrack(track);
     state = state.clone();
   }
+
+  void setQueue(List<Track> tracks) {
+    state.setQueue(tracks);
+    state = state.clone();
+  }
 }
