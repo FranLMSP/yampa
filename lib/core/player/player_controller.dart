@@ -93,4 +93,14 @@ class PlayerController {
   void setQueue(List<Track> tracks) {
     trackQueue = tracks;
   }
+
+  void toggleLoopMode() {
+    final nextLoopModeMap = {
+      LoopMode.singleSong: LoopMode.infinite,
+      LoopMode.infinite: LoopMode.startToEnd,
+      LoopMode.startToEnd: LoopMode.none,
+      LoopMode.none: LoopMode.singleSong,
+    };
+    loopMode = nextLoopModeMap[loopMode]!;
+  }
 }
