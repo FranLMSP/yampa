@@ -34,7 +34,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   }
 
   int _normalizeMilliseconds(int milliseconds) {
-    return (milliseconds / 100).floor() * 100;
+    return (milliseconds / 100).round() * 100;
   }
 
   Future<void> _getPlayerCurrentPosition(PlayerControllerNotifier playerControllerNotifier) async {
@@ -52,6 +52,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
     }
     final totalDuration = playerController.currentTrack!.duration;
     final currentDuration = await playerController.getCurrentPosition();
+    // TODO: this check here isn't very precise, so we have to find a better way to check whether the tracked has finished playing
     if (_normalizeMilliseconds(currentDuration.inMilliseconds) == _normalizeMilliseconds(totalDuration.inMilliseconds)) {
       await playerControllerNotifier.handleNextAutomatically();
       setState(() {

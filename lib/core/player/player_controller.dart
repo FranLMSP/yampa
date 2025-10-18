@@ -54,6 +54,8 @@ class PlayerController {
         currentTrackIndex++;
         currentTrack = trackQueue[currentTrackIndex];
         await play();
+      } else {
+        await seek(Duration.zero);
       }
     } else if (loopMode == LoopMode.infinite) {
       currentTrackIndex++;
@@ -96,6 +98,9 @@ class PlayerController {
 
   void setCurrentTrack(Track track) {
     currentTrack = track;
+    if (trackQueue.isNotEmpty) {
+      currentTrackIndex = trackQueue.indexWhere((e) => e.id == currentTrack?.id);
+    }
   }
 
   PlayerController clone() {
