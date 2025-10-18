@@ -9,7 +9,7 @@ class LoopButton extends ConsumerWidget {
 
   IconData _getIcon(PlayerController playerController) {
     final iconMap = {
-      LoopMode.singleSong: Icons.repeat_one,
+      LoopMode.singleTrack: Icons.repeat_one,
       LoopMode.infinite: Icons.repeat,
       LoopMode.startToEnd: Icons.playlist_play,
       LoopMode.none: Icons.not_interested,
@@ -19,7 +19,7 @@ class LoopButton extends ConsumerWidget {
 
   String _getTooltop(PlayerController playerController) {
     final loopModeMap = {
-      LoopMode.singleSong: "Replaying a single song",
+      LoopMode.singleTrack: "Replaying a single song",
       LoopMode.infinite: "Replaying playlist",
       LoopMode.startToEnd: "Playing playlist from start to end",
       LoopMode.none: "Not replaying",

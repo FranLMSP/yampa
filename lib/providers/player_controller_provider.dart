@@ -61,4 +61,9 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state.toggleLoopMode();
     state = state.clone();
   }
+
+  Future<void> handleNextAutomatically() async {
+    state.handleNextAutomatically();
+    state = state.clone();
+  }
 }

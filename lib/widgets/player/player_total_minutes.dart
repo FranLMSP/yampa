@@ -28,7 +28,7 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
   }
 
   void _updateDurations() async {
-    final playerController = ref.read(playerControllerProvider);
+    final playerController = ref.watch(playerControllerProvider);
     if (playerController.state != PlayerState.playing) {
       return;
     }

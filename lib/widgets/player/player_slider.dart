@@ -18,25 +18,46 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   bool _changeStarted = false;
   Timer? _timer;
 
-  @override
-  void initState() {
-    super.initState();
+  void _initializeTimer() {
+    if (_timer != null) {
+      _timer?.cancel();
+      _timer = null;
+    }
     _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
-      _getPlayerCurrentPosition(_currentSliderValue);
+      _getPlayerCurrentPosition();
     });
   }
 
-  Future<void> _getPlayerCurrentPosition(double value) async {
+  @override
+  void initState() {
+    super.initState();
+    _initializeTimer();
+  }
+
+  int _normalizeMilliseconds(int milliseconds) {
+    return (milliseconds / 100).floor() * 100;
+  }
+
+  Future<void> _getPlayerCurrentPosition() async {
     if (_changeStarted) {
       return;
     }
-    final player = ref.read(playerControllerProvider);
+    final player = ref.watch(playerControllerProvider);
     if (player.currentTrack == null || player.currentTrack!.duration == Duration.zero || player.state == PlayerState.stopped) {
       _currentSliderValue = 0;
       return;
     }
     final totalDuration = player.currentTrack!.duration;
     final currentDuration = await player.getCurrentPosition();
+    if (_normalizeMilliseconds(currentDuration.inMilliseconds) == _normalizeMilliseconds(totalDuration.inMilliseconds)) {
+      final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
+      await playerControllerNotifier.handleNextAutomatically();
+      setState(() {
+        _currentSliderValue = 0;
+      });
+      _initializeTimer();
+      return;
+    }
     final currentPosition = (currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100;
     setState(() {
       _currentSliderValue = currentPosition;
@@ -44,7 +65,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   }
 
   Future<void> _setPlayerCurrentPosition(double value) async {
-    final player = ref.read(playerControllerProvider);
+    final player = ref.watch(playerControllerProvider);
     if (player.currentTrack == null || player.currentTrack!.duration == Duration.zero) {
       return;
     }
