@@ -63,7 +63,11 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> handleNextAutomatically() async {
-    state.handleNextAutomatically();
+    await state.handleNextAutomatically();
     state = state.clone();
+  }
+
+  PlayerController getPlayerController() {
+    return state.clone();
   }
 }

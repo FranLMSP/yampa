@@ -14,6 +14,7 @@ class PlayerController {
   PlayerController();
   PlayerController._clone({
     required this.currentTrack,
+    required this.currentTrackIndex,
     required this.trackQueue,
     required this.state,
     required this.loopMode,
@@ -47,15 +48,22 @@ class PlayerController {
   }
 
   Future<void> next() async {
-    if (loopMode == LoopMode.infinite) {
-      await stop();
-    } else {
-      await stop();
-      if (trackQueue.isNotEmpty && currentTrackIndex < trackQueue.length) {
+    await stop();
+    if (loopMode == LoopMode.startToEnd) {
+      if (currentTrackIndex < trackQueue.length - 1) {
         currentTrackIndex++;
         currentTrack = trackQueue[currentTrackIndex];
         await play();
       }
+    } else if (loopMode == LoopMode.infinite) {
+      currentTrackIndex++;
+      if (currentTrackIndex >= trackQueue.length) {
+        currentTrackIndex = 0;
+      }
+      if (trackQueue.isNotEmpty) {
+        currentTrack = trackQueue[currentTrackIndex];
+      }
+      await play();
     }
   }
 
@@ -93,6 +101,7 @@ class PlayerController {
   PlayerController clone() {
     return PlayerController._clone(
       currentTrack: currentTrack,
+      currentTrackIndex: currentTrackIndex,
       trackQueue: List<Track>.from(trackQueue),
       state: state,
       loopMode: loopMode,

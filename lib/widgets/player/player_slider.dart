@@ -18,44 +18,45 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   bool _changeStarted = false;
   Timer? _timer;
 
-  void _initializeTimer() {
+  void _initializeTimer(PlayerControllerNotifier playerControllerNotifier) {
     if (_timer != null) {
       _timer?.cancel();
       _timer = null;
     }
     _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
-      _getPlayerCurrentPosition();
+      _getPlayerCurrentPosition(playerControllerNotifier);
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _initializeTimer();
   }
 
   int _normalizeMilliseconds(int milliseconds) {
     return (milliseconds / 100).floor() * 100;
   }
 
-  Future<void> _getPlayerCurrentPosition() async {
+  Future<void> _getPlayerCurrentPosition(PlayerControllerNotifier playerControllerNotifier) async {
     if (_changeStarted) {
       return;
     }
-    final player = ref.watch(playerControllerProvider);
-    if (player.currentTrack == null || player.currentTrack!.duration == Duration.zero || player.state == PlayerState.stopped) {
+    final playerController = playerControllerNotifier.getPlayerController();
+    if (
+      playerController.currentTrack == null
+      || playerController.currentTrack!.duration == Duration.zero
+      || playerController.state == PlayerState.stopped
+    ) {
       _currentSliderValue = 0;
       return;
     }
-    final totalDuration = player.currentTrack!.duration;
-    final currentDuration = await player.getCurrentPosition();
+    final totalDuration = playerController.currentTrack!.duration;
+    final currentDuration = await playerController.getCurrentPosition();
     if (_normalizeMilliseconds(currentDuration.inMilliseconds) == _normalizeMilliseconds(totalDuration.inMilliseconds)) {
-      final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
       await playerControllerNotifier.handleNextAutomatically();
       setState(() {
         _currentSliderValue = 0;
       });
-      _initializeTimer();
       return;
     }
     final currentPosition = (currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100;
@@ -85,6 +86,8 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
 
   @override
   Widget build(BuildContext context) {
+    final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
+    _initializeTimer(playerControllerNotifier);
     return Slider(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       value: _currentSliderValue,
