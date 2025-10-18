@@ -9,10 +9,10 @@ class LoopButton extends ConsumerWidget {
 
   IconData _getIcon(PlayerController playerController) {
     final iconMap = {
-      LoopMode.singleSong: Icons.loop,
-      LoopMode.infinite: Icons.loop,
-      LoopMode.startToEnd: Icons.loop,
-      LoopMode.none: Icons.loop,
+      LoopMode.singleSong: Icons.repeat_one,
+      LoopMode.infinite: Icons.repeat,
+      LoopMode.startToEnd: Icons.playlist_play,
+      LoopMode.none: Icons.not_interested,
     };
     return iconMap[playerController.loopMode]!;
   }
