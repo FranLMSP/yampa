@@ -4,8 +4,8 @@ import 'package:music_player/core/player/enums.dart';
 
 class PlayerController {
   Track? currentTrack;
+  int currentTrackIndex = 0;
   List<Track> trackQueue = [];
-  Duration currentPosition = Duration.zero;
   PlayerState state = PlayerState.stopped;
   LoopMode loopMode = LoopMode.startToEnd;
   NextTrackMode nextTrackMode = NextTrackMode.randomBasedOnHistory;
@@ -14,8 +14,8 @@ class PlayerController {
   PlayerController();
   PlayerController._clone({
     required this.currentTrack,
+    required this.currentTrackIndex,
     required this.trackQueue,
-    required this.currentPosition,
     required this.state,
     required this.loopMode,
     required this.nextTrackMode,
@@ -40,17 +40,46 @@ class PlayerController {
   }
 
   Future<void> stop() async {
-    if (state != PlayerState.stopped && trackPlayer != null) {
+    if (trackPlayer != null) {
+      await trackPlayer!.seek(Duration.zero);
       await trackPlayer!.stop();
-      currentPosition = Duration.zero;
       state = PlayerState.stopped;
     }
   }
 
   Future<void> next() async {
+    await stop();
+    if (loopMode == LoopMode.startToEnd) {
+      if (currentTrackIndex < trackQueue.length - 1) {
+        currentTrackIndex++;
+        currentTrack = trackQueue[currentTrackIndex];
+        await play();
+      } else {
+        await seek(Duration.zero);
+      }
+    } else if (loopMode == LoopMode.infinite) {
+      currentTrackIndex++;
+      if (currentTrackIndex >= trackQueue.length) {
+        currentTrackIndex = 0;
+      }
+      if (trackQueue.isNotEmpty) {
+        currentTrack = trackQueue[currentTrackIndex];
+      }
+      await play();
+    }
   }
 
   Future<void> prev() async {
+    await stop();
+    if (currentTrackIndex > 0) {
+      currentTrackIndex--;
+      if (trackQueue.isNotEmpty) {
+        currentTrack = trackQueue[currentTrackIndex];
+      }
+    } else {
+      currentTrackIndex = 0;
+    }
+    await play();
   }
 
   void suffleTrackQueue() {
@@ -69,13 +98,16 @@ class PlayerController {
 
   void setCurrentTrack(Track track) {
     currentTrack = track;
+    if (trackQueue.isNotEmpty) {
+      currentTrackIndex = trackQueue.indexWhere((e) => e.id == currentTrack?.id);
+    }
   }
 
   PlayerController clone() {
     return PlayerController._clone(
       currentTrack: currentTrack,
+      currentTrackIndex: currentTrackIndex,
       trackQueue: List<Track>.from(trackQueue),
-      currentPosition: currentPosition,
       state: state,
       loopMode: loopMode,
       nextTrackMode: nextTrackMode,
@@ -92,5 +124,35 @@ class PlayerController {
 
   void setQueue(List<Track> tracks) {
     trackQueue = tracks;
+  }
+
+  void toggleLoopMode() {
+    final nextLoopModeMap = {
+      LoopMode.singleTrack: LoopMode.infinite,
+      LoopMode.infinite: LoopMode.startToEnd,
+      LoopMode.startToEnd: LoopMode.none,
+      LoopMode.none: LoopMode.singleTrack,
+    };
+    loopMode = nextLoopModeMap[loopMode]!;
+  }
+
+  Future<void> handleNextAutomatically() async {
+    final nextHandlerMap = {
+      LoopMode.singleTrack: () async {
+        await stop();
+        await play();
+      },
+      LoopMode.infinite: () async {
+        await next();
+      },
+      LoopMode.startToEnd: () async {
+        await next();
+      },
+      LoopMode.none: () async {
+        await stop();
+      },
+    };
+    final nextHandler = nextHandlerMap[loopMode]!;
+    await nextHandler();
   }
 }

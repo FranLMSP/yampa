@@ -18,25 +18,48 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   bool _changeStarted = false;
   Timer? _timer;
 
-  @override
-  void initState() {
-    super.initState();
+  void _initializeTimer(PlayerControllerNotifier playerControllerNotifier) {
+    if (_timer != null) {
+      _timer?.cancel();
+      _timer = null;
+    }
     _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
-      _getPlayerCurrentPosition(_currentSliderValue);
+      _getPlayerCurrentPosition(playerControllerNotifier);
     });
   }
 
-  Future<void> _getPlayerCurrentPosition(double value) async {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  int _normalizeMilliseconds(int milliseconds) {
+    return (milliseconds / 100).round() * 100;
+  }
+
+  Future<void> _getPlayerCurrentPosition(PlayerControllerNotifier playerControllerNotifier) async {
     if (_changeStarted) {
       return;
     }
-    final player = ref.read(playerControllerProvider);
-    if (player.currentTrack == null || player.currentTrack!.duration == Duration.zero || player.state == PlayerState.stopped) {
+    final playerController = playerControllerNotifier.getPlayerController();
+    if (
+      playerController.currentTrack == null
+      || playerController.currentTrack!.duration == Duration.zero
+      || playerController.state == PlayerState.stopped
+    ) {
       _currentSliderValue = 0;
       return;
     }
-    final totalDuration = player.currentTrack!.duration;
-    final currentDuration = await player.getCurrentPosition();
+    final totalDuration = playerController.currentTrack!.duration;
+    final currentDuration = await playerController.getCurrentPosition();
+    // TODO: this check here isn't very precise, so we have to find a better way to check whether the tracked has finished playing
+    if (_normalizeMilliseconds(currentDuration.inMilliseconds) == _normalizeMilliseconds(totalDuration.inMilliseconds)) {
+      await playerControllerNotifier.handleNextAutomatically();
+      setState(() {
+        _currentSliderValue = 0;
+      });
+      return;
+    }
     final currentPosition = (currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100;
     setState(() {
       _currentSliderValue = currentPosition;
@@ -44,7 +67,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   }
 
   Future<void> _setPlayerCurrentPosition(double value) async {
-    final player = ref.read(playerControllerProvider);
+    final player = ref.watch(playerControllerProvider);
     if (player.currentTrack == null || player.currentTrack!.duration == Duration.zero) {
       return;
     }
@@ -64,6 +87,8 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
 
   @override
   Widget build(BuildContext context) {
+    final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
+    _initializeTimer(playerControllerNotifier);
     return Slider(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       value: _currentSliderValue,

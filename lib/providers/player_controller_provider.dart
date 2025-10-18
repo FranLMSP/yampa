@@ -56,4 +56,18 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state.setQueue(tracks);
     state = state.clone();
   }
+
+  void toggleLoopMode() {
+    state.toggleLoopMode();
+    state = state.clone();
+  }
+
+  Future<void> handleNextAutomatically() async {
+    await state.handleNextAutomatically();
+    state = state.clone();
+  }
+
+  PlayerController getPlayerController() {
+    return state.clone();
+  }
 }

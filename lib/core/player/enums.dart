@@ -5,7 +5,7 @@ enum PlayerState {
 }
 
 enum LoopMode {
-  singleSong,
+  singleTrack,
   infinite,
   startToEnd,
   none,
