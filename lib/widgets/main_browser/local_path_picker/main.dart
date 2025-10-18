@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/core/utils/filename_utils.dart';
 import 'package:music_player/models/path.dart';
 import 'package:music_player/providers/initial_load_provider.dart';
 import 'package:music_player/providers/local_paths_provider.dart';
@@ -67,6 +68,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
           filename: file.path,
         );
       }).toList();
+      genericPaths.removeWhere((e) => !isValidMusicPath(e.filename!));
       handlePathsAdded(genericPaths, localPathsNotifier, tracksNotifier);
     }
   }
