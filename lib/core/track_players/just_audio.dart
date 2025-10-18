@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
+import 'package:music_player/core/utils/filename_utils.dart';
 import 'package:music_player/models/path.dart';
 import 'package:music_player/models/track.dart';
 import 'interface.dart';
@@ -27,21 +28,13 @@ class JustAudioProvider implements TrackPlayer {
     final Map<String, Track> result = HashMap();
     final List<Future<Track?>> futures = [];
     for (final path in paths) {
-      if (path.filename != null) {
+      if (path.filename != null && isValidMusicPath(path.filename!)) {
         futures.add(_getTrackMetadataFromGenericPath(path));
       } else if (path.folder != null) {
         final files = Directory(path.folder!)
           .listSync(recursive: true)
           .whereType<File>()
-          .where((file) =>
-              file.path.endsWith(".mp4") ||
-              file.path.endsWith(".m4a") ||
-              file.path.endsWith(".mp3") ||
-              file.path.endsWith(".ogg") ||
-              file.path.endsWith(".ogg") ||
-              file.path.endsWith(".opus") ||
-              file.path.endsWith(".wav") ||
-              file.path.endsWith(".flac"))
+          .where((file) => isValidMusicPath(file.path))
           .toList();
         for (final file in files) {
           final effectivePath = GenericPath(

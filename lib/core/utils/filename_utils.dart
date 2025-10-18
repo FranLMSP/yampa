@@ -23,3 +23,19 @@ String getParentFolder(String folder) {
   if (lastSlash <= 0) return ""; // No parent or root
   return trimmed.substring(0, lastSlash);
 }
+
+
+bool isValidMusicPath(String path) {
+  // TODO: maybe check for mimetype here as well?
+
+  return (
+    path.endsWith(".mp4")  ||
+    path.endsWith(".m4a")  ||
+    path.endsWith(".mp3")  ||
+    path.endsWith(".ogg")  ||
+    path.endsWith(".ogg")  ||
+    path.endsWith(".opus") ||
+    path.endsWith(".wav")  ||
+    path.endsWith(".flac")
+  );
+}
