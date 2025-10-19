@@ -126,5 +126,6 @@ else()
   set(SQLITE_DLL "${CMAKE_SOURCE_DIR}/sqlite3-x64.dll")
 endif()
 
-# Install the selected sqlite3 DLL into the bundle lib dir during the install step.
-install(FILES "${SQLITE_DLL}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" COMPONENT Runtime)
+# Install the selected sqlite3 DLL into the bundle lib dir during the install step,
+# and rename the copied file to sqlite3.dll so the runtime finds it.
+install(FILES "${SQLITE_DLL}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" RENAME "sqlite3.dll" COMPONENT Runtime)
