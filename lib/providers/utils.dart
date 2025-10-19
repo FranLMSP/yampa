@@ -158,6 +158,10 @@ Future<void> handleTracksAddedToPlaylist(
     }
   }
 
+  // TODO: if the playlist matches the current playlist being played, add it to the controller here.
+  // Or maybe refactor the controller to point to the playlist ID instead of holding the list of tracks
+  // ondepentendly? Idk I'll figure it out later.
+
   selectedTracksNotifier.clear();
   selectedPlaylistsNotifier.clear();
 

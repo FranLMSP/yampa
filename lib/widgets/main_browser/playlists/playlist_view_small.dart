@@ -63,6 +63,8 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     final imagePath = widget.playlist.imagePath;
     final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
     final playlistNotifier = ref.watch(playlistsProvider.notifier);
+    final playlists = ref.watch(playlistsProvider);
+    final selectedPlaylist = playlists.where((e) => e.id == widget.playlist.id).firstOrNull ?? widget.playlist;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -140,7 +142,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           ),
           const SizedBox(height: 24),
           Column(
-            children: widget.playlist.tracks.map((track) {
+            children: selectedPlaylist.tracks.map((track) {
               return ListTile(
                 leading: _buildTrackImage(track),
                 title: Text(track.displayName()),
