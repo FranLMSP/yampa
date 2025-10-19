@@ -6,9 +6,10 @@ class PlayerController {
   Track? currentTrack;
   int currentTrackIndex = 0;
   List<Track> trackQueue = [];
+  List<Track> shuffledTrackQueue = [];
   PlayerState state = PlayerState.stopped;
-  LoopMode loopMode = LoopMode.startToEnd;
-  NextTrackMode nextTrackMode = NextTrackMode.randomBasedOnHistory;
+  LoopMode loopMode = LoopMode.infinite;
+  ShuffleMode shuffleMode = ShuffleMode.randomBasedOnHistory;
   TrackPlayer? trackPlayer;
 
   PlayerController();
@@ -16,9 +17,10 @@ class PlayerController {
     required this.currentTrack,
     required this.currentTrackIndex,
     required this.trackQueue,
+    required this.shuffledTrackQueue,
     required this.state,
     required this.loopMode,
-    required this.nextTrackMode,
+    required this.shuffleMode,
     required this.trackPlayer,
   });
 
@@ -50,20 +52,20 @@ class PlayerController {
   Future<void> next() async {
     await stop();
     if (loopMode == LoopMode.startToEnd) {
-      if (currentTrackIndex < trackQueue.length - 1) {
+      if (currentTrackIndex < shuffledTrackQueue.length - 1) {
         currentTrackIndex++;
-        currentTrack = trackQueue[currentTrackIndex];
+        currentTrack = shuffledTrackQueue[currentTrackIndex];
         await play();
       } else {
         await seek(Duration.zero);
       }
     } else if (loopMode == LoopMode.infinite) {
       currentTrackIndex++;
-      if (currentTrackIndex >= trackQueue.length) {
+      if (currentTrackIndex >= shuffledTrackQueue.length) {
         currentTrackIndex = 0;
       }
-      if (trackQueue.isNotEmpty) {
-        currentTrack = trackQueue[currentTrackIndex];
+      if (shuffledTrackQueue.isNotEmpty) {
+        currentTrack = shuffledTrackQueue[currentTrackIndex];
       }
       await play();
     }
@@ -73,8 +75,8 @@ class PlayerController {
     await stop();
     if (currentTrackIndex > 0) {
       currentTrackIndex--;
-      if (trackQueue.isNotEmpty) {
-        currentTrack = trackQueue[currentTrackIndex];
+      if (shuffledTrackQueue.isNotEmpty) {
+        currentTrack = shuffledTrackQueue[currentTrackIndex];
       }
     } else {
       currentTrackIndex = 0;
@@ -83,6 +85,22 @@ class PlayerController {
   }
 
   void suffleTrackQueue() {
+    final shuffleHandler = {
+      ShuffleMode.sequential: () {
+        shuffledTrackQueue = trackQueue;
+      },
+      ShuffleMode.random: () {
+        shuffledTrackQueue = trackQueue;
+        shuffledTrackQueue.shuffle();
+      },
+      ShuffleMode.randomBasedOnHistory: () {
+        // TODO: implement this in the future after collecting statistics of each track
+        shuffledTrackQueue = trackQueue;
+        shuffledTrackQueue.shuffle();
+      },
+    };
+    final handler = shuffleHandler[shuffleMode]!;
+    handler();
   }
 
   Future<void> seek(Duration position) async {
@@ -98,8 +116,8 @@ class PlayerController {
 
   void setCurrentTrack(Track track) {
     currentTrack = track;
-    if (trackQueue.isNotEmpty) {
-      currentTrackIndex = trackQueue.indexWhere((e) => e.id == currentTrack?.id);
+    if (shuffledTrackQueue.isNotEmpty) {
+      currentTrackIndex = shuffledTrackQueue.indexWhere((e) => e.id == currentTrack?.id);
     }
   }
 
@@ -108,9 +126,10 @@ class PlayerController {
       currentTrack: currentTrack,
       currentTrackIndex: currentTrackIndex,
       trackQueue: List<Track>.from(trackQueue),
+      shuffledTrackQueue: List<Track>.from(shuffledTrackQueue),
       state: state,
       loopMode: loopMode,
-      nextTrackMode: nextTrackMode,
+      shuffleMode: shuffleMode,
       trackPlayer: trackPlayer,
     );
   }
@@ -124,6 +143,8 @@ class PlayerController {
 
   void setQueue(List<Track> tracks) {
     trackQueue = tracks;
+    shuffledTrackQueue = tracks;
+    suffleTrackQueue();
   }
 
   void toggleLoopMode() {
@@ -134,6 +155,15 @@ class PlayerController {
       LoopMode.none: LoopMode.singleTrack,
     };
     loopMode = nextLoopModeMap[loopMode]!;
+  }
+
+  void toggleShuffleMode() {
+    final shuffleModeMap = {
+      ShuffleMode.sequential: ShuffleMode.random,
+      ShuffleMode.random: ShuffleMode.randomBasedOnHistory,
+      ShuffleMode.randomBasedOnHistory: ShuffleMode.sequential,
+    };
+    shuffleMode = shuffleModeMap[shuffleMode]!;
   }
 
   Future<void> handleNextAutomatically() async {

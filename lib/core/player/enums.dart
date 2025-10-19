@@ -11,7 +11,7 @@ enum LoopMode {
   none,
 }
 
-enum NextTrackMode {
+enum ShuffleMode {
   sequential,
   random,
   randomBasedOnHistory,

@@ -62,6 +62,11 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = state.clone();
   }
 
+  void toggleShuffleMode() {
+    state.toggleShuffleMode();
+    state = state.clone();
+  }
+
   Future<void> handleNextAutomatically() async {
     await state.handleNextAutomatically();
     state = state.clone();
