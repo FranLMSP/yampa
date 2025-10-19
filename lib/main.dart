@@ -8,6 +8,7 @@ import 'package:music_player/providers/utils.dart';
 import 'package:music_player/widgets/main_browser/main.dart';
 import 'package:music_player/widgets/main_page_loader.dart';
 import 'package:music_player/widgets/player/big_player.dart';
+import 'package:music_player/widgets/utils.dart';
 
 void main() {
   runApp(ProviderScope(child: const MyApp()));
@@ -57,22 +58,35 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   Widget _buildMainContent() {
-    return const Scaffold(
-      body: Center(
-        child: Row(
-          children: [
-            SizedBox(
-              width: 500,
-              child: MainBrowser(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final viewMode = getViewMode(constraints);
+        if (viewMode == ViewMode.portrait) {
+          return Scaffold(
+            body: Center(
+              child: MainBrowser(viewMode: viewMode),
             ),
-            Expanded(
-              child: Center(
-                child: BigPlayer(),
+          );
+        } else {
+          return Scaffold(
+            body: Center(
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 500,
+                    child: MainBrowser(viewMode: viewMode),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: BigPlayer(),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
+          );
+        }
+      },
     );
   }
 
