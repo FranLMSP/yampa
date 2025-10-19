@@ -117,7 +117,7 @@ endif()
 
 if(TARGET_ARCH MATCHES "ARM64")
   set(SQLITE_DLL "${CMAKE_SOURCE_DIR}/sqlite3-arm64.dll")
-elseif(TARGET_ARCH MATCHES "AMD64|X64|AMD64")
+elseif(TARGET_ARCH MATCHES "AMD64|X64|X86_64")
   set(SQLITE_DLL "${CMAKE_SOURCE_DIR}/sqlite3-x64.dll")
 elseif(TARGET_ARCH MATCHES "X86|WIN32")
   set(SQLITE_DLL "${CMAKE_SOURCE_DIR}/sqlite3-x86.dll")
@@ -126,8 +126,5 @@ else()
   set(SQLITE_DLL "${CMAKE_SOURCE_DIR}/sqlite3-x64.dll")
 endif()
 
-add_custom_command(TARGET ${BINARY_NAME} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${SQLITE_DLL}"
-    $<TARGET_FILE_DIR:${BINARY_NAME}>
-)
+# Install the selected sqlite3 DLL into the bundle lib dir during the install step.
+install(FILES "${SQLITE_DLL}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" COMPONENT Runtime)
