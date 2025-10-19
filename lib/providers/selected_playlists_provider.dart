@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/models/playlist.dart';
+import 'package:yampa/models/playlist.dart';
 
 
 final selectedPlaylistsProvider = NotifierProvider<SelectedPlaylistNotifier, List<String>>(

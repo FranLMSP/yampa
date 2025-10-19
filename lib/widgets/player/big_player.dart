@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/providers/player_controller_provider.dart';
-import 'package:music_player/widgets/player/player_buttons.dart';
-import 'package:music_player/widgets/player/player_image.dart';
-import 'package:music_player/widgets/player/player_slider.dart';
-import 'package:music_player/widgets/player/player_total_minutes.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/widgets/player/player_buttons.dart';
+import 'package:yampa/widgets/player/player_image.dart';
+import 'package:yampa/widgets/player/player_slider.dart';
+import 'package:yampa/widgets/player/player_total_minutes.dart';
 
 class BigPlayer extends ConsumerWidget {
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/providers/player_controller_provider.dart';
-import 'package:music_player/providers/playlists_provider.dart';
-import 'package:music_player/providers/selected_playlists_provider.dart';
-import 'package:music_player/providers/selected_tracks_provider.dart';
-import 'package:music_player/providers/tracks_provider.dart';
-import 'package:music_player/widgets/main_browser/playlists/add_to_playlist_modal.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/playlists_provider.dart';
+import 'package:yampa/providers/selected_playlists_provider.dart';
+import 'package:yampa/providers/selected_tracks_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
+import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart';
 
 class PlaylistButton extends ConsumerWidget {
   const PlaylistButton({super.key});

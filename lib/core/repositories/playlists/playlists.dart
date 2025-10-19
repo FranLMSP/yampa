@@ -1,5 +1,5 @@
-import 'package:music_player/models/playlist.dart';
-import 'package:music_player/models/track.dart';
+import 'package:yampa/models/playlist.dart';
+import 'package:yampa/models/track.dart';
 
 abstract class PlaylistsRepository {
   Future<List<Playlist>> getPlaylists(List<Track> tracks);

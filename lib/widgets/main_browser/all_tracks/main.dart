@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/player/player_controller.dart';
-import 'package:music_player/core/track_players/just_audio.dart';
-import 'package:music_player/models/track.dart';
-import 'package:music_player/providers/initial_load_provider.dart';
-import 'package:music_player/providers/player_controller_provider.dart';
-import 'package:music_player/providers/tracks_provider.dart';
-import 'package:music_player/widgets/main_browser/all_tracks/track_list/common.dart';
-import 'package:music_player/widgets/main_browser/all_tracks/track_list/track_list.dart';
+import 'package:yampa/core/player/player_controller.dart';
+import 'package:yampa/core/track_players/just_audio.dart';
+import 'package:yampa/models/track.dart';
+import 'package:yampa/providers/initial_load_provider.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
+import 'package:yampa/widgets/main_browser/all_tracks/track_list/common.dart';
+import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_list.dart';
 
 class AllTracksPicker extends ConsumerWidget {
   const AllTracksPicker({super.key});

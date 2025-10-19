@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/models/path.dart';
+import 'package:yampa/models/path.dart';
 
 final localPathsProvider = NotifierProvider<LocalPathsNotifier, List<GenericPath>>(
   () => LocalPathsNotifier(),

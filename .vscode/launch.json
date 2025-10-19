@@ -6,18 +6,18 @@
     "configurations": [
     
         {
-            "name": "music_player",
+            "name": "yampa",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "music_player (profile mode)",
+            "name": "yampa (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "music_player (release mode)",
+            "name": "yampa (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

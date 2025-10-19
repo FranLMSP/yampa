@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:music_player/models/playlist.dart';
+import 'package:yampa/models/playlist.dart';
 
 class PlaylistItemBig extends StatelessWidget {
   const PlaylistItemBig({super.key, required this.playlist, this.onTap});

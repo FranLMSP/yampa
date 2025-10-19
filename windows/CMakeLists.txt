@@ -1,10 +1,10 @@
 # Project-level configuration.
 cmake_minimum_required(VERSION 3.14)
-project(music_player LANGUAGES CXX)
+project(yampa LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "music_player")
+set(BINARY_NAME "yampa")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -106,3 +106,28 @@ install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
 install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
   CONFIGURATIONS Profile;Release
   COMPONENT Runtime)
+
+# Copy the correct sqlite3 DLL for the target architecture into the exe folder
+# Place sqlite3-arm64.dll, sqlite3-x64.dll and sqlite3-x86.dll in this windows/ folder.
+if(DEFINED CMAKE_VS_PLATFORM_NAME)
+  string(TOUPPER "${CMAKE_VS_PLATFORM_NAME}" TARGET_ARCH)
+else()
+  string(TOUPPER "${CMAKE_HOST_SYSTEM_PROCESSOR}" TARGET_ARCH)
+endif()
+
+if(TARGET_ARCH MATCHES "ARM64")
+  set(SQLITE_DLL "${CMAKE_SOURCE_DIR}/sqlite3-arm64.dll")
+elseif(TARGET_ARCH MATCHES "AMD64|X64|AMD64")
+  set(SQLITE_DLL "${CMAKE_SOURCE_DIR}/sqlite3-x64.dll")
+elseif(TARGET_ARCH MATCHES "X86|WIN32")
+  set(SQLITE_DLL "${CMAKE_SOURCE_DIR}/sqlite3-x86.dll")
+else()
+  message(WARNING "Unknown Windows target architecture '${TARGET_ARCH}'. Defaulting to x64 sqlite3 DLL.")
+  set(SQLITE_DLL "${CMAKE_SOURCE_DIR}/sqlite3-x64.dll")
+endif()
+
+add_custom_command(TARGET ${BINARY_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${SQLITE_DLL}"
+    $<TARGET_FILE_DIR:${BINARY_NAME}>
+)

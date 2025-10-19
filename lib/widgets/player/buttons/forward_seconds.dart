@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/player/player_controller.dart';
-import 'package:music_player/providers/player_controller_provider.dart';
+import 'package:yampa/core/player/player_controller.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
 
 class ForwardSecondsButton extends ConsumerWidget {
   const ForwardSecondsButton({super.key});

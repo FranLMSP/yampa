@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/utils/filename_utils.dart';
-import 'package:music_player/models/path.dart';
-import 'package:music_player/providers/local_paths_provider.dart';
-import 'package:music_player/providers/tracks_provider.dart';
-import 'package:music_player/providers/utils.dart';
+import 'package:yampa/core/utils/filename_utils.dart';
+import 'package:yampa/models/path.dart';
+import 'package:yampa/providers/local_paths_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
+import 'package:yampa/providers/utils.dart';
 
 class PathItem extends ConsumerStatefulWidget {
   const PathItem({super.key, required this.path});

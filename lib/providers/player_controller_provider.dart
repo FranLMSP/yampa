@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/player/player_controller.dart';
-import 'package:music_player/core/track_players/interface.dart';
-import 'package:music_player/models/track.dart';
+import 'package:yampa/core/player/player_controller.dart';
+import 'package:yampa/core/track_players/interface.dart';
+import 'package:yampa/models/track.dart';
 
 
 final playerControllerProvider = NotifierProvider<PlayerControllerNotifier, PlayerController>(

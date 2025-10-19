@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:music_player/models/track.dart';
+import 'package:yampa/models/track.dart';
 
 const imageWidth = 200.0;
 const imageHeight = 200.0;
