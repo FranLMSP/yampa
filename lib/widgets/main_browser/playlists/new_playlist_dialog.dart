@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/models/playlist.dart';
+import 'package:yampa/models/playlist.dart';
 
 
 class NewPlaylistDialog extends ConsumerStatefulWidget {

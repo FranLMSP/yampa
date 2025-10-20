@@ -1,9 +1,9 @@
 import 'dart:collection';
 
-import 'package:music_player/core/repositories/playlists/playlists.dart';
-import 'package:music_player/core/utils/sqlite_utils.dart';
-import 'package:music_player/models/playlist.dart';
-import 'package:music_player/models/track.dart';
+import 'package:yampa/core/repositories/playlists/playlists.dart';
+import 'package:yampa/core/utils/sqlite_utils.dart';
+import 'package:yampa/models/playlist.dart';
+import 'package:yampa/models/track.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ulid/ulid.dart';
 

@@ -1,6 +1,6 @@
-import 'package:music_player/core/utils/sqlite_utils.dart';
-import 'package:music_player/core/repositories/stored_paths/stored_paths.dart';
-import 'package:music_player/models/path.dart';
+import 'package:yampa/core/utils/sqlite_utils.dart';
+import 'package:yampa/core/repositories/stored_paths/stored_paths.dart';
+import 'package:yampa/models/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ulid/ulid.dart';
 

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/player/enums.dart';
-import 'package:music_player/core/utils/format_utils.dart';
-import 'package:music_player/providers/player_controller_provider.dart';
+import 'package:yampa/core/player/enums.dart';
+import 'package:yampa/core/utils/format_utils.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
 
 class PlayerTotalMinutes extends ConsumerStatefulWidget {
   const PlayerTotalMinutes({
@@ -35,15 +35,19 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
     if (playerController.currentTrack != null) {
       final totalDuration = playerController.currentTrack!.duration;
       final currentDuration = await playerController.getCurrentPosition();
-      setState(() {
-        _currentDuration = currentDuration;
-        _totalDuration = totalDuration;
-      });
+      if (mounted) {
+        setState(() {
+          _currentDuration = currentDuration;
+          _totalDuration = totalDuration;
+        });
+      }
     } else {
-      setState(() {
-        _currentDuration = Duration.zero;
-        _totalDuration = Duration.zero;
-      });
+      if (mounted) {
+        setState(() {
+          _currentDuration = Duration.zero;
+          _totalDuration = Duration.zero;
+        });
+      }
     }
   }
 

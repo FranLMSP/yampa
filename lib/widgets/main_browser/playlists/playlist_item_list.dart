@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/models/playlist.dart';
-import 'package:music_player/providers/selected_playlists_provider.dart';
+import 'package:yampa/models/playlist.dart';
+import 'package:yampa/providers/selected_playlists_provider.dart';
 
 
 class PlaylistItemList extends ConsumerWidget {

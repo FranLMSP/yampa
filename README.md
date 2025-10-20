@@ -1,6 +1,6 @@
-# music_player
+# YAMPA - Yet Another Music player App
 
-A new Flutter project.
+Simple music player app that respects your privacy.
 
 ## Getting Started
 

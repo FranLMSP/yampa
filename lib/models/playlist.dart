@@ -1,4 +1,4 @@
-import 'package:music_player/models/track.dart';
+import 'package:yampa/models/track.dart';
 
 class Playlist {
   final String id;

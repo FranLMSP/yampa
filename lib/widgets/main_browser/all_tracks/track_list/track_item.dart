@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/player/player_controller.dart';
-import 'package:music_player/core/utils/format_utils.dart';
-import 'package:music_player/models/playlist.dart';
-import 'package:music_player/models/track.dart';
-import 'package:music_player/providers/player_controller_provider.dart';
-import 'package:music_player/providers/playlists_provider.dart';
-import 'package:music_player/providers/selected_playlists_provider.dart';
-import 'package:music_player/providers/selected_tracks_provider.dart';
-import 'package:music_player/providers/tracks_provider.dart';
-import 'package:music_player/widgets/main_browser/all_tracks/track_list/common.dart';
-import 'package:music_player/widgets/main_browser/playlists/add_to_playlist_modal.dart';
+import 'package:yampa/core/player/player_controller.dart';
+import 'package:yampa/core/utils/format_utils.dart';
+import 'package:yampa/models/playlist.dart';
+import 'package:yampa/models/track.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/playlists_provider.dart';
+import 'package:yampa/providers/selected_playlists_provider.dart';
+import 'package:yampa/providers/selected_tracks_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
+import 'package:yampa/widgets/main_browser/all_tracks/track_list/common.dart';
+import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart';
 
 enum OptionSelected {
   select,

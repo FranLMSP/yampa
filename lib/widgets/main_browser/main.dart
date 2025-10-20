@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/widgets/main_browser/all_tracks/main.dart';
-import 'package:music_player/widgets/main_browser/local_path_picker/main.dart';
-import 'package:music_player/widgets/main_browser/playlists/main.dart';
-import 'package:music_player/widgets/player/big_player.dart';
-import 'package:music_player/widgets/utils.dart';
+import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
+import 'package:yampa/widgets/main_browser/local_path_picker/main.dart';
+import 'package:yampa/widgets/main_browser/playlists/main.dart';
+import 'package:yampa/widgets/player/big_player.dart';
+import 'package:yampa/widgets/utils.dart';
 
 class MainBrowser extends ConsumerWidget {
 

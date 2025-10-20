@@ -5,26 +5,30 @@ import 'dart:io';
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
-import 'package:music_player/core/utils/filename_utils.dart';
-import 'package:music_player/models/path.dart';
-import 'package:music_player/models/track.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:yampa/core/utils/filename_utils.dart';
+import 'package:yampa/models/path.dart';
+import 'package:yampa/models/track.dart';
 import 'interface.dart';
 
 class JustAudioProvider implements TrackPlayer {
   final AudioPlayer _player = AudioPlayer();
 
   JustAudioProvider() {
-    JustAudioMediaKit.ensureInitialized(
-      linux: true,
-      windows: true,
-      android: true,
-      iOS: true,
-      macOS: true,
-    );
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      JustAudioMediaKit.ensureInitialized(
+        linux: true,
+        windows: true,
+        macOS: true,
+      );
+    }
   }
 
   @override
   Future<List<Track>> fetchTracks(List<GenericPath> paths) async {
+    if (!await Permission.storage.request().isGranted) {
+      // return [];
+    }
     final Map<String, Track> result = HashMap();
     final List<Future<Track?>> futures = [];
     for (final path in paths) {

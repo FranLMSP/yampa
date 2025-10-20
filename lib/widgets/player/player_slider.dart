@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/player/enums.dart';
-import 'package:music_player/providers/player_controller_provider.dart';
+import 'package:yampa/core/player/enums.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
 
 class PlayerSlider extends ConsumerStatefulWidget {
   const PlayerSlider({
@@ -55,12 +55,14 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
     // TODO: this check here isn't very precise, so we have to find a better way to check whether the tracked has finished playing
     if (_normalizeMilliseconds(currentDuration.inMilliseconds) == _normalizeMilliseconds(totalDuration.inMilliseconds)) {
       await playerControllerNotifier.handleNextAutomatically();
+      if (!mounted) return;
       setState(() {
         _currentSliderValue = 0;
       });
       return;
     }
     final currentPosition = (currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100;
+    if (!mounted) return;
     setState(() {
       _currentSliderValue = currentPosition;
     });

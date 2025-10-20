@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/player/enums.dart';
-import 'package:music_player/widgets/player/buttons/play.dart';
-import 'package:music_player/widgets/player/buttons/pause.dart';
-import 'package:music_player/providers/player_controller_provider.dart';
+import 'package:yampa/core/player/enums.dart';
+import 'package:yampa/widgets/player/buttons/play.dart';
+import 'package:yampa/widgets/player/buttons/pause.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
 
 class PlayAndPauseButton extends ConsumerWidget {
 

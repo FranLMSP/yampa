@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/models/playlist.dart';
-import 'package:music_player/providers/playlists_provider.dart';
-import 'package:music_player/providers/utils.dart';
-import 'package:music_player/widgets/main_browser/playlists/new_playlist_dialog.dart';
-import 'package:music_player/widgets/main_browser/playlists/playlist_list_big.dart';
-import 'package:music_player/widgets/main_browser/playlists/playlist_view_small.dart';
+import 'package:yampa/models/playlist.dart';
+import 'package:yampa/providers/playlists_provider.dart';
+import 'package:yampa/providers/utils.dart';
+import 'package:yampa/widgets/main_browser/playlists/new_playlist_dialog.dart';
+import 'package:yampa/widgets/main_browser/playlists/playlist_list_big.dart';
+import 'package:yampa/widgets/main_browser/playlists/playlist_view_small.dart';
 
 class Playlists extends ConsumerStatefulWidget {
   const Playlists({super.key});

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/providers/initial_load_provider.dart';
-import 'package:music_player/providers/local_paths_provider.dart';
-import 'package:music_player/providers/playlists_provider.dart';
-import 'package:music_player/providers/tracks_provider.dart';
-import 'package:music_player/providers/utils.dart';
-import 'package:music_player/widgets/main_browser/main.dart';
-import 'package:music_player/widgets/main_page_loader.dart';
-import 'package:music_player/widgets/player/big_player.dart';
-import 'package:music_player/widgets/utils.dart';
+import 'package:yampa/providers/initial_load_provider.dart';
+import 'package:yampa/providers/local_paths_provider.dart';
+import 'package:yampa/providers/playlists_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
+import 'package:yampa/providers/utils.dart';
+import 'package:yampa/widgets/main_browser/main.dart';
+import 'package:yampa/widgets/main_page_loader.dart';
+import 'package:yampa/widgets/player/big_player.dart';
+import 'package:yampa/widgets/utils.dart';
 
 void main() {
   runApp(ProviderScope(child: const MyApp()));
@@ -63,25 +63,29 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         final viewMode = getViewMode(constraints);
         if (viewMode == ViewMode.portrait) {
           return Scaffold(
-            body: Center(
-              child: MainBrowser(viewMode: viewMode),
+            body: SafeArea(
+              child: Center(
+                child: MainBrowser(viewMode: viewMode),
+              ),
             ),
           );
         } else {
           return Scaffold(
-            body: Center(
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 500,
-                    child: MainBrowser(viewMode: viewMode),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: BigPlayer(),
+            body: SafeArea(
+              child: Center(
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: MainBrowser(viewMode: viewMode),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: Center(
+                        child: BigPlayer(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

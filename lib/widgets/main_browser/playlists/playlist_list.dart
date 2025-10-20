@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/models/playlist.dart';
-import 'package:music_player/widgets/main_browser/playlists/playlist_item_list.dart';
+import 'package:yampa/models/playlist.dart';
+import 'package:yampa/widgets/main_browser/playlists/playlist_item_list.dart';
 
 class PlaylistList extends ConsumerWidget {
   const PlaylistList({super.key, this.onTap, required this.playlists});

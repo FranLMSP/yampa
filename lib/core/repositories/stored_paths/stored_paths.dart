@@ -1,4 +1,4 @@
-import 'package:music_player/models/path.dart';
+import 'package:yampa/models/path.dart';
 
 abstract class StoredPaths {
   Future<List<GenericPath>> getStoredPaths();

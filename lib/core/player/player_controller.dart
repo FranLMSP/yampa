@@ -1,6 +1,6 @@
-import 'package:music_player/core/track_players/interface.dart';
-import 'package:music_player/models/track.dart';
-import 'package:music_player/core/player/enums.dart';
+import 'package:yampa/core/track_players/interface.dart';
+import 'package:yampa/models/track.dart';
+import 'package:yampa/core/player/enums.dart';
 
 class PlayerController {
   Track? currentTrack;

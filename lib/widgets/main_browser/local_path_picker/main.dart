@@ -1,14 +1,14 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/core/utils/filename_utils.dart';
-import 'package:music_player/models/path.dart';
-import 'package:music_player/providers/initial_load_provider.dart';
-import 'package:music_player/providers/local_paths_provider.dart';
-import 'package:music_player/providers/tracks_provider.dart';
-import 'package:music_player/providers/utils.dart';
-import 'package:music_player/widgets/main_browser/local_path_picker/path_item.dart';
-import 'package:music_player/widgets/misc/loader.dart';
+import 'package:yampa/core/utils/filename_utils.dart';
+import 'package:yampa/models/path.dart';
+import 'package:yampa/providers/initial_load_provider.dart';
+import 'package:yampa/providers/local_paths_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
+import 'package:yampa/providers/utils.dart';
+import 'package:yampa/widgets/main_browser/local_path_picker/path_item.dart';
+import 'package:yampa/widgets/misc/loader.dart';
 
 class LocalPathPicker extends ConsumerStatefulWidget {
   const LocalPathPicker({super.key});

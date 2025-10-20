@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:music_player/core/utils/filename_utils.dart';
+import 'package:yampa/core/utils/filename_utils.dart';
 
 class Track {
   final String id;

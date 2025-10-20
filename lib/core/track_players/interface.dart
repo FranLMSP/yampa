@@ -1,5 +1,5 @@
-import 'package:music_player/models/path.dart';
-import 'package:music_player/models/track.dart';
+import 'package:yampa/models/path.dart';
+import 'package:yampa/models/track.dart';
 
 abstract class TrackPlayer {
   Future<List<Track>> fetchTracks(List<GenericPath> paths);

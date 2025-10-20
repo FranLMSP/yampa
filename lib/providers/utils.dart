@@ -1,18 +1,18 @@
 import 'dart:collection';
 
-import 'package:music_player/core/repositories/playlists/factory.dart';
-import 'package:music_player/core/repositories/stored_paths/factory.dart';
-import 'package:music_player/core/track_players/factory.dart';
-import 'package:music_player/core/utils/filename_utils.dart';
-import 'package:music_player/models/path.dart';
-import 'package:music_player/models/playlist.dart';
-import 'package:music_player/models/track.dart';
-import 'package:music_player/providers/initial_load_provider.dart';
-import 'package:music_player/providers/local_paths_provider.dart';
-import 'package:music_player/providers/playlists_provider.dart';
-import 'package:music_player/providers/selected_playlists_provider.dart';
-import 'package:music_player/providers/selected_tracks_provider.dart';
-import 'package:music_player/providers/tracks_provider.dart';
+import 'package:yampa/core/repositories/playlists/factory.dart';
+import 'package:yampa/core/repositories/stored_paths/factory.dart';
+import 'package:yampa/core/track_players/factory.dart';
+import 'package:yampa/core/utils/filename_utils.dart';
+import 'package:yampa/models/path.dart';
+import 'package:yampa/models/playlist.dart';
+import 'package:yampa/models/track.dart';
+import 'package:yampa/providers/initial_load_provider.dart';
+import 'package:yampa/providers/local_paths_provider.dart';
+import 'package:yampa/providers/playlists_provider.dart';
+import 'package:yampa/providers/selected_playlists_provider.dart';
+import 'package:yampa/providers/selected_tracks_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
 
 Future<void> doInitialLoad(
   bool initialLoadDone,
