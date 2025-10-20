@@ -55,12 +55,14 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
     // TODO: this check here isn't very precise, so we have to find a better way to check whether the tracked has finished playing
     if (_normalizeMilliseconds(currentDuration.inMilliseconds) == _normalizeMilliseconds(totalDuration.inMilliseconds)) {
       await playerControllerNotifier.handleNextAutomatically();
+      if (!mounted) return;
       setState(() {
         _currentSliderValue = 0;
       });
       return;
     }
     final currentPosition = (currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100;
+    if (!mounted) return;
     setState(() {
       _currentSliderValue = currentPosition;
     });

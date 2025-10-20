@@ -27,7 +27,7 @@ class JustAudioProvider implements TrackPlayer {
   @override
   Future<List<Track>> fetchTracks(List<GenericPath> paths) async {
     if (!await Permission.storage.request().isGranted) {
-      return [];
+      // return [];
     }
     final Map<String, Track> result = HashMap();
     final List<Future<Track?>> futures = [];

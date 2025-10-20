@@ -35,15 +35,19 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
     if (playerController.currentTrack != null) {
       final totalDuration = playerController.currentTrack!.duration;
       final currentDuration = await playerController.getCurrentPosition();
-      setState(() {
-        _currentDuration = currentDuration;
-        _totalDuration = totalDuration;
-      });
+      if (mounted) {
+        setState(() {
+          _currentDuration = currentDuration;
+          _totalDuration = totalDuration;
+        });
+      }
     } else {
-      setState(() {
-        _currentDuration = Duration.zero;
-        _totalDuration = Duration.zero;
-      });
+      if (mounted) {
+        setState(() {
+          _currentDuration = Duration.zero;
+          _totalDuration = Duration.zero;
+        });
+      }
     }
   }
 
