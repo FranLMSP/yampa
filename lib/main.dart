@@ -63,25 +63,29 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         final viewMode = getViewMode(constraints);
         if (viewMode == ViewMode.portrait) {
           return Scaffold(
-            body: Center(
-              child: MainBrowser(viewMode: viewMode),
+            body: SafeArea(
+              child: Center(
+                child: MainBrowser(viewMode: viewMode),
+              ),
             ),
           );
         } else {
           return Scaffold(
-            body: Center(
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 500,
-                    child: MainBrowser(viewMode: viewMode),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: BigPlayer(),
+            body: SafeArea(
+              child: Center(
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: MainBrowser(viewMode: viewMode),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: Center(
+                        child: BigPlayer(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
