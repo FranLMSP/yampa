@@ -134,6 +134,11 @@ class PlayerController {
     );
   }
 
+  bool hasTrackFinishedPlaying() {
+    if (trackPlayer == null) return false;
+    return trackPlayer!.hasTrackFinishedPlaying();
+  }
+
   Future<Duration> getCurrentPosition() async {
     if (trackPlayer != null) {
       return await trackPlayer!.getCurrentPosition();

@@ -119,4 +119,9 @@ class JustAudioProvider implements TrackPlayer {
   Future<Duration> getCurrentPosition() async {
     return _player.position;
   }
+
+  @override
+  bool hasTrackFinishedPlaying() {
+    return _player.processingState == ProcessingState.completed;
+  }
 }
