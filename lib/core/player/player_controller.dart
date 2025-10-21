@@ -9,7 +9,7 @@ class PlayerController {
   List<Track> shuffledTrackQueue = [];
   PlayerState state = PlayerState.stopped;
   LoopMode loopMode = LoopMode.infinite;
-  ShuffleMode shuffleMode = ShuffleMode.randomBasedOnHistory;
+  ShuffleMode shuffleMode = ShuffleMode.sequential;
   TrackPlayer? trackPlayer;
 
   PlayerController();

@@ -46,14 +46,6 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
       _currentSliderValue = 0;
       return;
     }
-    if (playerController.hasTrackFinishedPlaying()) {
-      await playerControllerNotifier.handleNextAutomatically();
-      if (!mounted) return;
-      setState(() {
-        _currentSliderValue = 0;
-      });
-      return;
-    }
     final totalDuration = playerController.currentTrack!.duration;
     final currentDuration = await playerController.getCurrentPosition();
     final currentPosition = (currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100;

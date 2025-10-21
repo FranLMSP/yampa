@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
@@ -37,6 +40,20 @@ class MyHomePage extends ConsumerStatefulWidget {
 }
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 2000), (timer) async {
+      final playerController = ref.watch(playerControllerProvider);
+      final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
+      if (playerController.hasTrackFinishedPlaying()) {
+        await playerControllerNotifier.handleNextAutomatically();
+      }
+    });
+  }
+
   Future<void> _load(
     bool initialLoadDone,
     InitialLoadNotifier initialLoadNotifier,
@@ -92,6 +109,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         }
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override

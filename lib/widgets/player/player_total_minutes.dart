@@ -59,7 +59,6 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
 
   @override
   Widget build(BuildContext context) {
-    _updateDurations();
     return Text("${formatDuration(_currentDuration)} / ${formatDuration(_totalDuration)}");
   }
 }
