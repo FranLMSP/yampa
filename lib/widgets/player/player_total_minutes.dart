@@ -22,7 +22,7 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 300), (timer) {
       _updateDurations();
     });
   }
@@ -59,7 +59,6 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
 
   @override
   Widget build(BuildContext context) {
-    _updateDurations();
     return Text("${formatDuration(_currentDuration)} / ${formatDuration(_totalDuration)}");
   }
 }

@@ -11,4 +11,5 @@ abstract class TrackPlayer {
   Future<void> setSpeed(double speed);
   Future<void> setVolume(double volume);
   Future<Duration> getCurrentPosition();
+  bool hasTrackFinishedPlaying();
 } 

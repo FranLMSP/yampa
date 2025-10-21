@@ -23,7 +23,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
       _timer?.cancel();
       _timer = null;
     }
-    _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       _getPlayerCurrentPosition(playerControllerNotifier);
     });
   }
@@ -31,10 +31,6 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   @override
   void initState() {
     super.initState();
-  }
-
-  int _normalizeMilliseconds(int milliseconds) {
-    return (milliseconds / 100).round() * 100;
   }
 
   Future<void> _getPlayerCurrentPosition(PlayerControllerNotifier playerControllerNotifier) async {
@@ -52,15 +48,6 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
     }
     final totalDuration = playerController.currentTrack!.duration;
     final currentDuration = await playerController.getCurrentPosition();
-    // TODO: this check here isn't very precise, so we have to find a better way to check whether the tracked has finished playing
-    if (_normalizeMilliseconds(currentDuration.inMilliseconds) == _normalizeMilliseconds(totalDuration.inMilliseconds)) {
-      await playerControllerNotifier.handleNextAutomatically();
-      if (!mounted) return;
-      setState(() {
-        _currentSliderValue = 0;
-      });
-      return;
-    }
     final currentPosition = (currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100;
     if (!mounted) return;
     setState(() {
