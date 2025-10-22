@@ -4,6 +4,7 @@ import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
 import 'package:yampa/widgets/main_browser/local_path_picker/main.dart';
 import 'package:yampa/widgets/main_browser/playlists/main.dart';
 import 'package:yampa/widgets/player/big_player.dart';
+import 'package:yampa/widgets/player/mini_player.dart';
 import 'package:yampa/widgets/utils.dart';
 
 class MainBrowser extends ConsumerWidget {
@@ -54,6 +55,7 @@ class MainBrowser extends ConsumerWidget {
       child: Scaffold(
         appBar: TabBar(tabs: tabs),
         body: TabBarView(children: elements),
+        bottomSheet: MiniPlayer(),
       ),
     );
   }

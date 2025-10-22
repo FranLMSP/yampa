@@ -40,6 +40,3 @@ class BigPlayer extends ConsumerWidget {
     );
   }
 }
-
-
-
