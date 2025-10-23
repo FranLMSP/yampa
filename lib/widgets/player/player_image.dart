@@ -1,33 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:yampa/models/track.dart';
 
-const imageWidth = 200.0;
-const imageHeight = 200.0;
-
 class PlayerImage extends StatelessWidget {
 
   const PlayerImage({
     super.key,
     this.track,
+    this.width = 200.0,
+    this.height = 200.0,
+    this.iconSize = 100.0,
   });
 
   final Track? track;
+  final double width;
+  final double height;
+  final double iconSize;
 
   Widget _buildImage(Track track) {
     return Image.memory(
       track.imageBytes!,
-      width: imageWidth,
-      height: imageHeight,
+      width: width,
+      height: height,
       fit: BoxFit.cover,
     );
   }
 
   Widget _buildImagePlaceholder() {
     return Container(
-      width: imageWidth,
-      height: imageHeight,
+      width: width,
+      height: height,
       color: Colors.grey,
-      child: const Icon(Icons.music_note, size: 100, color: Colors.white),
+      child: Icon(Icons.music_note, size: iconSize, color: Colors.white),
     );
   }
 
