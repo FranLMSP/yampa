@@ -10,7 +10,10 @@ class MiniPlayer extends ConsumerWidget {
 
   const MiniPlayer({
     super.key,
+    this.onTap,
   });
+
+  final Function? onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,44 +21,47 @@ class MiniPlayer extends ConsumerWidget {
     if (track == null) {
       return Row();
     }
-    return SizedBox(
-      height: 75,
-      child: Column(
-        children: [
-          MiniPlayerSlider(),
-          Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(10.0),
-                child: PlayerImage(
-                  track: track,
-                  width: 50.0,
-                  height: 50.0,
-                  iconSize: 40.0,
+    return InkWell(
+      onTap: () => onTap != null ? onTap!() : null,
+      child: SizedBox(
+        height: 75,
+        child: Column(
+          children: [
+            MiniPlayerSlider(),
+            Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: PlayerImage(
+                    track: track,
+                    width: 50.0,
+                    height: 50.0,
+                    iconSize: 40.0,
+                  ),
                 ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        track.displayName(),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(track.album),
+                    ],
+                  ),
+                ),
+                Row(
                   children: [
-                    Text(
-                      track.displayName(),
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(track.album),
+                    PlayerTotalMinutes(),
+                    PlayAndPauseButton(),
                   ],
                 ),
-              ),
-              Row(
-                children: [
-                  PlayerTotalMinutes(),
-                  PlayAndPauseButton(),
-                ],
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
