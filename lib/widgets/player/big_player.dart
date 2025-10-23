@@ -21,13 +21,13 @@ class BigPlayer extends ConsumerWidget {
         PlayerImage(track: track),
         const SizedBox(height: 20),
         Text(
-          track?.name ?? "",
+          track != null ? track.displayName() : "",
           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 10),
         Text(
-          track?.artist ?? "",
+          track?.album ?? "",
           style: const TextStyle(fontSize: 18, color: Colors.grey),
           textAlign: TextAlign.center,
         ),
