@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/widgets/player/buttons/play_and_pause.dart';
+import 'package:yampa/widgets/player/player_image.dart';
 import 'package:yampa/widgets/player/player_total_minutes.dart';
 
 class MiniPlayer extends ConsumerWidget {
@@ -28,11 +29,11 @@ class MiniPlayer extends ConsumerWidget {
               Padding(
                 padding: EdgeInsets.all(10.0),
                 // TODO: use PlayerImage here
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  color: Colors.grey,
-                  child: const Icon(Icons.music_note, size: 40, color: Colors.white),
+                child: PlayerImage(
+                  track: track,
+                  width: 50.0,
+                  height: 50.0,
+                  iconSize: 40.0,
                 ),
               ),
               Expanded(
@@ -41,10 +42,10 @@ class MiniPlayer extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      "Sample title",
+                      track.displayName(),
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text("Sample artist and album"),
+                    Text(track.album),
                   ],
                 ),
               ),
