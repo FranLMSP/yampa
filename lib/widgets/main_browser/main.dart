@@ -98,19 +98,24 @@ class _MainBrowserState extends ConsumerState<MainBrowser> with SingleTickerProv
           }
         },
       ),
-      body: TabBarView(controller: _tabController, children: elements),
-      bottomSheet: _showMiniPlayer
-        ? MiniPlayer(
-            onTap: () {
-              _tabController.animateTo(0);
-              if (mounted) {
-                setState(() {
-                  _showMiniPlayer = false;
-                });
+      body: Column(
+        children: [
+          Expanded(
+            child: TabBarView(controller: _tabController, children: elements)
+          ),
+          if (_showMiniPlayer)
+            MiniPlayer(
+              onTap: () {
+                _tabController.animateTo(0);
+                if (mounted) {
+                  setState(() {
+                    _showMiniPlayer = false;
+                  });
+                }
               }
-            }
-          )
-        : null,
+            )
+        ],
+      ),
     );
   }
 }
