@@ -18,7 +18,7 @@ class AllTracksPicker extends ConsumerStatefulWidget {
 
 class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
 
-  List<String> _selectedTrackIds = [];
+  final List<String> _selectedTrackIds = [];
 
   Future<void> _playSelectedTrack(Track track, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
     if (isTrackCurrentlyPlaying(track, playerController)) {
@@ -33,7 +33,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     await playerControllerNotifier.play();
   }
 
-  Future<void> _toggleSelectedTrack(Track track) async {
+  void _toggleSelectedTrack(Track track) {
     setState(() {
       if (_selectedTrackIds.contains(track.id)) {
         _selectedTrackIds.remove(track.id);
@@ -41,6 +41,36 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         _selectedTrackIds.add(track.id);
       }
     });
+  }
+
+  PreferredSizeWidget? _buildAppBar() {
+    if (_selectedTrackIds.isEmpty) {
+      return null;
+    }
+    return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.close),
+        onPressed: () {
+          setState(() {
+            _selectedTrackIds.clear();
+          });
+        },
+      ),
+      title: Text('${_selectedTrackIds.length} selected'),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.playlist_add),
+          tooltip: 'Add to playlist',
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Added ${_selectedTrackIds.length} track(s) to playlist.'),
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 
   @override
@@ -55,7 +85,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
       return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));
     }
     return Scaffold(
-      appBar: null,
+      appBar: _buildAppBar(),
       body: ListView(
         children: tracks.map(
           (track) {
