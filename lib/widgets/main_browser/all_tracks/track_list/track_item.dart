@@ -19,10 +19,20 @@ enum OptionSelected {
 }
 
 class TrackItem extends ConsumerWidget {
-  const TrackItem({super.key, required this.track, this.onTap});
+  const TrackItem({
+    super.key,
+    required this.track,
+    this.onTap,
+    this.onLongPress,
+    this.onSelect,
+    this.isSelected = false,
+  });
 
   final Track track;
   final Function(Track track)? onTap;
+  final Function(Track track)? onLongPress;
+  final Function(Track track)? onSelect;
+  final bool isSelected;
 
   Widget _buildTrackImage() {
     return Image.memory(
@@ -71,6 +81,8 @@ class TrackItem extends ConsumerWidget {
       selectedTracksNotifier.clear();
       selectedTracksNotifier.selectTrack(track);
       addToPlaylistsModal(context, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
+    } else if (optionSelected == OptionSelected.select && onSelect != null) {
+      onSelect!(track);
     }
   }
 
@@ -109,10 +121,13 @@ class TrackItem extends ConsumerWidget {
           onTap!(track);
         }
       },
-      onLongPress: () => {
-        // TODO: implement functionality to select multiple tracks
+      onLongPress: () {
+        if (onLongPress != null) {
+          onLongPress!(track);
+        }
       },
       child: Card(
+        color: isSelected ? Colors.indigo : null, // TODO: grab this from the main theme of the app
         child: ListTile(
           leading: _buildTrackIcon(playerController),
           title: Text(track.displayName()),
@@ -123,6 +138,7 @@ class TrackItem extends ConsumerWidget {
               _buildDuration(track.duration),
             ],
           ),
+          // TODO: put this on a separate widget and receive it as a parameter
           trailing: _buildPopupMenuButton(context, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier),
         ),
       ),
