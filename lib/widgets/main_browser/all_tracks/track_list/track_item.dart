@@ -2,21 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/utils/format_utils.dart';
-import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
-import 'package:yampa/providers/playlists_provider.dart';
-import 'package:yampa/providers/selected_playlists_provider.dart';
-import 'package:yampa/providers/selected_tracks_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/common.dart';
-import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart';
-
-enum OptionSelected {
-  select,
-  addToPlaylists,
-  info,
-}
 
 class TrackItem extends ConsumerWidget {
   const TrackItem({
@@ -24,14 +12,14 @@ class TrackItem extends ConsumerWidget {
     required this.track,
     this.onTap,
     this.onLongPress,
-    this.onSelect,
+    this.trailing,
     this.isSelected = false,
   });
 
   final Track track;
   final Function(Track track)? onTap;
   final Function(Track track)? onLongPress;
-  final Function(Track track)? onSelect;
+  final Widget? trailing;
   final bool isSelected;
 
   Widget _buildTrackImage() {
@@ -68,53 +56,9 @@ class TrackItem extends ConsumerWidget {
     return Text(formatDuration(duration));
   }
 
-  void _handleOptionSelected(
-    BuildContext context,
-    OptionSelected? optionSelected,
-    List<Track> tracks,
-    List<Playlist> playlists,
-    PlaylistNotifier playlistNotifier,
-    SelectedPlaylistNotifier selectedPlaylistsNotifier,
-    SelectedTracksNotifier selectedTracksNotifier,
-  ) {
-    if (optionSelected == OptionSelected.addToPlaylists) {
-      selectedTracksNotifier.clear();
-      selectedTracksNotifier.selectTrack(track);
-      addToPlaylistsModal(context, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
-    } else if (optionSelected == OptionSelected.select && onSelect != null) {
-      onSelect!(track);
-    }
-  }
-
-  Widget _buildPopupMenuButton(
-    BuildContext context,
-    List<Track> tracks,
-    List<Playlist> playlists,
-    PlaylistNotifier playlistNotifier,
-    SelectedPlaylistNotifier selectedPlaylistsNotifier,
-    SelectedTracksNotifier selectedTracksNotifier,
-  ) {
-    return PopupMenuButton<OptionSelected>(
-      initialValue: null,
-      onSelected: (OptionSelected item) {
-        _handleOptionSelected(context, item, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
-      },
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.select, child: Text('Select')),
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.addToPlaylists, child: Text('Add to playlists')),
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.info, child: Text('Info')),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerController = ref.watch(playerControllerProvider);
-    final tracks = ref.read(tracksProvider);
-    final playlists = ref.read(playlistsProvider);
-    final playlistNotifier = ref.read(playlistsProvider.notifier);
-    final selectedPlaylistsNotifier = ref.read(selectedPlaylistsProvider.notifier);
-    final selectedTracksNotifier = ref.read(selectedTracksProvider.notifier);
     return InkWell(
       onTap: () {
         if (onTap != null) {
@@ -138,8 +82,7 @@ class TrackItem extends ConsumerWidget {
               _buildDuration(track.duration),
             ],
           ),
-          // TODO: put this on a separate widget and receive it as a parameter
-          trailing: _buildPopupMenuButton(context, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier),
+          trailing: trailing,
         ),
       ),
     );

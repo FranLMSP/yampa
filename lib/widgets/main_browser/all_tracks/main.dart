@@ -14,14 +14,56 @@ import 'package:yampa/widgets/main_browser/all_tracks/track_list/common.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart';
 
-class AllTracksPicker extends ConsumerStatefulWidget {
-  const AllTracksPicker({super.key});
 
-  @override
-  ConsumerState<AllTracksPicker> createState() => _AllTracksPickerState();
+enum OptionSelected {
+  select,
+  addToPlaylists,
+  info,
 }
 
-class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
+class AllTracksPicker extends ConsumerWidget {
+  const AllTracksPicker({super.key});
+
+  Widget _buildItemPopupMenuButton(
+    BuildContext context,
+    Track track,
+    List<Track> tracks,
+    List<Playlist> playlists,
+    PlaylistNotifier playlistNotifier,
+    SelectedPlaylistNotifier selectedPlaylistsNotifier,
+    SelectedTracksNotifier selectedTracksNotifier,
+  ) {
+    return PopupMenuButton<OptionSelected>(
+      initialValue: null,
+      onSelected: (OptionSelected item) {
+        _handleItemOptionSelected(context, track, item, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
+        const PopupMenuItem<OptionSelected>(value: OptionSelected.select, child: Text('Select')),
+        const PopupMenuItem<OptionSelected>(value: OptionSelected.addToPlaylists, child: Text('Add to playlists')),
+        const PopupMenuItem<OptionSelected>(value: OptionSelected.info, child: Text('Info')),
+      ],
+    );
+  }
+ 
+  void _handleItemOptionSelected(
+    BuildContext context,
+    Track track,
+    OptionSelected? optionSelected,
+    List<Track> tracks,
+    List<Playlist> playlists,
+    PlaylistNotifier playlistNotifier,
+    SelectedPlaylistNotifier selectedPlaylistsNotifier,
+    SelectedTracksNotifier selectedTracksNotifier,
+  ) {
+    if (optionSelected == OptionSelected.addToPlaylists) {
+      selectedTracksNotifier.clear();
+      selectedTracksNotifier.selectTrack(track);
+      addToPlaylistsModal(context, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
+    } else if (optionSelected == OptionSelected.select) {
+      selectedTracksNotifier.selectTrack(track);
+    }
+  }
 
   Future<void> _playSelectedTrack(Track track, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
     if (isTrackCurrentlyPlaying(track, playerController)) {
@@ -84,7 +126,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final initialLoadDone = ref.watch(initialLoadProvider);
     final tracks = ref.watch(tracksProvider);
     final playlists = ref.watch(playlistsProvider);
@@ -132,7 +174,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
               onTap: onTap,
               onLongPress: onLongPress,
               isSelected: isSelected,
-              onSelect: onSelect,
+              trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier),
             );
         }).toList()
       ),
