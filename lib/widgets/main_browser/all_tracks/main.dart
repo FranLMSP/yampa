@@ -18,6 +18,7 @@ import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart'
 enum OptionSelected {
   select,
   addToPlaylists,
+  removeFromPlaylist,
   info,
 }
 

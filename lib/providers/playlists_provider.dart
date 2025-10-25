@@ -33,15 +33,17 @@ class PlaylistNotifier extends Notifier<List<Playlist>> {
   }
 
   void addTrack(Playlist playlist, Track track) {
-    if (playlist.tracks.indexWhere((e) => e.id == track.id) != -1) {
+    final foundPlaylist = state.firstWhere((e) => e.id == playlist.id);
+    if (foundPlaylist.tracks.indexWhere((e) => e.id == track.id) != -1) {
       return;
     }
-    playlist.tracks.add(track);
-    updatePlaylist(playlist);
+    foundPlaylist.tracks.add(track);
+    updatePlaylist(foundPlaylist);
   }
 
   void removeTrack(Playlist playlist, Track track) {
-    playlist.tracks.removeWhere((t) => t.id == track.id);
-    updatePlaylist(playlist);
+    final foundPlaylist = state.firstWhere((e) => e.id == playlist.id);
+    foundPlaylist.tracks.removeWhere((t) => t.id == track.id);
+    updatePlaylist(foundPlaylist);
   }
 }

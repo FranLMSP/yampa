@@ -156,6 +156,19 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
   }
 
   @override
+  Future<void> removeMultipleTracksFromPlaylist(Playlist playlist, List<Track> tracks) async {
+    final db = await _getdb();
+    await db.delete(
+      playlistsTracksRelationsTableName,
+      where: 'playlist_id = ? and track_id in (${List.filled(tracks.length, '?').join(',')})',
+      whereArgs: [
+        playlist.id,
+        ...tracks.map((e) => e.id),
+      ],
+    );
+  }
+
+  @override
   Future<void> removePlaylist(Playlist playlist) async {
     final db = await _getdb();
     final futures = [

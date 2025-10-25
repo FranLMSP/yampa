@@ -179,3 +179,16 @@ Future<void> handleTrackRemovedFromPlaylist(
   await playlistRepository.removeTrackFromPlaylist(playlist, track);
   await playlistRepository.close();
 }
+
+Future<void> handleMultipleTrackRemovedFromPlaylist(
+  Playlist playlist,
+  List<Track> tracks,
+  PlaylistNotifier playlistNotifier,
+) async {
+  for (final track in tracks) {
+    playlistNotifier.removeTrack(playlist, track);
+  }
+  final playlistRepository = getPlaylistRepository();
+  await playlistRepository.removeMultipleTracksFromPlaylist(playlist, tracks);
+  await playlistRepository.close();
+}
