@@ -33,6 +33,9 @@ class PlaylistNotifier extends Notifier<List<Playlist>> {
   }
 
   void addTrack(Playlist playlist, Track track) {
+    if (playlist.tracks.indexWhere((e) => e.id == track.id) != -1) {
+      return;
+    }
     playlist.tracks.add(track);
     updatePlaylist(playlist);
   }

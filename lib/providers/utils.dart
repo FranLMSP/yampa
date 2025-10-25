@@ -129,7 +129,6 @@ Future<void> handleTracksAddedToPlaylist(
   SelectedPlaylistNotifier selectedPlaylistsNotifier,
   SelectedTracksNotifier selectedTracksNotifier,
 ) async {
-  // TODO: this function doesn't seem to be handling tracks already added to the playlist, as they appear to be duplicated in the UI
   final selectedPlaylistIds = selectedPlaylistsNotifier.getPlaylistIds();
   final selectedTrackIds = selectedTracksNotifier.getTrackIds();
   final playlistRepository = getPlaylistRepository();
