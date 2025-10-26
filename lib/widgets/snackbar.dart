@@ -10,6 +10,7 @@ void showSnackBarMessage(
     void Function()? onPressed,
   }
 ) {
+  // test 1
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(message),
