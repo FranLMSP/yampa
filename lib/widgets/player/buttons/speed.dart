@@ -7,7 +7,9 @@ class SpeedButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Chip(
-      label: Text('x1'),
+      label: Text(
+        'x1'
+      ),
       backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
       labelStyle: TextStyle(
         color: Theme.of(context).colorScheme.onSecondaryContainer,
