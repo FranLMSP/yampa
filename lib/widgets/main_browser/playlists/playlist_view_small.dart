@@ -89,8 +89,6 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     PlaylistNotifier playlistNotifier,
   ) {
     if (optionSelected == OptionSelected.removeFromPlaylist) {
-      /*final removedTracks = tracks.where((e) => _selectedTrackIds.contains(e.id)).toList();
-      handleMultipleTrackRemovedFromPlaylist(widget.playlist, removedTracks, playlistNotifier);*/
       handleTrackRemovedFromPlaylist(widget.playlist, track, playlistNotifier);
     } else if (optionSelected == OptionSelected.select) {
       _toggleSelectedTrack(track.id);

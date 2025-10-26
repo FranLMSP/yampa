@@ -201,7 +201,7 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
     final batch = db.batch();
 
     for (final row in playlistAndTrackMapping) {
-      // maybe not the most optimal way to ensure no duplicated entries but it was convenient
+      // Perhaps not the most optimal way to ensure no duplicated entries but it was convenient
       batch.delete(
         playlistsTracksRelationsTableName,
         where: 'playlist_id = ? and track_id = ?',
