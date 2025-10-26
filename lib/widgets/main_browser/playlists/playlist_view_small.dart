@@ -15,12 +15,14 @@ class PlaylistViewSmall extends ConsumerStatefulWidget {
   final Playlist playlist;
   final Function(Playlist editedPlaylist) onEdit;
   final Function onGoBack;
+  final Function(List<String> tracks) setSelectedTrackIds;
 
   const PlaylistViewSmall({
     super.key,
     required this.playlist,
     required this.onEdit,
     required this.onGoBack,
+    required this.setSelectedTrackIds,
   });
 
   @override
@@ -102,6 +104,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
       } else {
         _selectedTrackIds.add(id);
       }
+      widget.setSelectedTrackIds(_selectedTrackIds);
     });
   }
 
