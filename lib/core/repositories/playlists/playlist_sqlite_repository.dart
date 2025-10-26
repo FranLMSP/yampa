@@ -156,6 +156,19 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
   }
 
   @override
+  Future<void> removeMultipleTracksFromPlaylist(Playlist playlist, List<Track> tracks) async {
+    final db = await _getdb();
+    await db.delete(
+      playlistsTracksRelationsTableName,
+      where: 'playlist_id = ? and track_id in (${List.filled(tracks.length, '?').join(',')})',
+      whereArgs: [
+        playlist.id,
+        ...tracks.map((e) => e.id),
+      ],
+    );
+  }
+
+  @override
   Future<void> removePlaylist(Playlist playlist) async {
     final db = await _getdb();
     final futures = [
@@ -188,6 +201,12 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
     final batch = db.batch();
 
     for (final row in playlistAndTrackMapping) {
+      // maybe not the most optimal way to ensure no duplicated entries but it was convenient
+      batch.delete(
+        playlistsTracksRelationsTableName,
+        where: 'playlist_id = ? and track_id = ?',
+        whereArgs: [row["playlist_id"], row["track_id"]],
+      );
       final id = Ulid().toString();
       batch.insert(
         playlistsTracksRelationsTableName,

@@ -5,19 +5,24 @@ import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
+import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 
 
 class PlaylistViewSmall extends ConsumerStatefulWidget {
   final Playlist playlist;
   final Function(Playlist editedPlaylist) onEdit;
   final Function onGoBack;
+  final Function(List<String> tracks) setSelectedTrackIds;
 
   const PlaylistViewSmall({
     super.key,
     required this.playlist,
     required this.onEdit,
     required this.onGoBack,
+    required this.setSelectedTrackIds,
   });
 
   @override
@@ -27,6 +32,7 @@ class PlaylistViewSmall extends ConsumerStatefulWidget {
 class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
+  final List<String> _selectedTrackIds = [];
 
   @override
   void initState() {
@@ -58,13 +64,59 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     }
   }
 
+  Widget _buildItemPopupMenuButton(
+    Track track,
+    List<Track> tracks,
+    PlaylistNotifier playlistNotifier,
+  ) {
+    return PopupMenuButton<OptionSelected>(
+      initialValue: null,
+      onSelected: (OptionSelected item) {
+        _handleItemOptionSelected(track, item, tracks, playlistNotifier);
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
+        const PopupMenuItem<OptionSelected>(value: OptionSelected.select, child: Text('Select')),
+        const PopupMenuItem<OptionSelected>(value: OptionSelected.removeFromPlaylist, child: Text('Remove from playlist')),
+        const PopupMenuItem<OptionSelected>(value: OptionSelected.info, child: Text('Info')),
+      ],
+    );
+  }
+
+  void _handleItemOptionSelected(
+    Track track,
+    OptionSelected? optionSelected,
+    List<Track> tracks,
+    PlaylistNotifier playlistNotifier,
+  ) {
+    if (optionSelected == OptionSelected.removeFromPlaylist) {
+      /*final removedTracks = tracks.where((e) => _selectedTrackIds.contains(e.id)).toList();
+      handleMultipleTrackRemovedFromPlaylist(widget.playlist, removedTracks, playlistNotifier);*/
+      handleTrackRemovedFromPlaylist(widget.playlist, track, playlistNotifier);
+    } else if (optionSelected == OptionSelected.select) {
+      _toggleSelectedTrack(track.id);
+    }
+  }
+
+  void _toggleSelectedTrack(String id) {
+    setState(() {
+      if (_selectedTrackIds.contains(id)) {
+        _selectedTrackIds.remove(id);
+      } else {
+        _selectedTrackIds.add(id);
+      }
+      widget.setSelectedTrackIds(_selectedTrackIds);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final imagePath = widget.playlist.imagePath;
     final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
     final playlistNotifier = ref.watch(playlistsProvider.notifier);
+    final tracks = ref.watch(tracksProvider);
     final playlists = ref.watch(playlistsProvider);
     final selectedPlaylist = playlists.where((e) => e.id == widget.playlist.id).firstOrNull ?? widget.playlist;
+    final isInSelectMode = _selectedTrackIds.isNotEmpty;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -124,7 +176,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             width: 100,
             child: ElevatedButton(
               onPressed: () async {
-                if (widget.playlist.tracks.isNotEmpty) {
+                if (selectedPlaylist.tracks.isNotEmpty) {
                   await playerControllerNotifier.stop();
                   playerControllerNotifier.setTrackPlayer(JustAudioProvider());
                   playerControllerNotifier.setQueue(widget.playlist.tracks);
@@ -144,37 +196,28 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           const SizedBox(height: 24),
           Column(
             children: selectedPlaylist.tracks.map((track) {
-              return ListTile(
-                leading: _buildTrackImage(track),
-                title: Text(track.displayName()),
-                subtitle: Text(track.artist),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () async {
-                    // TODO: scaffold with an "undo" button
-                    setState(() {
-                      widget.playlist.tracks.removeWhere((e) => e.id == track.id);
-                      widget.onEdit(widget.playlist);
-                    });
-                    await handleTrackRemovedFromPlaylist(widget.playlist, track, playlistNotifier);
-                  },
-                ),
+              final isSelected = _selectedTrackIds.contains(track.id);
+              return TrackItem(
+                key: Key(track.id),
+                track: track,
+                onTap: (Track track) {
+                  if (isInSelectMode) {
+                    _toggleSelectedTrack(track.id);
+                  } else {
+                    // TODO: play track
+                  }
+                },
+                onLongPress: (Track track) {
+                  _toggleSelectedTrack(track.id);
+                },
+                isSelected: isSelected,
+                trailing: isInSelectMode ? null : _buildItemPopupMenuButton(track, tracks, playlistNotifier),
               );
             }).toList(),
           ),
         ],
       ),
     );
-  }
-
-  Widget _buildTrackImage(Track track) {
-    if (track.imageBytes != null) {
-      return CircleAvatar(
-        backgroundImage: MemoryImage(track.imageBytes!),
-      );
-    } else {
-      return const CircleAvatar(child: Icon(Icons.music_note));
-    }
   }
 
   @override

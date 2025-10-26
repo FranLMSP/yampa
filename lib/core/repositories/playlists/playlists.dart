@@ -8,6 +8,7 @@ abstract class PlaylistsRepository {
   Future<void> addTrackToPlaylist(Playlist playlist, Track track);
   Future<void> linkTracksWithPlaylists(List<Map<String, String>> playlistAndTrackMapping);
   Future<void> removeTrackFromPlaylist(Playlist playlist, Track track);
+  Future<void> removeMultipleTracksFromPlaylist(Playlist playlist, List<Track> tracks);
   Future<void> removePlaylist(Playlist playlist);
   Future<void> close();
 }
