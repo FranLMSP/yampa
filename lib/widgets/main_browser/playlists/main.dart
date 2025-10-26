@@ -60,9 +60,12 @@ class _PlaylistsState extends ConsumerState<Playlists> {
                 TextButton(
                   child: const Text('Yes'),
                   onPressed: () {
-                    handleMultipleTrackRemovedFromPlaylist(_selectedPlaylist!, selectedTracks, playlistNotifier);
-                    // TODO: show a snackbar with an "undo" button
-                    Navigator.of(context).pop();
+                    setState(() {
+                      _selectedTrackIds = [];
+                      handleMultipleTrackRemovedFromPlaylist(_selectedPlaylist!, selectedTracks, playlistNotifier);
+                      // TODO: show a snackbar with an "undo" button
+                      Navigator.of(context).pop();
+                    });
                   },
                 ),
               ],
@@ -74,15 +77,11 @@ class _PlaylistsState extends ConsumerState<Playlists> {
   }
 
   Widget? _buildFloatingActionButton(BuildContext context, PlaylistNotifier playlistNotifier) {
-    if (_selectedPlaylist != null) {
-      return null;
-    }
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if (_selectedTrackIds.isEmpty) _buildAddNewTrackFloatingButton(playlistNotifier),
+        if (_selectedTrackIds.isEmpty && _selectedPlaylist == null) _buildAddNewTrackFloatingButton(playlistNotifier),
         if (_selectedTrackIds.isNotEmpty) _buildRemoveSelectedTracksButton(playlistNotifier),
       ],
     );
