@@ -5,27 +5,32 @@ lint-all:
 	flutter analyze
 
 FILE ?= .
-DOCKER_IMAGE ?= yampa_linux_builder
+DOCKER_IMAGE_LINUX ?= yampa_linux_builder
+DOCKER_IMAGE_ANDROID ?= yampa_android_builder
 format:
 	dart format $(FILE)
 
-.PHONY: docker/clean-image build/linux build/windows build/android build/all
+.PHONY: docker/clean-images build/linux build/windows build/android build/all
 
-docker/clean-image:
-	docker image rm $(DOCKER_IMAGE)
+docker/clean-images:
+	docker image rm $(DOCKER_IMAGE_LINUX) \
+	&& docker image rm $(DOCKER_IMAGE_ANDROID)
 
-build-dockerfile:
-	docker build -t $(DOCKER_IMAGE) -f docker/linux.Dockerfile ./
+docker/build-image/linux:
+	docker build -t $(DOCKER_IMAGE_LINUX) -f docker/linux.Dockerfile ./
+
+docker/build-image/android:
+	docker build -t $(DOCKER_IMAGE_ANDROID) -f docker/android.Dockerfile ./
 
 build/linux:
-	make build-dockerfile \
-	&& docker run --rm -v ./:/app/project/ -v yampa_build:/app/project/build/ $(DOCKER_IMAGE) "flutter clean && flutter doctor && flutter build linux --release"
+	make docker/build-image/linux \
+	&& docker run --rm -v ./:/app/project/ -v yampa_build:/app/project/build/ $(DOCKER_IMAGE_LINUX) "flutter clean && flutter doctor && flutter build linux --release"
+
+build/android:
+	make docker/build-image/android \
+	&& docker run --rm -v ./:/app/project/ -v yampa_build:/app/project/build/ $(DOCKER_IMAGE_ANDROID) "flutter clean && flutter doctor && flutter build apk --release"
 
 build/windows:
 	echo "TODO"
-
-build/android:
-	make build-dockerfile \
-	&& docker run --rm -v ./:/app/project/ -v yampa_build:/app/project/build/ $(DOCKER_IMAGE) "flutter clean && flutter doctor && flutter build apk --release"
 
 build/all: build/linux build/windows build/android

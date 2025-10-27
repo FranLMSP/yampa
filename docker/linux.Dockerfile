@@ -18,7 +18,6 @@ USER builder
 
 WORKDIR /app/project
 
-COPY ./android .
 COPY ./lib .
 COPY ./linux .
 COPY ./test .
