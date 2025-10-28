@@ -7,6 +7,8 @@ lint-all:
 FILE ?= .
 DOCKER_IMAGE_LINUX ?= yampa_linux_builder
 DOCKER_IMAGE_ANDROID ?= yampa_android_builder
+DOCKER_IMAGE_WINDOWS ?= yampa_windows_builder
+
 format:
 	dart format $(FILE)
 
@@ -34,3 +36,13 @@ build/windows:
 	echo "TODO"
 
 build/all: build/linux build/windows build/android
+
+.PHONY: release/get-latest-tag release/new-tag
+
+
+release/get-latest-tag:
+	git tag --sort=creatordate | tail -n 1
+
+DRY_RUN ?= --dry-run
+release/new-tag:
+	./scripts/version-tag.sh $(DRY_RUN)
