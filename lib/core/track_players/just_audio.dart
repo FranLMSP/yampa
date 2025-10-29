@@ -6,6 +6,7 @@ import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
+import 'package:yampa/core/utils/id_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/track.dart';
 import 'interface.dart';
@@ -62,8 +63,7 @@ class JustAudioProvider implements TrackPlayer {
       final tempPlayer = AudioPlayer();
       final duration = await tempPlayer.setFilePath(path.filename!);
       return Track(
-        // id: path.id,
-        id: path.filename!, // TODO: find a better way to give these an actual ID
+        id: await generateTrackId(path.filename!),
         name: metadata.title ?? "",
         artist: metadata.artist ?? "",
         album: metadata.album ?? "",
