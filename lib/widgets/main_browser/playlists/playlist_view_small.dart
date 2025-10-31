@@ -1,6 +1,8 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/track_players/just_audio.dart';
+import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
@@ -42,26 +44,23 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
   }
 
   void _changeImage() async {
-    // Replace this with your image picking logic
-    final newImagePath = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Change Image'),
-        content: const Text('Simulate picking image here...'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'path/to/new/image.png'),
-            child: const Text('Pick'),
-          ),
-        ],
-      ),
-    );
-
-    if (newImagePath != null) {
-      setState(() {
-        // You might want to save this to the backend or update state elsewhere
-      });
+    FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: false);
+    if (result == null) {
+      return;
     }
+    final path = result.paths.first;
+    if (path == null || !isValidImagePath(path)) {
+      return;
+    }
+
+    final editedPlaylist = Playlist(
+      id: widget.playlist.id,
+      name: widget.playlist.name,
+      description: widget.playlist.description,
+      tracks: widget.playlist.tracks,
+      imagePath: path,
+    );
+    widget.onEdit(editedPlaylist);
   }
 
   Widget _buildItemPopupMenuButton(
