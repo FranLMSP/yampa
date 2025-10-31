@@ -102,7 +102,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
         ? PlaylistViewSmall(
             playlist: _selectedPlaylist!,
             onEdit: (Playlist editedPlaylist) {
-              // TODO
+              handlePlaylistEdited(editedPlaylist, playlistNotifier);
             },
             onGoBack: () {
               setState(() {

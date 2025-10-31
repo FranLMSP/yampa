@@ -143,11 +143,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           TextField(
             controller: _titleController,
             decoration: const InputDecoration(labelText: 'Title'),
-            onEditingComplete: () {
+            onTapOutside: (text) {
               final editedPlaylist = Playlist(
                 id: widget.playlist.id,
                 name: _titleController.text,
-                description: widget.playlist.id,
+                description: widget.playlist.description,
                 tracks: widget.playlist.tracks,
                 imagePath: widget.playlist.imagePath,
               );
@@ -158,7 +158,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           TextField(
             controller: _descriptionController,
             decoration: const InputDecoration(labelText: 'Description'),
-            onChanged: (text) {
+            onTapOutside: (text) {
               final editedPlaylist = Playlist(
                 id: widget.playlist.id,
                 name: widget.playlist.name,
