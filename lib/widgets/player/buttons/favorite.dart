@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yampa/providers/favorite_tracks_provider.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/utils.dart';
 
 class FavoriteButton extends ConsumerWidget {
   const FavoriteButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
+    final currentTrack = ref.watch(playerControllerProvider).currentTrack;
+    final favorites = ref.watch(favoriteTracksProvider);
+    final favoritesNotifier = ref.watch(favoriteTracksProvider.notifier);
+    final isFavorite = favorites.contains(currentTrack?.id);
     return IconButton(
-      icon: const Icon(Icons.favorite),
-      tooltip: 'Saved to favorites',
+      icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
+      tooltip: isFavorite ? "Remove from favorites" : "Add to favorites",
       onPressed: () async {
-        print("clicked on favorite");
+        if (currentTrack == null) {
+          return;
+        }
+        if (isFavorite) {
+          handleTracksRemovedFromFavorites([currentTrack], favoritesNotifier);
+        } else {
+          handleTracksAddedToFavorites([currentTrack], favoritesNotifier);
+        }
       },
     );
   }
 }
-
-
