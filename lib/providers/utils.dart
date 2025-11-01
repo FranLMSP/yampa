@@ -122,6 +122,20 @@ Future<void> handlePlaylistCreated(Playlist playlist, PlaylistNotifier playlistN
   );
 }
 
+Future<void> handlePlaylistEdited(Playlist playlist, PlaylistNotifier playlistNotifier) async {
+  final playlistRepository = getPlaylistRepository();
+  await playlistRepository.updatePlaylist(playlist);
+  playlistNotifier.updatePlaylist(
+    Playlist(
+      id: playlist.id,
+      name: playlist.name,
+      description: playlist.description,
+      imagePath: playlist.imagePath,
+      tracks: playlist.tracks,
+    )
+  );
+}
+
 Future<void> handleTracksAddedToPlaylist(
   List<Track> tracks,
   List<Playlist> playlists,

@@ -39,3 +39,15 @@ bool isValidMusicPath(String path) {
     path.endsWith(".flac")
   );
 }
+
+bool isValidImagePath(String path) {
+  // TODO: maybe check for mimetype here as well?
+
+  return (
+    path.endsWith(".gif") ||
+    path.endsWith(".jpg") ||
+    path.endsWith(".jpeg") ||
+    path.endsWith(".webp") ||
+    path.endsWith(".png")
+  );
+}

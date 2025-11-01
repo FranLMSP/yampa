@@ -88,6 +88,7 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
           id: playlistData["id"].toString(),
           name: playlistData["name"].toString(),
           description: playlistData["description"].toString(),
+          imagePath: playlistData["image_path"]?.toString(),
           tracks: tracks,
         )
       );

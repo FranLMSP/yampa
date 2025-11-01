@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yampa/models/playlist.dart';
+import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 
 class PlaylistItemBig extends StatelessWidget {
   const PlaylistItemBig({super.key, required this.playlist, this.onTap});
@@ -21,23 +22,7 @@ class PlaylistItemBig extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(
-                child: playlist.imagePath != null
-                  ? Image.asset(
-                      playlist.imagePath!,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    )
-                  : Container(
-                      width: double.infinity,
-                      color: Colors.grey[300],
-                      child: const Icon(
-                        Icons.playlist_play,
-                        size: 40,
-                        color: Colors.black54,
-                      ),
-                    ),
-              ),
+              Expanded(child: PlaylistImage(playlist: playlist)),
               Container(
                 padding: const EdgeInsets.all(8),
                 width: double.infinity,
