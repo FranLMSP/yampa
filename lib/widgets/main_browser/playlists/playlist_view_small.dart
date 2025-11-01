@@ -48,26 +48,6 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     _descriptionController = TextEditingController(text: widget.playlist.description);
   }
 
-  Widget _buildItemPopupMenuButtonForImage(
-    BuildContext context,
-    Playlist selectedPlaylist,
-  ) {
-    return PopupMenuButton<ImageTabOptions>(
-      initialValue: null,
-      onSelected: (ImageTabOptions item) {
-        if (item == ImageTabOptions.changeImage) {
-          _changeImage(selectedPlaylist);
-        } else if (item == ImageTabOptions.removeImage) {
-          _updateImage(selectedPlaylist, null);
-        }
-      },
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<ImageTabOptions>>[
-        const PopupMenuItem<ImageTabOptions>(value: ImageTabOptions.changeImage, child: Text('Select another image')),
-        const PopupMenuItem<ImageTabOptions>(value: ImageTabOptions.removeImage, child: Text('Remove image')),
-      ],
-    );
-  }
-
   void _updateImage(Playlist selectedPlaylist, String? path) {
     final editedPlaylist = Playlist(
       id: selectedPlaylist.id,
@@ -93,7 +73,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
   }
 
   void _showImageOptions(BuildContext context, Playlist selectedPlaylist) async {
-    final overlay = Overlay.of(context)?.context.findRenderObject() as RenderBox?;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
     final box = context.findRenderObject() as RenderBox?;
     if (overlay == null || box == null) return;
 
