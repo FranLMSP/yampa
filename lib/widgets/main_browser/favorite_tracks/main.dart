@@ -2,58 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/track_players/just_audio.dart';
-import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/favorite_tracks_provider.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
-import 'package:yampa/providers/playlists_provider.dart';
-import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/providers/selected_tracks_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/common.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
-import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart';
 
 
-enum OptionSelected {
+enum OptionSelectedFavorites {
   select,
-  addToPlaylists,
-  addToFavorites,
-  removeFromPlaylist,
-  info,
+  removeFromFavorites,
 }
 
-class AllTracksPicker extends ConsumerWidget {
-  const AllTracksPicker({super.key});
+class FavoriteTracksPicker extends ConsumerWidget {
+  const FavoriteTracksPicker({super.key});
 
   Widget _buildItemPopupMenuButton(
     BuildContext context,
     Track track,
     List<Track> tracks,
-    List<Playlist> playlists,
     List<String> selectedTrackIds,
-    PlaylistNotifier playlistNotifier,
-    SelectedPlaylistNotifier selectedPlaylistsNotifier,
     SelectedTracksNotifier selectedTracksNotifier,
     FavoriteTracksNotifier favoriteTracksNotifier,
   ) {
-    return PopupMenuButton<OptionSelected>(
+    return PopupMenuButton<OptionSelectedFavorites>(
       initialValue: null,
-      onSelected: (OptionSelected item) {
-        _handleItemOptionSelected(context, track, item, tracks, playlists, selectedTrackIds, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, favoriteTracksNotifier);
+      onSelected: (OptionSelectedFavorites item) {
+        _handleItemOptionSelected(context, track, item, tracks, selectedTrackIds, selectedTracksNotifier, favoriteTracksNotifier);
       },
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.select, child: Text('Select')),
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.addToPlaylists, child: Text('Add to playlists')),
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.addToFavorites, child: Text('Add to favorites')),
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.info, child: Text('Info')),
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelectedFavorites>>[
+        const PopupMenuItem<OptionSelectedFavorites>(value: OptionSelectedFavorites.select, child: Text('Select')),
+        const PopupMenuItem<OptionSelectedFavorites>(value: OptionSelectedFavorites.removeFromFavorites, child: Text('Remove from favorites')),
       ],
     );
   }
 
-  void _addToFavoritesModal(
+  void _removeFromFavoritesModal(
     BuildContext context,
     List<Track> tracks,
     List<String> selectedTrackIds,
@@ -64,7 +52,7 @@ class AllTracksPicker extends ConsumerWidget {
       context: context,
       builder: (BuildContext ctx) {
         return AlertDialog(
-          title: const Text('Add to favorites?'),
+          title: const Text('Remove from favorites?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -74,7 +62,7 @@ class AllTracksPicker extends ConsumerWidget {
             ),
             TextButton(
               onPressed: () {
-                handleTracksAddedToFavorites(
+                handleTracksRemovedFromFavorites(
                   tracks.where((e) => selectedTrackIds.contains(e.id)).toList(),
                   favoriteTracksNotifier,
                 );
@@ -92,25 +80,18 @@ class AllTracksPicker extends ConsumerWidget {
   void _handleItemOptionSelected(
     BuildContext context,
     Track track,
-    OptionSelected? optionSelected,
+    OptionSelectedFavorites? optionSelected,
     List<Track> tracks,
-    List<Playlist> playlists,
     List<String> selectedTrackIds,
-    PlaylistNotifier playlistNotifier,
-    SelectedPlaylistNotifier selectedPlaylistsNotifier,
     SelectedTracksNotifier selectedTracksNotifier,
     FavoriteTracksNotifier favoriteTracksNotifier,
   ) {
-    if (optionSelected == OptionSelected.addToPlaylists) {
+    if (optionSelected == OptionSelectedFavorites.removeFromFavorites) {
       selectedTracksNotifier.clear();
       selectedTracksNotifier.selectTrack(track);
-      addToPlaylistsModal(context, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
-    } else if (optionSelected == OptionSelected.select) {
+      _removeFromFavoritesModal(context, tracks, selectedTrackIds, selectedTracksNotifier, favoriteTracksNotifier);
+    } else if (optionSelected == OptionSelectedFavorites.select) {
       selectedTracksNotifier.selectTrack(track);
-    } else if (optionSelected == OptionSelected.addToFavorites) {
-      selectedTracksNotifier.clear();
-      selectedTracksNotifier.selectTrack(track);
-      _addToFavoritesModal(context, tracks, selectedTrackIds, selectedTracksNotifier, favoriteTracksNotifier);
     }
   }
 
@@ -138,11 +119,8 @@ class AllTracksPicker extends ConsumerWidget {
   PreferredSizeWidget? _buildAppBar(
     BuildContext context,
     List<Track> tracks,
-    List<Playlist> playlists,
-    PlaylistNotifier playlistNotifier,
     List<String> selectedTracks,
     SelectedTracksNotifier selectedTracksNotifier,
-    SelectedPlaylistNotifier selectedPlaylistsNotifier,
     FavoriteTracksNotifier favoriteTracksNotifier,
   ) {
     if (selectedTracks.isEmpty) {
@@ -158,30 +136,10 @@ class AllTracksPicker extends ConsumerWidget {
       title: Text('${selectedTracks.length} selected'),
       actions: [
         IconButton(
-          icon: const Icon(Icons.favorite),
-          tooltip: 'Add to favorites',
+          icon: const Icon(Icons.favorite_border),
+          tooltip: 'Remove from favorites',
           onPressed: () {
-            _addToFavoritesModal(
-              context,
-              tracks,
-              selectedTracks,
-              selectedTracksNotifier,
-              favoriteTracksNotifier,
-            );
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.playlist_add),
-          tooltip: 'Add to playlist',
-          onPressed: () {
-            addToPlaylistsModal(
-              context,
-              tracks,
-              playlists,
-              playlistNotifier,
-              selectedPlaylistsNotifier,
-              selectedTracksNotifier,
-            );
+            _removeFromFavoritesModal(context, tracks, selectedTracks, selectedTracksNotifier, favoriteTracksNotifier);
           },
         ),
       ],
@@ -192,56 +150,79 @@ class AllTracksPicker extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final initialLoadDone = ref.watch(initialLoadProvider);
     final tracks = ref.watch(tracksProvider);
-    final playlists = ref.watch(playlistsProvider);
-    final playlistsNotifier = ref.watch(playlistsProvider.notifier);
     final selectedTracks = ref.watch(selectedTracksProvider);
     final selectedTracksNotifier = ref.watch(selectedTracksProvider.notifier);
-    final selectedPlaylistsNotifier = ref.watch(selectedPlaylistsProvider.notifier);
     final playerController = ref.read(playerControllerProvider);
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
-    final favoriteTracksNotifier = ref.read(favoriteTracksProvider.notifier);
     final isInSelectMode = selectedTracks.isNotEmpty;
+    final favoriteTrackIds = ref.watch(favoriteTracksProvider);
+    final favoriteTracksNotifier = ref.watch(favoriteTracksProvider.notifier);
+    final favoriteTracks = tracks.where((e) => favoriteTrackIds.contains(e.id)).toList();
 
-    if (initialLoadDone && tracks.isEmpty) {
-      return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));
+    if (initialLoadDone && favoriteTracks.isEmpty) {
+      return Center(child:Text("No favorite tracks found. Go to the \"All Tracks\" tab to add some!"));
     }
     return Scaffold(
       appBar: _buildAppBar(
         context,
         tracks,
-        playlists,
-        playlistsNotifier,
         selectedTracks,
         selectedTracksNotifier,
-        selectedPlaylistsNotifier,
         favoriteTracksNotifier,
       ),
-      body: ListView(
-        children: tracks.map(
-          (track) {
-            Function(Track track)? onTap;
-            Function(Track track)? onLongPress;
-            void onSelect(Track track) {
-              _toggleSelectedTrack(track, selectedTracks, selectedTracksNotifier);
-            }
-            if (isInSelectMode) {
-              onTap = onSelect;
-            } else {
-              onTap = (Track track) {
-                _playSelectedTrack(track, playerController, playerControllerNotifier);
-              };
-              onLongPress = onSelect;
-            }
-            final isSelected = selectedTracks.contains(track.id);
-            return TrackItem(
-              key: Key(track.id),
-              track: track,
-              onTap: onTap,
-              onLongPress: onLongPress,
-              isSelected: isSelected,
-              trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, favoriteTracksNotifier),
-            );
-        }).toList()
+      body: Column(
+        children: [
+          Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
+          SizedBox(
+            width: 100,
+            child: ElevatedButton(
+              onPressed: () async {
+                await playerControllerNotifier.stop();
+                playerControllerNotifier.setTrackPlayer(JustAudioProvider());
+                playerControllerNotifier.setQueue(favoriteTracks);
+                final firstTrack = playerControllerNotifier.getPlayerController().shuffledTrackQueue.first;
+                playerControllerNotifier.setCurrentTrack(firstTrack);
+                await playerControllerNotifier.play();
+              },
+              child: Row(
+                children: [
+                  Icon(Icons.play_arrow),
+                  Text("Play"),
+                ],
+              ),
+            ),
+          ),
+          Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
+          Expanded(
+            child: ListView(
+              children: tracks.map(
+                (track) {
+                  Function(Track track)? onTap;
+                  Function(Track track)? onLongPress;
+                  void onSelect(Track track) {
+                    _toggleSelectedTrack(track, selectedTracks, selectedTracksNotifier);
+                  }
+                  if (isInSelectMode) {
+                    onTap = onSelect;
+                  } else {
+                    onTap = (Track track) {
+                      _playSelectedTrack(track, playerController, playerControllerNotifier);
+                    };
+                    onLongPress = onSelect;
+                  }
+                  final isSelected = selectedTracks.contains(track.id);
+                  return TrackItem(
+                    key: Key(track.id),
+                    track: track,
+                    onTap: onTap,
+                    onLongPress: onLongPress,
+                    isSelected: isSelected,
+                    trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, selectedTracks, selectedTracksNotifier, favoriteTracksNotifier),
+                  );
+              }).toList()
+            ),
+          ),
+        ],
       ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
