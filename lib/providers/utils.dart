@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:yampa/core/repositories/favorite_tracks/factory.dart';
 import 'package:yampa/core/repositories/playlists/factory.dart';
 import 'package:yampa/core/repositories/stored_paths/factory.dart';
 import 'package:yampa/core/track_players/factory.dart';
@@ -7,6 +8,7 @@ import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/providers/favorite_tracks_provider.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
@@ -20,6 +22,7 @@ Future<void> doInitialLoad(
   LocalPathsNotifier localPathsNotifier,
   TracksNotifier tracksNotifier,
   PlaylistNotifier playlistNotifier,
+  FavoriteTracksNotifier favoriteTracksNotifier,
 ) async {
   if (initialLoadDone) return;
 
@@ -27,13 +30,22 @@ Future<void> doInitialLoad(
   final storedPaths = await storedPathsRepository.getStoredPaths();
   await storedPathsRepository.close();
   localPathsNotifier.setPaths(storedPaths);
+
   final tracksPlayer = getTrackPlayer();
   final tracks = await tracksPlayer.fetchTracks(storedPaths);
   tracksNotifier.setTracks(tracks);
+
   final playlistsRepo = getPlaylistRepository();
   final playlists = await playlistsRepo.getPlaylists(tracks);
   await playlistsRepo.close();
   playlistNotifier.setPlaylists(playlists);
+
+  final favoriteTracksRepository = getFavoriteTracksRepository();
+  final favoriteTrackIds = await favoriteTracksRepository.getFavoriteTrackIds();
+  favoriteTracksRepository.close();
+  print(favoriteTrackIds);
+  final favoriteTracks = tracks.where((e) => favoriteTrackIds.contains(e.id)).toList();
+  favoriteTracksNotifier.selectTracks(favoriteTracks);
 
   initialLoadNotifier.setInitialLoadDone();
 }
@@ -205,4 +217,26 @@ Future<void> handleMultipleTrackRemovedFromPlaylist(
   final playlistRepository = getPlaylistRepository();
   await playlistRepository.removeMultipleTracksFromPlaylist(playlist, tracks);
   await playlistRepository.close();
+}
+
+// I know that in theory we can reuse the playlists logic and have a fixed "Favorites" playlist (kinda like Youtube does)
+// but I feel like that is going to complicate things even more tbh
+Future<void> handleTracksAddedToFavorites(
+  List<Track> tracks,
+  FavoriteTracksNotifier favoriteTracksNotifier,
+) async {
+  favoriteTracksNotifier.selectTracks(tracks);
+  final favoriteTracksRepository = getFavoriteTracksRepository();
+  await favoriteTracksRepository.addFavoriteTracks(tracks);
+  await favoriteTracksRepository.close();
+}
+
+Future<void> handleTracksRemovedFromFavorites(
+  List<Track> tracks,
+  FavoriteTracksNotifier favoriteTracksNotifier,
+) async {
+  favoriteTracksNotifier.unselectTracks(tracks);
+  final favoriteTracksRepository = getFavoriteTracksRepository();
+  await favoriteTracksRepository.removeTracksFromFavorites(tracks);
+  await favoriteTracksRepository.close();
 }

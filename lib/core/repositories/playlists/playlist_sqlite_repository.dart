@@ -8,7 +8,6 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ulid/ulid.dart';
 
 
-const String dbFilename = 'app_data.db';
 const String playlistsTableName = 'playlists';
 const String playlistsTracksRelationsTableName = 'playlists_tracks_relation';
 
