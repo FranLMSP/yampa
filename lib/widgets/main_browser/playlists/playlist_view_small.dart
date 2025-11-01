@@ -13,6 +13,10 @@ import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 
+enum ImageTabOptions {
+  changeImage,
+  removeImage,
+}
 
 class PlaylistViewSmall extends ConsumerStatefulWidget {
   final Playlist playlist;
@@ -44,6 +48,37 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     _descriptionController = TextEditingController(text: widget.playlist.description);
   }
 
+  Widget _buildItemPopupMenuButtonForImage(
+    BuildContext context,
+    Playlist selectedPlaylist,
+  ) {
+    return PopupMenuButton<ImageTabOptions>(
+      initialValue: null,
+      onSelected: (ImageTabOptions item) {
+        if (item == ImageTabOptions.changeImage) {
+          _changeImage(selectedPlaylist);
+        } else if (item == ImageTabOptions.removeImage) {
+          _updateImage(selectedPlaylist, null);
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<ImageTabOptions>>[
+        const PopupMenuItem<ImageTabOptions>(value: ImageTabOptions.changeImage, child: Text('Select another image')),
+        const PopupMenuItem<ImageTabOptions>(value: ImageTabOptions.removeImage, child: Text('Remove image')),
+      ],
+    );
+  }
+
+  void _updateImage(Playlist selectedPlaylist, String? path) {
+    final editedPlaylist = Playlist(
+      id: selectedPlaylist.id,
+      name: selectedPlaylist.name,
+      description: selectedPlaylist.description,
+      tracks: selectedPlaylist.tracks,
+      imagePath: path,
+    );
+    widget.onEdit(editedPlaylist);
+  }
+
   void _changeImage(Playlist selectedPlaylist) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: false);
     if (result == null) {
@@ -54,17 +89,31 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
       return;
     }
 
-    // TODO 2: have an unified image widget
-    // TODO 3: have a way of removing image from playlist
+    _updateImage(selectedPlaylist, path);
+  }
 
-    final editedPlaylist = Playlist(
-      id: selectedPlaylist.id,
-      name: selectedPlaylist.name,
-      description: selectedPlaylist.description,
-      tracks: selectedPlaylist.tracks,
-      imagePath: path,
+  void _showImageOptions(BuildContext context, Playlist selectedPlaylist) async {
+    final overlay = Overlay.of(context)?.context.findRenderObject() as RenderBox?;
+    final box = context.findRenderObject() as RenderBox?;
+    if (overlay == null || box == null) return;
+
+    final selected = await showMenu<ImageTabOptions>(
+      context: context,
+      position: RelativeRect.fromRect(
+        box.localToGlobal(Offset.zero) & box.size,
+        Offset.zero & overlay.size,
+      ),
+      items: <PopupMenuEntry<ImageTabOptions>>[
+        const PopupMenuItem<ImageTabOptions>(value: ImageTabOptions.changeImage, child: Text('Select another image')),
+        const PopupMenuItem<ImageTabOptions>(value: ImageTabOptions.removeImage, child: Text('Remove image')),
+      ],
     );
-    widget.onEdit(editedPlaylist);
+
+    if (selected == ImageTabOptions.changeImage) {
+      _changeImage(selectedPlaylist);
+    } else if (selected == ImageTabOptions.removeImage) {
+      _updateImage(selectedPlaylist, null);
+    }
   }
 
   Widget _buildItemPopupMenuButton(
@@ -133,7 +182,13 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             ),
           ),
           InkWell(
-            onTap: () => _changeImage(selectedPlaylist),
+            onTap: () {
+              if (selectedPlaylist.imagePath == null) {
+                _changeImage(selectedPlaylist);
+              } else {
+                _showImageOptions(context, selectedPlaylist);
+              }
+            },
             child: PlaylistImage(playlist: selectedPlaylist),
           ),
           const SizedBox(height: 16),
