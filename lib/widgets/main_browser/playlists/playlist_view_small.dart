@@ -11,6 +11,7 @@ import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
+import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 
 
 class PlaylistViewSmall extends ConsumerStatefulWidget {
@@ -43,7 +44,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     _descriptionController = TextEditingController(text: widget.playlist.description);
   }
 
-  void _changeImage() async {
+  void _changeImage(Playlist selectedPlaylist) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: false);
     if (result == null) {
       return;
@@ -53,17 +54,21 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
       return;
     }
 
+    // TODO 2: have an unified image widget
+    // TODO 3: have a way of removing image from playlist
+
     final editedPlaylist = Playlist(
-      id: widget.playlist.id,
-      name: widget.playlist.name,
-      description: widget.playlist.description,
-      tracks: widget.playlist.tracks,
+      id: selectedPlaylist.id,
+      name: selectedPlaylist.name,
+      description: selectedPlaylist.description,
+      tracks: selectedPlaylist.tracks,
       imagePath: path,
     );
     widget.onEdit(editedPlaylist);
   }
 
   Widget _buildItemPopupMenuButton(
+    Playlist selectedPlaylist,
     Track track,
     List<Track> tracks,
     PlaylistNotifier playlistNotifier,
@@ -71,7 +76,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     return PopupMenuButton<OptionSelected>(
       initialValue: null,
       onSelected: (OptionSelected item) {
-        _handleItemOptionSelected(track, item, tracks, playlistNotifier);
+        _handleItemOptionSelected(selectedPlaylist, track, item, tracks, playlistNotifier);
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
         const PopupMenuItem<OptionSelected>(value: OptionSelected.select, child: Text('Select')),
@@ -82,13 +87,14 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
   }
 
   void _handleItemOptionSelected(
+    Playlist selectedPlaylist,
     Track track,
     OptionSelected? optionSelected,
     List<Track> tracks,
     PlaylistNotifier playlistNotifier,
   ) {
     if (optionSelected == OptionSelected.removeFromPlaylist) {
-      handleTrackRemovedFromPlaylist(widget.playlist, track, playlistNotifier);
+      handleTrackRemovedFromPlaylist(selectedPlaylist, track, playlistNotifier);
     } else if (optionSelected == OptionSelected.select) {
       _toggleSelectedTrack(track.id);
     }
@@ -107,7 +113,6 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
 
   @override
   Widget build(BuildContext context) {
-    final imagePath = widget.playlist.imagePath;
     final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
     final playlistNotifier = ref.watch(playlistsProvider.notifier);
     final tracks = ref.watch(tracksProvider);
@@ -127,16 +132,9 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
               label: const Text('Back'),
             ),
           ),
-          GestureDetector(
-            onTap: _changeImage,
-            child: CircleAvatar(
-              radius: 50,
-              backgroundImage:
-                  imagePath != null ? AssetImage(imagePath) : null,
-              child: imagePath == null
-                  ? const Icon(Icons.playlist_play, size: 40)
-                  : null,
-            ),
+          InkWell(
+            onTap: () => _changeImage(selectedPlaylist),
+            child: PlaylistImage(playlist: selectedPlaylist),
           ),
           const SizedBox(height: 16),
           TextField(
@@ -144,11 +142,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             decoration: const InputDecoration(labelText: 'Title'),
             onTapOutside: (text) {
               final editedPlaylist = Playlist(
-                id: widget.playlist.id,
+                id: selectedPlaylist.id,
                 name: _titleController.text,
-                description: widget.playlist.description,
-                tracks: widget.playlist.tracks,
-                imagePath: widget.playlist.imagePath,
+                description: selectedPlaylist.description,
+                tracks: selectedPlaylist.tracks,
+                imagePath: selectedPlaylist.imagePath,
               );
               widget.onEdit(editedPlaylist);
             },
@@ -159,11 +157,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             decoration: const InputDecoration(labelText: 'Description'),
             onTapOutside: (text) {
               final editedPlaylist = Playlist(
-                id: widget.playlist.id,
-                name: widget.playlist.name,
+                id: selectedPlaylist.id,
+                name: selectedPlaylist.name,
                 description: _descriptionController.text,
-                tracks: widget.playlist.tracks,
-                imagePath: widget.playlist.imagePath,
+                tracks: selectedPlaylist.tracks,
+                imagePath: selectedPlaylist.imagePath,
               );
               widget.onEdit(editedPlaylist);
             },
@@ -176,7 +174,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 if (selectedPlaylist.tracks.isNotEmpty) {
                   await playerControllerNotifier.stop();
                   playerControllerNotifier.setTrackPlayer(JustAudioProvider());
-                  playerControllerNotifier.setQueue(widget.playlist.tracks);
+                  playerControllerNotifier.setQueue(selectedPlaylist.tracks);
                   final firstTrack = playerControllerNotifier.getPlayerController().shuffledTrackQueue.first;
                   playerControllerNotifier.setCurrentTrack(firstTrack);
                   await playerControllerNotifier.play();
@@ -208,7 +206,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                   _toggleSelectedTrack(track.id);
                 },
                 isSelected: isSelected,
-                trailing: isInSelectMode ? null : _buildItemPopupMenuButton(track, tracks, playlistNotifier),
+                trailing: isInSelectMode ? null : _buildItemPopupMenuButton(selectedPlaylist, track, tracks, playlistNotifier),
               );
             }).toList(),
           ),

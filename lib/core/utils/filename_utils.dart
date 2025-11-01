@@ -47,6 +47,7 @@ bool isValidImagePath(String path) {
     path.endsWith(".gif") ||
     path.endsWith(".jpg") ||
     path.endsWith(".jpeg") ||
+    path.endsWith(".webp") ||
     path.endsWith(".png")
   );
 }
