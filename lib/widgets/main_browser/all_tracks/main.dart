@@ -110,7 +110,7 @@ class AllTracksPicker extends ConsumerWidget {
     } else if (optionSelected == OptionSelected.addToFavorites) {
       selectedTracksNotifier.clear();
       selectedTracksNotifier.selectTrack(track);
-      _addToFavoritesModal(context, tracks, selectedTrackIds, selectedTracksNotifier, favoriteTracksNotifier);
+      _addToFavoritesModal(context, tracks, [track.id], selectedTracksNotifier, favoriteTracksNotifier);
     }
   }
 

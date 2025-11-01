@@ -89,7 +89,7 @@ class FavoriteTracksPicker extends ConsumerWidget {
     if (optionSelected == OptionSelectedFavorites.removeFromFavorites) {
       selectedTracksNotifier.clear();
       selectedTracksNotifier.selectTrack(track);
-      _removeFromFavoritesModal(context, tracks, selectedTrackIds, selectedTracksNotifier, favoriteTracksNotifier);
+      _removeFromFavoritesModal(context, tracks, [track.id], selectedTracksNotifier, favoriteTracksNotifier);
     } else if (optionSelected == OptionSelectedFavorites.select) {
       selectedTracksNotifier.selectTrack(track);
     }
