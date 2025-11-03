@@ -220,7 +220,10 @@ Future<void> handleMultipleTrackRemovedFromPlaylist(
 }
 
 // I know that in theory we can reuse the playlists logic and have a fixed "Favorites" playlist (kinda like Youtube does)
-// but I feel like that is going to complicate things even more tbh
+// but I feel like that is going to complicate things even more tbh.
+// 
+// You know what, I think I should have reused the playlist logic for all of this.
+// Whatever I'll refactor it later.
 Future<void> handleTracksAddedToFavorites(
   List<Track> tracks,
   FavoriteTracksNotifier favoriteTracksNotifier,

@@ -75,4 +75,9 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   PlayerController getPlayerController() {
     return state.clone();
   }
+
+  Future<void> setSpeed (double value) async {
+    await state.setSpeed(value);
+    state = state.clone();
+  }
 }

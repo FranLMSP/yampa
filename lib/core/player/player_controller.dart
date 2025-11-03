@@ -5,8 +5,9 @@ import 'package:yampa/core/player/enums.dart';
 class PlayerController {
   Track? currentTrack;
   int currentTrackIndex = 0;
-  List<Track> trackQueue = [];
-  List<Track> shuffledTrackQueue = [];
+  double speed = 1;
+  List<Track> trackQueue = []; // TODO change this to a list of IDs
+  List<Track> shuffledTrackQueue = [];  // TODO change this to a list of IDs
   PlayerState state = PlayerState.stopped;
   LoopMode loopMode = LoopMode.infinite;
   ShuffleMode shuffleMode = ShuffleMode.sequential;
@@ -16,6 +17,7 @@ class PlayerController {
   PlayerController._clone({
     required this.currentTrack,
     required this.currentTrackIndex,
+    required this.speed,
     required this.trackQueue,
     required this.shuffledTrackQueue,
     required this.state,
@@ -29,6 +31,7 @@ class PlayerController {
       if (state == PlayerState.stopped && currentTrack != null) {
         await trackPlayer!.setTrack(currentTrack!);
       }
+      await setSpeed(speed);
       await trackPlayer!.play();
       state = PlayerState.playing;
     }
@@ -125,6 +128,7 @@ class PlayerController {
     return PlayerController._clone(
       currentTrack: currentTrack,
       currentTrackIndex: currentTrackIndex,
+      speed: speed,
       trackQueue: List<Track>.from(trackQueue),
       shuffledTrackQueue: List<Track>.from(shuffledTrackQueue),
       state: state,
@@ -150,6 +154,13 @@ class PlayerController {
     trackQueue = tracks;
     shuffledTrackQueue = tracks;
     suffleTrackQueue();
+  }
+
+  Future<void> setSpeed(double value) async {
+    speed = value;
+    if (trackPlayer != null) {
+      await trackPlayer!.setSpeed(speed);
+    }
   }
 
   void toggleLoopMode() {
