@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:yampa/providers/favorite_tracks_provider.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
@@ -63,6 +64,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     PlaylistNotifier playlistNotifier,
     FavoriteTracksNotifier favoriteTracksNotifier,
   ) async {
+    await Permission.audio.request();
     await doInitialLoad(
       initialLoadDone,
       initialLoadNotifier,
