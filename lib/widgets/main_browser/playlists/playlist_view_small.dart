@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/track_players/just_audio.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
+import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
@@ -142,6 +143,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
 
   @override
   Widget build(BuildContext context) {
+    final playerController = ref.watch(playerControllerProvider);
     final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
     final playlistNotifier = ref.watch(playlistsProvider.notifier);
     final tracks = ref.watch(tracksProvider);
@@ -234,7 +236,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                   if (isInSelectMode) {
                     _toggleSelectedTrack(track.id);
                   } else {
-                    // TODO: play track
+                    playTrack(track, playerController, playerControllerNotifier);
                   }
                 },
                 onLongPress: (Track track) {
