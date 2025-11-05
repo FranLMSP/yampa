@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/player_controller.dart';
-import 'package:yampa/core/track_players/just_audio.dart';
+import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/favorite_tracks_provider.dart';
@@ -12,7 +12,6 @@ import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/providers/selected_tracks_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
-import 'package:yampa/widgets/main_browser/all_tracks/track_list/common.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart';
 
@@ -115,16 +114,7 @@ class AllTracksPicker extends ConsumerWidget {
   }
 
   Future<void> _playSelectedTrack(Track track, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
-    if (isTrackCurrentlyPlaying(track, playerController)) {
-      return;
-    }
-    if (playerController.trackPlayer == null) {
-      // TODO: here we want to set the track player type depending on the source type of the track
-      playerController.setTrackPlayer(JustAudioProvider());
-    }
-    await playerControllerNotifier.stop();
-    playerControllerNotifier.setCurrentTrack(track);
-    await playerControllerNotifier.play();
+    playTrack(track, playerController, playerControllerNotifier);
   }
 
   void _toggleSelectedTrack(Track track, List<String> selectedTracks, SelectedTracksNotifier selectedTracksNotifier) {
