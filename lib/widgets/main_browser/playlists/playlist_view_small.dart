@@ -50,6 +50,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
   }
 
   void _updateImage(Playlist selectedPlaylist, String? path) {
+    // TODO: here we want to copy the image to a local path in case the user deletes or moves the image in the original location
     final editedPlaylist = Playlist(
       id: selectedPlaylist.id,
       name: selectedPlaylist.name,
@@ -165,7 +166,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           ),
           InkWell(
             onTap: () {
-              if (selectedPlaylist.imagePath == null) {
+              if (selectedPlaylist.imagePath == null || !isValidImagePath(selectedPlaylist.imagePath!)) {
                 _changeImage(selectedPlaylist);
               } else {
                 _showImageOptions(context, selectedPlaylist);

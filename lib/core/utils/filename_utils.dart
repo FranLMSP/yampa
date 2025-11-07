@@ -1,3 +1,5 @@
+import 'dart:io' as io;
+
 String extractFilenameFromFullPath(String string) {
   if (string.isEmpty) return "";
   // Handles both Unix (/) and Windows (\) separators
@@ -48,6 +50,7 @@ bool isValidImagePath(String path) {
     path.endsWith(".jpg") ||
     path.endsWith(".jpeg") ||
     path.endsWith(".webp") ||
-    path.endsWith(".png")
+    path.endsWith(".png") &&
+    io.File(path).existsSync()
   );
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
+import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 
 
 class PlaylistItemList extends ConsumerWidget {
@@ -23,7 +24,11 @@ class PlaylistItemList extends ConsumerWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
       child: playlist.imagePath != null
-        ? null // TODO: build playlist's image
+        ? SizedBox(
+          width: 50,
+          height: 50,
+          child: PlaylistImage(playlist: playlist)
+        )
         : _buildPlaylistPlaceholder(),
     );
   }

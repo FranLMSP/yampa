@@ -132,6 +132,7 @@ Future<void> handlePlaylistCreated(Playlist playlist, PlaylistNotifier playlistN
       tracks: playlist.tracks,
     )
   );
+  await playlistRepository.close();
 }
 
 Future<void> handlePlaylistEdited(Playlist playlist, PlaylistNotifier playlistNotifier) async {
@@ -146,6 +147,14 @@ Future<void> handlePlaylistEdited(Playlist playlist, PlaylistNotifier playlistNo
       tracks: playlist.tracks,
     )
   );
+  await playlistRepository.close();
+}
+
+Future<void> handlePlaylistRemoved(Playlist playlist, PlaylistNotifier playlistNotifier) async {
+  final playlistRepository = getPlaylistRepository();
+  await playlistRepository.removePlaylist(playlist);
+  playlistNotifier.removePlaylist(playlist);
+  await playlistRepository.close();
 }
 
 Future<void> handleTracksAddedToPlaylist(

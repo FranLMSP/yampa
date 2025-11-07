@@ -94,6 +94,66 @@ class _PlaylistsState extends ConsumerState<Playlists> {
     });
   }
 
+  Future<void> _handlePlaylistOptions(BuildContext context, Playlist playlist, PlaylistNotifier playlistsNotifier, TapDownDetails details) async {
+    final selected = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        details.globalPosition.dx,
+        details.globalPosition.dy,
+        details.globalPosition.dx,
+        details.globalPosition.dy,
+      ),
+      items: const [
+        PopupMenuItem<String>(
+          value: 'delete',
+          child: Text('Delete'),
+        ),
+        PopupMenuItem<String>(
+          value: 'select',
+          child: Text('Select'),
+        ),
+      ],
+    );
+
+    if (selected == 'delete') {
+      // TODO: Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' 
+      _removePlaylistModal(context, playlist, playlistsNotifier);
+    } else if (selected == 'select') {
+      // TODO: handle multi select
+    }
+  }
+
+  void _removePlaylistModal(
+    BuildContext context,
+    Playlist playlist,
+    PlaylistNotifier playlistsNotifier,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          title: const Text('Delete this playlist?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No')
+            ),
+            TextButton(
+              onPressed: () {
+                handlePlaylistRemoved(playlist, playlistsNotifier);
+                Navigator.of(context).pop();
+                // TODO: show snackbar with "undo" button
+              },
+              child: const Text('Yes')
+            ),
+          ],
+        );
+      }
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final playlistNotifier = ref.read(playlistsProvider.notifier);
@@ -119,6 +179,12 @@ class _PlaylistsState extends ConsumerState<Playlists> {
         : PlaylistListBig(
             onTap: (Playlist playlist) {
               _handlePlaylistSelected(playlist);
+            },
+            onLongPress: (Playlist playlist) {
+              // TODO: handle multi select
+            },
+            onSecondaryTap: (Playlist playlist, TapDownDetails details) {
+              _handlePlaylistOptions(context, playlist, playlistNotifier, details);
             },
           ),
       floatingActionButton: _buildFloatingActionButton(context, playlistNotifier),

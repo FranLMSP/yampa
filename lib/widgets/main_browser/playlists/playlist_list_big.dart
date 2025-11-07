@@ -5,9 +5,11 @@ import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_item_big.dart';
 
 class PlaylistListBig extends ConsumerWidget {
-  const PlaylistListBig({super.key, this.onTap});
+  const PlaylistListBig({super.key, this.onTap, this.onSecondaryTap, this.onLongPress});
 
   final Function(Playlist playlist)? onTap;
+  final Function(Playlist playlist, TapDownDetails details)? onSecondaryTap;
+  final Function(Playlist playlist)? onLongPress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,6 +33,16 @@ class PlaylistListBig extends ConsumerWidget {
             onTap: (Playlist playlist) {
               if (onTap != null) {
                 onTap!(playlist);
+              }
+            },
+            onSecondaryTap: (Playlist playlist, TapDownDetails details) {
+              if (onSecondaryTap != null) {
+                onSecondaryTap!(playlist, details);
+              }
+            },
+            onLongPress: (Playlist playlist) {
+              if (onLongPress != null) {
+                onLongPress!(playlist);
               }
             },
           );
