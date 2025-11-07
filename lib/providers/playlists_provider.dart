@@ -32,6 +32,10 @@ class PlaylistNotifier extends Notifier<List<Playlist>> {
     ];
   }
 
+  void removePlaylist(Playlist playlist) {
+    state = state.where((e) => e.id != playlist.id).toList();
+  }
+
   void addTrack(Playlist playlist, Track track) {
     final foundPlaylist = state.firstWhere((e) => e.id == playlist.id);
     if (foundPlaylist.tracks.indexWhere((e) => e.id == track.id) != -1) {
