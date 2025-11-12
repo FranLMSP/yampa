@@ -280,7 +280,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                 _isSearchingEnabled = true;
                 _searchTextController.text = "";
               });
-              // TODO: implement searching
             },
             child: Icon(Icons.search),
           ),
