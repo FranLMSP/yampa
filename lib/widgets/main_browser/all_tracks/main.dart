@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/utils/player_utils.dart';
+import 'package:yampa/core/utils/search_utils.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/favorite_tracks_provider.dart';
@@ -24,8 +25,23 @@ enum OptionSelected {
   info,
 }
 
-class AllTracksPicker extends ConsumerWidget {
+class AllTracksPicker extends ConsumerStatefulWidget {
   const AllTracksPicker({super.key});
+
+  @override
+  ConsumerState<AllTracksPicker> createState() => _AllTracksPickerState();
+}
+
+class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
+  late TextEditingController _searchTextController;
+  bool _isSearchingEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchTextController = TextEditingController();
+    _isSearchingEnabled = false;
+  }
 
   Widget _buildItemPopupMenuButton(
     BuildContext context,
@@ -41,7 +57,7 @@ class AllTracksPicker extends ConsumerWidget {
     return PopupMenuButton<OptionSelected>(
       initialValue: null,
       onSelected: (OptionSelected item) {
-        _handleItemOptionSelected(context, track, item, tracks, playlists, selectedTrackIds, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, favoriteTracksNotifier);
+        _handleItemOptionSelected(context, track, item, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, favoriteTracksNotifier);
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
         const PopupMenuItem<OptionSelected>(value: OptionSelected.select, child: Text('Select')),
@@ -94,7 +110,6 @@ class AllTracksPicker extends ConsumerWidget {
     OptionSelected? optionSelected,
     List<Track> tracks,
     List<Playlist> playlists,
-    List<String> selectedTrackIds,
     PlaylistNotifier playlistNotifier,
     SelectedPlaylistNotifier selectedPlaylistsNotifier,
     SelectedTracksNotifier selectedTracksNotifier,
@@ -125,7 +140,26 @@ class AllTracksPicker extends ConsumerWidget {
     }
   }
 
-  PreferredSizeWidget? _buildAppBar(
+  PreferredSizeWidget? _buildSearchAppBar() {
+    return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.close),
+        onPressed: () {
+          setState(() {
+            _isSearchingEnabled = false;
+            _searchTextController.text = "";
+          });
+        },
+      ),
+      title: TextField(
+        controller: _searchTextController,
+        decoration: const InputDecoration(labelText: 'Search'),
+        onChanged: (_) => setState(() => {}),
+      ),
+    );
+  }
+
+  PreferredSizeWidget? _buildMultiSelectAppBar(
     BuildContext context,
     List<Track> tracks,
     List<Playlist> playlists,
@@ -179,7 +213,7 @@ class AllTracksPicker extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final initialLoadDone = ref.watch(initialLoadProvider);
     final tracks = ref.watch(tracksProvider);
     final playlists = ref.watch(playlistsProvider);
@@ -191,12 +225,15 @@ class AllTracksPicker extends ConsumerWidget {
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
     final favoriteTracksNotifier = ref.read(favoriteTracksProvider.notifier);
     final isInSelectMode = selectedTracks.isNotEmpty;
+    final filteredTracks = _isSearchingEnabled
+      ? tracks.where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
+      : tracks;
 
     if (initialLoadDone && tracks.isEmpty) {
       return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));
     }
     return Scaffold(
-      appBar: _buildAppBar(
+      appBar: _isSearchingEnabled ? _buildSearchAppBar() : _buildMultiSelectAppBar(
         context,
         tracks,
         playlists,
@@ -207,7 +244,7 @@ class AllTracksPicker extends ConsumerWidget {
         favoriteTracksNotifier,
       ),
       body: ListView(
-        children: tracks.map(
+        children: filteredTracks.map(
           (track) {
             Function(Track track)? onTap;
             Function(Track track)? onLongPress;
@@ -239,6 +276,10 @@ class AllTracksPicker extends ConsumerWidget {
         children: [
           FloatingActionButton(
             onPressed: () {
+              setState(() {
+                _isSearchingEnabled = true;
+                _searchTextController.text = "";
+              });
               // TODO: implement searching
             },
             child: Icon(Icons.search),
