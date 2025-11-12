@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/track_players/just_audio.dart';
 import 'package:yampa/core/utils/player_utils.dart';
+import 'package:yampa/core/utils/search_utils.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/favorite_tracks_provider.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
@@ -18,8 +19,23 @@ enum OptionSelectedFavorites {
   removeFromFavorites,
 }
 
-class FavoriteTracksPicker extends ConsumerWidget {
+class FavoriteTracksPicker extends ConsumerStatefulWidget {
   const FavoriteTracksPicker({super.key});
+
+  @override
+  ConsumerState<FavoriteTracksPicker> createState() => _FavoriteTracksPickerState();
+}
+
+class _FavoriteTracksPickerState extends ConsumerState<FavoriteTracksPicker> {
+  late TextEditingController _searchTextController;
+  bool _isSearchingEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchTextController = TextEditingController();
+    _isSearchingEnabled = false;
+  }
 
   Widget _buildItemPopupMenuButton(
     BuildContext context,
@@ -107,7 +123,26 @@ class FavoriteTracksPicker extends ConsumerWidget {
     }
   }
 
-  PreferredSizeWidget? _buildAppBar(
+  PreferredSizeWidget? _buildSearchAppBar() {
+    return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.close),
+        onPressed: () {
+          setState(() {
+            _isSearchingEnabled = false;
+            _searchTextController.text = "";
+          });
+        },
+      ),
+      title: TextField(
+        controller: _searchTextController,
+        decoration: const InputDecoration(labelText: 'Search'),
+        onChanged: (_) => setState(() => {}),
+      ),
+    );
+  }
+
+  PreferredSizeWidget? _buildMultiSelectAppBar(
     BuildContext context,
     List<Track> tracks,
     List<String> selectedTracks,
@@ -138,7 +173,7 @@ class FavoriteTracksPicker extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final initialLoadDone = ref.watch(initialLoadProvider);
     final tracks = ref.watch(tracksProvider);
     final selectedTracks = ref.watch(selectedTracksProvider);
@@ -149,12 +184,15 @@ class FavoriteTracksPicker extends ConsumerWidget {
     final favoriteTrackIds = ref.watch(favoriteTracksProvider);
     final favoriteTracksNotifier = ref.watch(favoriteTracksProvider.notifier);
     final favoriteTracks = tracks.where((e) => favoriteTrackIds.contains(e.id)).toList();
+    final filteredFavoriteTracks =  _isSearchingEnabled
+      ? favoriteTracks.where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
+      : favoriteTracks;
 
     if (initialLoadDone && favoriteTracks.isEmpty) {
       return Center(child:Text("No favorite tracks found. Go to the \"All Tracks\" tab to add some!"));
     }
     return Scaffold(
-      appBar: _buildAppBar(
+      appBar: _isSearchingEnabled ? _buildSearchAppBar() : _buildMultiSelectAppBar(
         context,
         tracks,
         selectedTracks,
@@ -186,7 +224,7 @@ class FavoriteTracksPicker extends ConsumerWidget {
           Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
           Expanded(
             child: ListView(
-              children: tracks.map(
+              children: filteredFavoriteTracks.map(
                 (track) {
                   Function(Track track)? onTap;
                   Function(Track track)? onLongPress;
@@ -221,7 +259,10 @@ class FavoriteTracksPicker extends ConsumerWidget {
         children: [
           FloatingActionButton(
             onPressed: () {
-              // TODO: implement searching
+              setState(() {
+                _isSearchingEnabled = true;
+                _searchTextController.text = "";
+              });
             },
             child: Icon(Icons.search),
           ),
