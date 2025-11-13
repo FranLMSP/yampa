@@ -212,9 +212,9 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 if (selectedPlaylist.tracks.isNotEmpty) {
                   await playerControllerNotifier.stop();
                   playerControllerNotifier.setTrackPlayer(JustAudioProvider());
-                  playerControllerNotifier.setQueue(selectedPlaylist.tracks);
+                  await playerControllerNotifier.setQueue(selectedPlaylist.tracks);
                   final firstTrack = playerControllerNotifier.getPlayerController().shuffledTrackQueue.first;
-                  playerControllerNotifier.setCurrentTrack(firstTrack);
+                  await playerControllerNotifier.setCurrentTrack(firstTrack);
                   await playerControllerNotifier.play();
                 }
               },

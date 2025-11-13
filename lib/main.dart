@@ -64,6 +64,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     TracksNotifier tracksNotifier,
     PlaylistNotifier playlistNotifier,
     FavoriteTracksNotifier favoriteTracksNotifier,
+    PlayerControllerNotifier playerControllerNotifier,
   ) async {
     if (Platform.isAndroid || Platform.isIOS) {
       await Permission.audio.request();
@@ -75,6 +76,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       tracksNotifier,
       playlistNotifier,
       favoriteTracksNotifier,
+      playerControllerNotifier,
     );
   }
 
@@ -134,6 +136,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       final tracksNotifier = ref.read(tracksProvider.notifier);
       final playlistsNotifier = ref.read(playlistsProvider.notifier);
       final favoriteTracksNotifier = ref.read(favoriteTracksProvider.notifier);
+      final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
       _load(
         initialLoadDone,
         initialLoadNotifier,
@@ -141,6 +144,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         tracksNotifier,
         playlistsNotifier,
         favoriteTracksNotifier,
+        playerControllerNotifier,
       );
     }
     return initialLoadDone

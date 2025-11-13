@@ -1,16 +1,20 @@
 import 'dart:collection';
 
+import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/repositories/favorite_tracks/factory.dart';
+import 'package:yampa/core/repositories/player_controller_state/factory.dart';
 import 'package:yampa/core/repositories/playlists/factory.dart';
 import 'package:yampa/core/repositories/stored_paths/factory.dart';
 import 'package:yampa/core/track_players/factory.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/models/path.dart';
+import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/favorite_tracks_provider.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/providers/selected_tracks_provider.dart';
@@ -23,6 +27,7 @@ Future<void> doInitialLoad(
   TracksNotifier tracksNotifier,
   PlaylistNotifier playlistNotifier,
   FavoriteTracksNotifier favoriteTracksNotifier,
+  PlayerControllerNotifier playerControllerNotifier,
 ) async {
   if (initialLoadDone) return;
 
@@ -43,9 +48,10 @@ Future<void> doInitialLoad(
   final favoriteTracksRepository = getFavoriteTracksRepository();
   final favoriteTrackIds = await favoriteTracksRepository.getFavoriteTrackIds();
   favoriteTracksRepository.close();
-  print(favoriteTrackIds);
   final favoriteTracks = tracks.where((e) => favoriteTrackIds.contains(e.id)).toList();
   favoriteTracksNotifier.selectTracks(favoriteTracks);
+
+  await loadPlayerControllerState(playerControllerNotifier, tracks);
 
   initialLoadNotifier.setInitialLoadDone();
 }
@@ -251,4 +257,29 @@ Future<void> handleTracksRemovedFromFavorites(
   final favoriteTracksRepository = getFavoriteTracksRepository();
   await favoriteTracksRepository.removeTracksFromFavorites(tracks);
   await favoriteTracksRepository.close();
+}
+
+Future<void> handlePersistPlayerControllerState(PlayerController playerController) async {
+  final playerControllerStateRepository = getPlayerControllerStateRepository();
+  await playerControllerStateRepository.savePlayerControllerState(
+    LastPlayerControllerState(
+      currentTrackId: playerController.currentTrack != null ? playerController.currentTrack?.id : "",
+      currentTrackIndex: playerController.currentTrackIndex,
+      speed: playerController.speed,
+      trackQueueIds: playerController.trackQueue.map((e) => e.id).toList(),
+      shuffledTrackQueueIds: playerController.shuffledTrackQueue.map((e) => e.id).toList(),
+      state: playerController.state,
+      loopMode: playerController.loopMode,
+      shuffleMode: playerController.shuffleMode,
+    )
+  );
+  await playerControllerStateRepository.close();
+}
+
+
+Future<void> loadPlayerControllerState(PlayerControllerNotifier playerControllerNotifier, List<Track> tracks) async {
+  final playerControllerStateRepository = getPlayerControllerStateRepository();
+  final lastPlayerControllerState = await playerControllerStateRepository.getPlayerControllerState();
+  playerControllerNotifier.setPlayerController(PlayerController.fromLastState(lastPlayerControllerState, tracks));
+  await playerControllerStateRepository.close();
 }

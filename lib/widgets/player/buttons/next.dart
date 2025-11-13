@@ -9,8 +9,8 @@ class NextButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playerNotifierController = ref.read(playerControllerProvider.notifier);
     return ElevatedButton(
-      onPressed: () {
-        playerNotifierController.next();
+      onPressed: () async {
+        await playerNotifierController.next();
       },
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),

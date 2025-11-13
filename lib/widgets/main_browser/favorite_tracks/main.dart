@@ -208,9 +208,9 @@ class _FavoriteTracksPickerState extends ConsumerState<FavoriteTracksPicker> {
               onPressed: () async {
                 await playerControllerNotifier.stop();
                 playerControllerNotifier.setTrackPlayer(JustAudioProvider());
-                playerControllerNotifier.setQueue(favoriteTracks);
+                await playerControllerNotifier.setQueue(favoriteTracks);
                 final firstTrack = playerControllerNotifier.getPlayerController().shuffledTrackQueue.first;
-                playerControllerNotifier.setCurrentTrack(firstTrack);
+                await playerControllerNotifier.setCurrentTrack(firstTrack);
                 await playerControllerNotifier.play();
               },
               child: Row(

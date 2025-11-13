@@ -15,6 +15,7 @@ class SpeedButton extends ConsumerWidget {
     final List<double> speedValues = [0.25, 0.50, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00];
 
     return PopupMenuButton<double>(
+      tooltip: "Playback speed",
       icon: Chip(
         label: Text('x$formattedSpeed'),
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
