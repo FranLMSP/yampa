@@ -1,4 +1,6 @@
 import 'package:yampa/core/track_players/interface.dart';
+import 'package:yampa/core/track_players/just_audio.dart';
+import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/core/player/enums.dart';
 
@@ -14,6 +16,20 @@ class PlayerController {
   TrackPlayer? trackPlayer;
 
   PlayerController();
+  factory PlayerController.fromLastState(LastPlayerControllerState lastState, List<Track> tracks) {
+    final existingTrackIds = tracks.map((e) => e.id).toList();
+    return PlayerController._clone(
+      currentTrack: lastState.currentTrackId != null && existingTrackIds.contains(lastState.currentTrackId) ? tracks.firstWhere((e) => e.id == lastState.currentTrackId) : null,
+      currentTrackIndex: lastState.currentTrackIndex,
+      speed: lastState.speed,
+      trackQueue: tracks.where((e) => lastState.trackQueueIds.contains(e.id)).toList(), // TODO: optimize this, maybe with a map of tracks
+      shuffledTrackQueue: tracks.where((e) => lastState.shuffledTrackQueueIds.contains(e.id)).toList(), // TODO: optimize this, maybe with a map of tracks
+      state: lastState.state,
+      loopMode: lastState.loopMode,
+      shuffleMode: lastState.shuffleMode,
+      trackPlayer: JustAudioProvider(), // TODO: store this state as well
+    );
+  }
   PlayerController._clone({
     required this.currentTrack,
     required this.currentTrackIndex,

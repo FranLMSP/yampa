@@ -12,13 +12,13 @@ Future<void> _initializeDatabase(Database db) async {
     db.execute(
       '''
         CREATE TABLE IF NOT EXISTS $playerControllerStateTableName (
-          current_track_id TEXT NULL
-          current_track_index TEXT NULL
-          speed DOUBLE NULL
-          track_queue_ids TEXT NULL
-          shuffled_track_queue_ids TEXT NULL
-          state TEXT NULL
-          loop_mode TEXT NULL
+          current_track_id TEXT NULL,
+          current_track_index TEXT NULL,
+          speed REAL NULL,
+          track_queue_ids TEXT NULL,
+          shuffled_track_queue_ids TEXT NULL,
+          state TEXT NULL,
+          loop_mode TEXT NULL,
           shuffle_mode TEXT NULL
         )
       '''

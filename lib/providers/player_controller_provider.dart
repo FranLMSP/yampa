@@ -80,4 +80,8 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     await state.setSpeed(value);
     state = state.clone();
   }
+
+  void setPlayerController(PlayerController playerController) {
+    state = playerController;
+  }
 }
