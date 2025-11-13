@@ -23,7 +23,7 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> next() async {
-    await state.next();
+    await state.next(true);
     state = state.clone();
   }
 
@@ -42,28 +42,28 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = state.clone();
   }
 
-  void setTrackPlayer(TrackPlayer trackPlayer) {
-    state.setTrackPlayer(trackPlayer);
+  Future<void> setTrackPlayer(TrackPlayer trackPlayer) async {
+    await state.setTrackPlayer(trackPlayer);
     state = state.clone();
   }
 
-  void setCurrentTrack(Track track) {
-    state.setCurrentTrack(track);
+  Future<void> setCurrentTrack(Track track) async {
+    await state.setCurrentTrack(track);
     state = state.clone();
   }
 
-  void setQueue(List<Track> tracks) {
-    state.setQueue(tracks);
+  Future<void> setQueue(List<Track> tracks) async {
+    await state.setQueue(tracks);
     state = state.clone();
   }
 
-  void toggleLoopMode() {
-    state.toggleLoopMode();
+  Future<void> toggleLoopMode() async {
+    await state.toggleLoopMode();
     state = state.clone();
   }
 
-  void toggleShuffleMode() {
-    state.toggleShuffleMode();
+  Future<void> toggleShuffleMode() async {
+    await state.toggleShuffleMode();
     state = state.clone();
   }
 

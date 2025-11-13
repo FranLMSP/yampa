@@ -259,7 +259,7 @@ Future<void> handleTracksRemovedFromFavorites(
   await favoriteTracksRepository.close();
 }
 
-Future<void> handlePersistPlaylistControllerState(PlayerController playerController) async {
+Future<void> handlePersistPlayerControllerState(PlayerController playerController) async {
   final playerControllerStateRepository = getPlayerControllerStateRepository();
   await playerControllerStateRepository.savePlayerControllerState(
     LastPlayerControllerState(

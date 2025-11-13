@@ -86,9 +86,9 @@ class PlayerControllerStateSqliteRepository extends PlayerControllerStateReposit
         "speed": playerControllerState.speed,
         "track_queue_ids": playerControllerState.trackQueueIds.join(","),
         "shuffled_track_queue_ids": playerControllerState.shuffledTrackQueueIds.join(","),
-        "state": playerControllerState.state.toString(),
-        "loop_mode": playerControllerState.loopMode.toString(),
-        "shuffle_mode": playerControllerState.shuffleMode.toString(),
+        "state": playerControllerState.state.index,
+        "loop_mode": playerControllerState.loopMode.index,
+        "shuffle_mode": playerControllerState.shuffleMode.index,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );

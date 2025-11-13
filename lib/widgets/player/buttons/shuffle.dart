@@ -25,8 +25,8 @@ class ShuffleButton extends ConsumerWidget {
     return shuffleModeMap[playerController.shuffleMode]!;
   }
 
-  void _toggleShuffleMode(PlayerControllerNotifier playerControllerNotifier) {
-    playerControllerNotifier.toggleShuffleMode();
+  Future<void> _toggleShuffleMode(PlayerControllerNotifier playerControllerNotifier) async {
+    await playerControllerNotifier.toggleShuffleMode();
   }
 
   @override
@@ -37,7 +37,7 @@ class ShuffleButton extends ConsumerWidget {
       icon: Icon(_getIcon(playerController)),
       tooltip: _getTooltop(playerController),
       onPressed: () async {
-        _toggleShuffleMode(playerControllerNotifier);
+        await _toggleShuffleMode(playerControllerNotifier);
       },
     );
   }

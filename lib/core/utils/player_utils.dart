@@ -9,10 +9,10 @@ Future<void> playTrack(Track track, PlayerController playerController, PlayerCon
   }
   if (playerController.trackPlayer == null) {
     // TODO: here we want to set the track player type depending on the source type of the track
-    playerController.setTrackPlayer(JustAudioProvider());
+    await playerController.setTrackPlayer(JustAudioProvider());
   }
   await playerControllerNotifier.stop();
-  playerControllerNotifier.setCurrentTrack(track);
+  await playerControllerNotifier.setCurrentTrack(track);
   await playerControllerNotifier.play();
 }
   

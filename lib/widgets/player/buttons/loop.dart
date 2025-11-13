@@ -27,8 +27,8 @@ class LoopButton extends ConsumerWidget {
     return loopModeMap[playerController.loopMode]!;
   }
 
-  void _toggleLoopMode(PlayerControllerNotifier playerControllerNotifier) {
-    playerControllerNotifier.toggleLoopMode();
+  Future<void> _toggleLoopMode(PlayerControllerNotifier playerControllerNotifier) async {
+    await playerControllerNotifier.toggleLoopMode();
   }
 
   @override
@@ -38,8 +38,8 @@ class LoopButton extends ConsumerWidget {
     return IconButton(
       icon: Icon(_getIcon(playerController)),
       tooltip: _getTooltop(playerController),
-      onPressed: () {
-        _toggleLoopMode(playerControllerNotifier);
+      onPressed: () async {
+        await _toggleLoopMode(playerControllerNotifier);
       },
     );
   }

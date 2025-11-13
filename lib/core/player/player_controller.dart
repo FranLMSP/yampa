@@ -3,6 +3,7 @@ import 'package:yampa/core/track_players/just_audio.dart';
 import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/core/player/enums.dart';
+import 'package:yampa/providers/utils.dart';
 
 class PlayerController {
   Track? currentTrack;
@@ -24,10 +25,10 @@ class PlayerController {
       speed: lastState.speed,
       trackQueue: tracks.where((e) => lastState.trackQueueIds.contains(e.id)).toList(), // TODO: optimize this, maybe with a map of tracks
       shuffledTrackQueue: tracks.where((e) => lastState.shuffledTrackQueueIds.contains(e.id)).toList(), // TODO: optimize this, maybe with a map of tracks
-      state: lastState.state,
+      state: PlayerState.stopped,
       loopMode: lastState.loopMode,
       shuffleMode: lastState.shuffleMode,
-      trackPlayer: JustAudioProvider(), // TODO: store this state as well
+      trackPlayer: JustAudioProvider(), // TODO: store this in sqlite as well
     );
   }
   PlayerController._clone({
@@ -68,7 +69,7 @@ class PlayerController {
     }
   }
 
-  Future<void> next() async {
+  Future<void> next(bool forceNext) async {
     await stop();
     if (loopMode == LoopMode.startToEnd) {
       if (currentTrackIndex < shuffledTrackQueue.length - 1) {
@@ -78,7 +79,7 @@ class PlayerController {
       } else {
         await seek(Duration.zero);
       }
-    } else if (loopMode == LoopMode.infinite) {
+    } else if (loopMode == LoopMode.infinite || forceNext) {
       currentTrackIndex++;
       if (currentTrackIndex >= shuffledTrackQueue.length) {
         currentTrackIndex = 0;
@@ -88,6 +89,7 @@ class PlayerController {
       }
       await play();
     }
+    await handlePersistPlayerControllerState(this);
   }
 
   Future<void> prev() async {
@@ -101,9 +103,10 @@ class PlayerController {
       currentTrackIndex = 0;
     }
     await play();
+    await handlePersistPlayerControllerState(this);
   }
 
-  void suffleTrackQueue() {
+  Future<void> suffleTrackQueue() async {
     final shuffleHandler = {
       ShuffleMode.sequential: () {
         shuffledTrackQueue = trackQueue;
@@ -120,6 +123,7 @@ class PlayerController {
     };
     final handler = shuffleHandler[shuffleMode]!;
     handler();
+    await handlePersistPlayerControllerState(this);
   }
 
   Future<void> seek(Duration position) async {
@@ -128,16 +132,18 @@ class PlayerController {
     }
   }
 
-  void setTrackPlayer(TrackPlayer trackPlayer) {
-    stop();
+  Future<void> setTrackPlayer(TrackPlayer trackPlayer) async {
+    await stop();
     this.trackPlayer = trackPlayer;
+    await handlePersistPlayerControllerState(this);
   }
 
-  void setCurrentTrack(Track track) {
+  Future<void> setCurrentTrack(Track track) async {
     currentTrack = track;
     if (shuffledTrackQueue.isNotEmpty) {
       currentTrackIndex = shuffledTrackQueue.indexWhere((e) => e.id == currentTrack?.id);
     }
+    await handlePersistPlayerControllerState(this);
   }
 
   PlayerController clone() {
@@ -166,10 +172,10 @@ class PlayerController {
     return Duration.zero;
   }
 
-  void setQueue(List<Track> tracks) {
+  Future<void> setQueue(List<Track> tracks) async {
     trackQueue = tracks;
     shuffledTrackQueue = tracks;
-    suffleTrackQueue();
+    await suffleTrackQueue();
   }
 
   Future<void> setSpeed(double value) async {
@@ -177,9 +183,10 @@ class PlayerController {
     if (trackPlayer != null) {
       await trackPlayer!.setSpeed(speed);
     }
+    await handlePersistPlayerControllerState(this);
   }
 
-  void toggleLoopMode() {
+  Future<void> toggleLoopMode() async {
     final nextLoopModeMap = {
       LoopMode.singleTrack: LoopMode.infinite,
       LoopMode.infinite: LoopMode.startToEnd,
@@ -187,15 +194,17 @@ class PlayerController {
       LoopMode.none: LoopMode.singleTrack,
     };
     loopMode = nextLoopModeMap[loopMode]!;
+    await handlePersistPlayerControllerState(this);
   }
 
-  void toggleShuffleMode() {
+  Future<void> toggleShuffleMode() async {
     final shuffleModeMap = {
       ShuffleMode.sequential: ShuffleMode.random,
       ShuffleMode.random: ShuffleMode.randomBasedOnHistory,
       ShuffleMode.randomBasedOnHistory: ShuffleMode.sequential,
     };
     shuffleMode = shuffleModeMap[shuffleMode]!;
+    await handlePersistPlayerControllerState(this);
   }
 
   Future<void> handleNextAutomatically() async {
@@ -205,10 +214,10 @@ class PlayerController {
         await play();
       },
       LoopMode.infinite: () async {
-        await next();
+        await next(false);
       },
       LoopMode.startToEnd: () async {
-        await next();
+        await next(false);
       },
       LoopMode.none: () async {
         await stop();
@@ -216,5 +225,6 @@ class PlayerController {
     };
     final nextHandler = nextHandlerMap[loopMode]!;
     await nextHandler();
+    await handlePersistPlayerControllerState(this);
   }
 }

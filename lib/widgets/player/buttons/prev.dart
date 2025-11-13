@@ -9,8 +9,8 @@ class PrevButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playerNotifierController = ref.read(playerControllerProvider.notifier);
     return ElevatedButton(
-      onPressed: () {
-        playerNotifierController.prev();
+      onPressed: () async {
+        await playerNotifierController.prev();
       },
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),
