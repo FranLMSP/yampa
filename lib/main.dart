@@ -4,8 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:yampa/core/player/player_controller.dart';
-import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
@@ -46,14 +44,17 @@ class MyHomePage extends ConsumerStatefulWidget {
 class _MyHomePageState extends ConsumerState<MyHomePage> {
   Timer? _timer;
 
-  void _setTimer(List<Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) {
+  void _setTimer() {
     if (_timer != null) {
       return;
     }
 
     _timer = Timer.periodic(const Duration(milliseconds: 2000), (timer) async {
-      if (playerController.hasTrackFinishedPlaying()) {
-        await playerControllerNotifier.handleNextAutomatically(tracks);
+      final playerNotifier = ref.watch(playerControllerProvider.notifier);
+      final player = playerNotifier.getPlayerController();
+      final tracks = ref.watch(tracksProvider);
+      if (player.hasTrackFinishedPlaying()) {
+        await playerNotifier.handleNextAutomatically(tracks);
       }
     });
   }
@@ -144,10 +145,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         playerControllerNotifier,
       );
     }
-    final playerController = ref.read(playerControllerProvider);
-    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
-    final tracks = ref.watch(tracksProvider);
-    _setTimer(tracks, playerController, playerControllerNotifier);
+    _setTimer();
     return initialLoadDone
         ? _buildMainContent()
         : _buildMainPageLoader();

@@ -7,6 +7,7 @@ import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/providers/utils.dart';
 
 class PlayerController {
+  // TODO: consider holding all the tracks here instead of a separate provider
   String? currentTrackId;
   String? currentPlaylistId;
   int currentTrackIndex = 0;
@@ -81,7 +82,7 @@ class PlayerController {
     if (loopMode == LoopMode.startToEnd) {
       if (currentTrackIndex < shuffledTrackQueueIds.length - 1) {
         currentTrackIndex++;
-        setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
+        await setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
         await play(tracks);
       } else {
         await seek(Duration.zero);
@@ -92,7 +93,7 @@ class PlayerController {
         currentTrackIndex = 0;
       }
       if (shuffledTrackQueueIds.isNotEmpty) {
-        setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
+        await setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
       }
       await play(tracks);
     }
@@ -104,7 +105,7 @@ class PlayerController {
     if (currentTrackIndex > 0) {
       currentTrackIndex--;
       if (shuffledTrackQueueIds.isNotEmpty) {
-        setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
+        await setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
       }
     } else {
       currentTrackIndex = 0;
@@ -146,6 +147,7 @@ class PlayerController {
   }
 
   Future<void> setCurrentTrack(String trackId) async {
+    currentTrackId = trackId;
     if (shuffledTrackQueueIds.isNotEmpty) {
       currentTrackIndex = shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
     }
