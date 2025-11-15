@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
-import 'package:yampa/widgets/main_browser/favorite_tracks/main.dart';
 import 'package:yampa/widgets/main_browser/local_path_picker/main.dart';
 import 'package:yampa/widgets/main_browser/playlists/main.dart';
 import 'package:yampa/widgets/player/big_player.dart';
@@ -52,7 +51,6 @@ class _MainBrowserState extends ConsumerState<MainBrowser> with SingleTickerProv
     final tabs = [
       Tab(icon: Icon(Icons.music_note), text: "All tracks"),
       Tab(icon: Icon(Icons.playlist_add), text: "Playlists"),
-      Tab(icon: Icon(Icons.favorite), text: "Favorites"),
       Tab(icon: Icon(Icons.folder), text: "Added paths"),
       Tab(icon: Icon(Icons.settings), text: "Settings"),
     ];
@@ -68,7 +66,6 @@ class _MainBrowserState extends ConsumerState<MainBrowser> with SingleTickerProv
     final elements = [
       AllTracksPicker(),
       Playlists(),
-      FavoriteTracksPicker(),
       LocalPathPicker(),
       Icon(Icons.settings),
     ];

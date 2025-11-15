@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/playlist.dart';
-import 'package:yampa/models/track.dart';
 
 
 final playlistsProvider = NotifierProvider<PlaylistNotifier, List<Playlist>>(
@@ -36,18 +35,18 @@ class PlaylistNotifier extends Notifier<List<Playlist>> {
     state = state.where((e) => e.id != playlist.id).toList();
   }
 
-  void addTrack(Playlist playlist, Track track) {
+  void addTrack(Playlist playlist, String trackId) {
     final foundPlaylist = state.firstWhere((e) => e.id == playlist.id);
-    if (foundPlaylist.tracks.indexWhere((e) => e.id == track.id) != -1) {
+    if (foundPlaylist.trackIds.indexWhere((e) => e == trackId) != -1) {
       return;
     }
-    foundPlaylist.tracks.add(track);
+    foundPlaylist.trackIds.add(trackId);
     updatePlaylist(foundPlaylist);
   }
 
-  void removeTrack(Playlist playlist, Track track) {
+  void removeTracks(Playlist playlist, List<String> trackIds) {
     final foundPlaylist = state.firstWhere((e) => e.id == playlist.id);
-    foundPlaylist.tracks.removeWhere((t) => t.id == track.id);
+    foundPlaylist.trackIds.removeWhere((t) => trackIds.contains(t));
     updatePlaylist(foundPlaylist);
   }
 }

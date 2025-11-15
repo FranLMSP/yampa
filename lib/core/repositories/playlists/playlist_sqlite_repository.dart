@@ -75,20 +75,13 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
 
     for (final playlistData in playlists) {
       final trackIds = playlistTracksMap[playlistData["id"]] ?? [];
-      final List<Track> tracks = [];
-      for (final trackId in trackIds) {
-        final track = tracksMap[trackId];
-        if (track != null) {
-          tracks.add(track);
-        }
-      }
       result.add(
         Playlist(
           id: playlistData["id"].toString(),
           name: playlistData["name"].toString(),
           description: playlistData["description"].toString(),
           imagePath: playlistData["image_path"]?.toString(),
-          tracks: tracks,
+          trackIds: trackIds,
         )
       );
     }
@@ -130,7 +123,7 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
   }
 
   @override
-  Future<void> addTrackToPlaylist(Playlist playlist, Track track) async {
+  Future<void> addTrackToPlaylist(Playlist playlist, String trackId) async {
     final db = await _getdb();
 
     final id = Ulid().toString();
@@ -139,31 +132,31 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
       {
         'id': id,
         'playlist_id': playlist.id,
-        'track_id': track.id,
+        'track_id': trackId,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
   @override
-  Future<void> removeTrackFromPlaylist(Playlist playlist, Track track) async {
+  Future<void> removeTrackFromPlaylist(Playlist playlist, String trackId) async {
     final db = await _getdb();
     await db.delete(
       playlistsTracksRelationsTableName,
       where: 'playlist_id = ? and track_id = ?',
-      whereArgs: [playlist.id, track.id],
+      whereArgs: [playlist.id, trackId],
     );
   }
 
   @override
-  Future<void> removeMultipleTracksFromPlaylist(Playlist playlist, List<Track> tracks) async {
+  Future<void> removeMultipleTracksFromPlaylist(Playlist playlist, List<String> trackIds) async {
     final db = await _getdb();
     await db.delete(
       playlistsTracksRelationsTableName,
-      where: 'playlist_id = ? and track_id in (${List.filled(tracks.length, '?').join(',')})',
+      where: 'playlist_id = ? and track_id in (${List.filled(trackIds.length, '?').join(',')})',
       whereArgs: [
         playlist.id,
-        ...tracks.map((e) => e.id),
+        ...trackIds,
       ],
     );
   }

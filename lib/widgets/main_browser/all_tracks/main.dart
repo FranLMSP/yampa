@@ -70,10 +70,10 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
 
   void _addToFavoritesModal(
     BuildContext context,
-    List<Track> tracks,
     List<String> selectedTrackIds,
     SelectedTracksNotifier selectedTracksNotifier,
-    FavoriteTracksNotifier favoriteTracksNotifier,
+    PlaylistNotifier playlistsNotifier,
+    List<Playlist> playlists,
   ) {
     showDialog(
       context: context,
@@ -89,9 +89,11 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
             ),
             TextButton(
               onPressed: () {
-                handleTracksAddedToFavorites(
-                  tracks.where((e) => selectedTrackIds.contains(e.id)).toList(),
-                  favoriteTracksNotifier,
+                final favoritesPlaylist = playlists.firstWhere((e) => e.id == favoritePlaylistId);
+                handleTracksAddedToPlaylist(
+                  selectedTrackIds,
+                  [favoritesPlaylist],
+                  playlistsNotifier,
                 );
                 selectedTracksNotifier.clear();
                 Navigator.of(context).pop();
@@ -118,13 +120,13 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     if (optionSelected == OptionSelected.addToPlaylists) {
       selectedTracksNotifier.clear();
       selectedTracksNotifier.selectTrack(track);
-      addToPlaylistsModal(context, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
+      addToPlaylistsModal(context, selectedTracksNotifier.getTrackIds(), playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
     } else if (optionSelected == OptionSelected.select) {
       selectedTracksNotifier.selectTrack(track);
     } else if (optionSelected == OptionSelected.addToFavorites) {
       selectedTracksNotifier.clear();
       selectedTracksNotifier.selectTrack(track);
-      _addToFavoritesModal(context, tracks, [track.id], selectedTracksNotifier, favoriteTracksNotifier);
+      _addToFavoritesModal(context, selectedTracksNotifier.getTrackIds(), selectedTracksNotifier, playlistNotifier, playlists);
     }
   }
 
@@ -187,10 +189,10 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
           onPressed: () {
             _addToFavoritesModal(
               context,
-              tracks,
-              selectedTracks,
+              tracks.map((e) => e.id).toList(),
               selectedTracksNotifier,
-              favoriteTracksNotifier,
+              playlistNotifier,
+              playlists,
             );
           },
         ),
@@ -200,7 +202,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
           onPressed: () {
             addToPlaylistsModal(
               context,
-              tracks,
+              selectedTracks,
               playlists,
               playlistNotifier,
               selectedPlaylistsNotifier,

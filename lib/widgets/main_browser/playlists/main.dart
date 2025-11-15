@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/providers/playlists_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/playlists/new_playlist_dialog.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_list_big.dart';
@@ -41,7 +40,6 @@ class _PlaylistsState extends ConsumerState<Playlists> {
   }
 
   Widget _buildRemoveSelectedTracksButton(PlaylistNotifier playlistNotifier) {
-    final selectedTracks = ref.watch(tracksProvider).where((e) => _selectedTrackIds.contains(e.id)).toList();
     return FloatingActionButton(
       child: Icon(Icons.delete),
       onPressed: () {
@@ -61,8 +59,8 @@ class _PlaylistsState extends ConsumerState<Playlists> {
                   child: const Text('Yes'),
                   onPressed: () {
                     setState(() {
+                      handleMultipleTrackRemovedFromPlaylist(_selectedPlaylist!, _selectedTrackIds, playlistNotifier);
                       _selectedTrackIds = [];
-                      handleMultipleTrackRemovedFromPlaylist(_selectedPlaylist!, selectedTracks, playlistNotifier);
                       // TODO: show a snackbar with an "undo" button
                       Navigator.of(context).pop();
                     });

@@ -181,7 +181,7 @@ class PlayerController {
 
   Future<void> setPlaylist(Playlist playlist) async {
     currentPlaylistId = playlist.id;
-    trackQueueIds = playlist.tracks.map((e) => e.id).toList();
+    trackQueueIds = playlist.trackIds;
     shuffledTrackQueueIds = trackQueueIds;
     await suffleTrackQueue();
   }

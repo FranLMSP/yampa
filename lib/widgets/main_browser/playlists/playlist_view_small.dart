@@ -55,7 +55,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
       id: selectedPlaylist.id,
       name: selectedPlaylist.name,
       description: selectedPlaylist.description,
-      tracks: selectedPlaylist.tracks,
+      trackIds: selectedPlaylist.trackIds,
       imagePath: path,
     );
     widget.onEdit(editedPlaylist);
@@ -125,7 +125,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     PlaylistNotifier playlistNotifier,
   ) {
     if (optionSelected == OptionSelected.removeFromPlaylist) {
-      handleTrackRemovedFromPlaylist(selectedPlaylist, track, playlistNotifier);
+      handleMultipleTrackRemovedFromPlaylist(selectedPlaylist, [track.id], playlistNotifier);
     } else if (optionSelected == OptionSelected.select) {
       _toggleSelectedTrack(track.id);
     }
@@ -183,7 +183,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 id: selectedPlaylist.id,
                 name: _titleController.text,
                 description: selectedPlaylist.description,
-                tracks: selectedPlaylist.tracks,
+                trackIds: selectedPlaylist.trackIds,
                 imagePath: selectedPlaylist.imagePath,
               );
               widget.onEdit(editedPlaylist);
@@ -198,7 +198,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 id: selectedPlaylist.id,
                 name: selectedPlaylist.name,
                 description: _descriptionController.text,
-                tracks: selectedPlaylist.tracks,
+                trackIds: selectedPlaylist.trackIds,
                 imagePath: selectedPlaylist.imagePath,
               );
               widget.onEdit(editedPlaylist);
@@ -209,7 +209,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             width: 100,
             child: ElevatedButton(
               onPressed: () async {
-                if (selectedPlaylist.tracks.isNotEmpty) {
+                if (selectedPlaylist.trackIds.isNotEmpty) {
                   await playerControllerNotifier.stop();
                   playerControllerNotifier.setTrackPlayer(JustAudioProvider());
                   await playerControllerNotifier.setPlaylist(selectedPlaylist);
@@ -229,10 +229,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           ),
           const SizedBox(height: 24),
           Column(
-            children: selectedPlaylist.tracks.map((track) {
-              final isSelected = _selectedTrackIds.contains(track.id);
+            children: selectedPlaylist.trackIds.map((trackId) {
+              final isSelected = _selectedTrackIds.contains(trackId);
+              final track = tracks.firstWhere((e) => e.id == trackId);
               return TrackItem(
-                key: Key(track.id),
+                key: Key(trackId),
                 track: track,
                 onTap: (Track track) {
                   if (isInSelectMode) {

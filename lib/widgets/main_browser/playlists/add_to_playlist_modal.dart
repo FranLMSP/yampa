@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:yampa/models/playlist.dart';
-import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/providers/selected_tracks_provider.dart';
@@ -9,7 +8,7 @@ import 'package:yampa/widgets/main_browser/playlists/playlist_item_list.dart';
 
 void addToPlaylistsModal(
   BuildContext context,
-  List<Track> tracks,
+  List<String> selectedTrackIds,
   List<Playlist> playlists,
   PlaylistNotifier playlistNotifier,
   SelectedPlaylistNotifier selectedPlaylistsNotifier,
@@ -48,7 +47,11 @@ void addToPlaylistsModal(
           ),
           TextButton(
             onPressed: () {
-              handleTracksAddedToPlaylist(tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
+              handleTracksAddedToPlaylist(
+                selectedTracksNotifier.getTrackIds(),
+                playlists.where((e) => selectedPlaylistsNotifier.getPlaylistIds().contains(e.id)).toList(),
+                playlistNotifier,
+              );
               Navigator.of(context).pop();
             },
             child: const Text('Add')
