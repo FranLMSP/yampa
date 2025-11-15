@@ -41,6 +41,9 @@ Future<void> doInitialLoad(
   final playlistsRepo = getPlaylistRepository();
   final playlists = await playlistsRepo.getPlaylists(tracks);
   await playlistsRepo.close();
+  if (playlists.indexWhere((e) => e.id == favoritePlaylistId) == -1) {
+    playlists.insert(0, Playlist(id: favoritePlaylistId, name: "Favorites", description: "", trackIds: []));
+  }
   playlistNotifier.setPlaylists(playlists);
 
   final favoriteTracksRepository = getFavoriteTracksRepository();

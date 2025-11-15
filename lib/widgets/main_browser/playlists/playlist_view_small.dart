@@ -177,7 +177,10 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           const SizedBox(height: 16),
           TextField(
             controller: _titleController,
-            decoration: const InputDecoration(labelText: 'Title'),
+            readOnly: selectedPlaylist.id == favoritePlaylistId,
+            decoration: const InputDecoration(
+              labelText: 'Title',
+            ),
             onTapOutside: (text) {
               final editedPlaylist = Playlist(
                 id: selectedPlaylist.id,
