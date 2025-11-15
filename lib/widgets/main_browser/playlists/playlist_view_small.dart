@@ -212,10 +212,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 if (selectedPlaylist.tracks.isNotEmpty) {
                   await playerControllerNotifier.stop();
                   playerControllerNotifier.setTrackPlayer(JustAudioProvider());
-                  await playerControllerNotifier.setQueue(selectedPlaylist.tracks);
-                  final firstTrack = playerControllerNotifier.getPlayerController().shuffledTrackQueue.first;
+                  await playerControllerNotifier.setPlaylist(selectedPlaylist);
+                  final firstTrackId = playerControllerNotifier.getPlayerController().shuffledTrackQueueIds.first;
+                  final firstTrack = tracks.firstWhere((e) => e.id == firstTrackId);
                   await playerControllerNotifier.setCurrentTrack(firstTrack);
-                  await playerControllerNotifier.play();
+                  await playerControllerNotifier.play(tracks);
                 }
               },
               child: Row(
@@ -237,7 +238,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                   if (isInSelectMode) {
                     _toggleSelectedTrack(track.id);
                   } else {
-                    playTrack(track, playerController, playerControllerNotifier);
+                    playTrack(track, tracks, playerController, playerControllerNotifier);
                   }
                 },
                 onLongPress: (Track track) {

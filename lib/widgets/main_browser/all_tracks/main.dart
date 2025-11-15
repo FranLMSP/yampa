@@ -128,8 +128,8 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     }
   }
 
-  Future<void> _playSelectedTrack(Track track, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
-    playTrack(track, playerController, playerControllerNotifier);
+  Future<void> _playSelectedTrack(Track track, List<Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
+    playTrack(track, tracks, playerController, playerControllerNotifier);
   }
 
   void _toggleSelectedTrack(Track track, List<String> selectedTracks, SelectedTracksNotifier selectedTracksNotifier) {
@@ -255,7 +255,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
               onTap = onSelect;
             } else {
               onTap = (Track track) {
-                _playSelectedTrack(track, playerController, playerControllerNotifier);
+                _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
               };
               onLongPress = onSelect;
             }

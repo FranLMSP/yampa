@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/utils/format_utils.dart';
+import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
-import 'package:yampa/widgets/main_browser/all_tracks/track_list/common.dart';
 
 class TrackItem extends ConsumerWidget {
   const TrackItem({
@@ -32,7 +32,7 @@ class TrackItem extends ConsumerWidget {
   }
 
   Widget _buildTrackPlaceholder(PlayerController playerController) {
-    final icon = isTrackCurrentlyPlaying(track, playerController)
+    final icon = isTrackCurrentlyBeingPlayed(track, playerController)
       ? Icons.play_arrow
       : Icons.music_note;
     return Container(

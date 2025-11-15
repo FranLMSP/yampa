@@ -263,11 +263,12 @@ Future<void> handlePersistPlayerControllerState(PlayerController playerControlle
   final playerControllerStateRepository = getPlayerControllerStateRepository();
   await playerControllerStateRepository.savePlayerControllerState(
     LastPlayerControllerState(
-      currentTrackId: playerController.currentTrack != null ? playerController.currentTrack?.id : "",
+      currentTrackId: playerController.currentTrackId ?? "",
+      currentPlaylistId: playerController.currentPlaylistId ?? "",
       currentTrackIndex: playerController.currentTrackIndex,
       speed: playerController.speed,
-      trackQueueIds: playerController.trackQueue.map((e) => e.id).toList(),
-      shuffledTrackQueueIds: playerController.shuffledTrackQueue.map((e) => e.id).toList(),
+      trackQueueIds: playerController.trackQueueIds,
+      shuffledTrackQueueIds: playerController.shuffledTrackQueueIds,
       state: playerController.state,
       loopMode: playerController.loopMode,
       shuffleMode: playerController.shuffleMode,

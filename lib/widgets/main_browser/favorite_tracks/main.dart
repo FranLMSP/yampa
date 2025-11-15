@@ -111,8 +111,8 @@ class _FavoriteTracksPickerState extends ConsumerState<FavoriteTracksPicker> {
     }
   }
 
-  Future<void> _playSelectedTrack(Track track, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
-    playTrack(track, playerController, playerControllerNotifier);
+  Future<void> _playSelectedTrack(Track track, List<Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
+    playTrack(track, tracks, playerController, playerControllerNotifier);
   }
 
   void _toggleSelectedTrack(Track track, List<String> selectedTracks, SelectedTracksNotifier selectedTracksNotifier) {
@@ -208,7 +208,8 @@ class _FavoriteTracksPickerState extends ConsumerState<FavoriteTracksPicker> {
               onPressed: () async {
                 await playerControllerNotifier.stop();
                 playerControllerNotifier.setTrackPlayer(JustAudioProvider());
-                await playerControllerNotifier.setQueue(favoriteTracks);
+                // TODO: delete all of this, we are now going to handle favorites as a playlist
+                await playerControllerNotifier.setPlaylist(favoriteTracks);
                 final firstTrack = playerControllerNotifier.getPlayerController().shuffledTrackQueue.first;
                 await playerControllerNotifier.setCurrentTrack(firstTrack);
                 await playerControllerNotifier.play();

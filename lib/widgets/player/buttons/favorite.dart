@@ -9,9 +9,10 @@ class FavoriteButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTrack = ref.watch(playerControllerProvider).currentTrack;
+    final currentTrackId = ref.watch(playerControllerProvider).currentTrackId;
     final favorites = ref.watch(favoriteTracksProvider);
     final favoritesNotifier = ref.watch(favoriteTracksProvider.notifier);
+    // TODO: check against the favorite playlist here
     final isFavorite = favorites.contains(currentTrack?.id);
     return IconButton(
       icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),

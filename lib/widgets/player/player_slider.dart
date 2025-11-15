@@ -2,7 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/enums.dart';
+import 'package:yampa/core/player/player_controller.dart';
+import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
 
 class PlayerSlider extends ConsumerStatefulWidget {
   const PlayerSlider({
@@ -18,13 +21,13 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   bool _changeStarted = false;
   Timer? _timer;
 
-  void _initializeTimer(PlayerControllerNotifier playerControllerNotifier) {
+  void _initializeTimer(List<Track> tracks, PlayerController player) {
     if (_timer != null) {
       _timer?.cancel();
       _timer = null;
     }
     _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      _getPlayerCurrentPosition(playerControllerNotifier);
+      _getPlayerCurrentPosition(tracks, player);
     });
   }
 
@@ -33,21 +36,24 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
     super.initState();
   }
 
-  Future<void> _getPlayerCurrentPosition(PlayerControllerNotifier playerControllerNotifier) async {
+  Future<void> _getPlayerCurrentPosition(List<Track> tracks, PlayerController player) async {
     if (_changeStarted) {
       return;
     }
-    final playerController = playerControllerNotifier.getPlayerController();
+    Track? currentTrack;
+    if (player.currentTrackId != null) {
+      currentTrack = tracks.firstWhere((e) => e.id == player.currentTrackId);
+    }
     if (
-      playerController.currentTrack == null
-      || playerController.currentTrack!.duration == Duration.zero
-      || playerController.state == PlayerState.stopped
+      currentTrack == null
+      || currentTrack.duration == Duration.zero
+      || player.state == PlayerState.stopped
     ) {
       _currentSliderValue = 0;
       return;
     }
-    final totalDuration = playerController.currentTrack!.duration;
-    final currentDuration = await playerController.getCurrentPosition();
+    final totalDuration = currentTrack.duration;
+    final currentDuration = await player.getCurrentPosition();
     final currentPosition = (currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100;
     if (!mounted) return;
     setState(() {
@@ -55,12 +61,16 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
     });
   }
 
-  Future<void> _setPlayerCurrentPosition(double value) async {
-    final player = ref.watch(playerControllerProvider);
-    if (player.currentTrack == null || player.currentTrack!.duration == Duration.zero) {
+  Future<void> _setPlayerCurrentPosition(List<Track> tracks, PlayerController player, double value) async {
+    Track? currentTrack;
+    if (player.currentTrackId != null) {
+      currentTrack = tracks.firstWhere((e) => e.id == player.currentTrackId);
+    }
+
+    if (currentTrack == null || currentTrack.duration == Duration.zero) {
       return;
     }
-    final totalDuration = player.currentTrack!.duration;
+    final totalDuration = currentTrack.duration;
     final newPosition = Duration(milliseconds: (totalDuration.inMilliseconds * value).toInt());
     await player.seek(newPosition);
     setState(() {
@@ -76,12 +86,13 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
 
   @override
   Widget build(BuildContext context) {
-    final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
-    _initializeTimer(playerControllerNotifier);
+    final tracks = ref.watch(tracksProvider);
+    final player = ref.watch(playerControllerProvider);
+    _initializeTimer(tracks, player);
     return Slider(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       value: _currentSliderValue,
-      onChanged: _setPlayerCurrentPosition,
+      onChanged: (value) => _setPlayerCurrentPosition(tracks, player, value),
       onChangeStart: (value) {
         setState(() {
           _changeStarted = true;

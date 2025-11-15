@@ -22,11 +22,11 @@ class PlaylistButton extends ConsumerWidget {
       icon: const Icon(Icons.playlist_add),
       tooltip: 'Save to playlist',
       onPressed: () async {
-        if (playerController.currentTrack == null) {
+        if (playerController.currentTrackId == null) {
           return;
         }
         selectedTracksNotifier.clear();
-        selectedTracksNotifier.selectTrack(playerController.currentTrack!);
+        selectedTracksNotifier.selectTrack(tracks.firstWhere((e) => e.id == playerController.currentTrackId));
         addToPlaylistsModal(context, tracks, playlists, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
       },
     );
