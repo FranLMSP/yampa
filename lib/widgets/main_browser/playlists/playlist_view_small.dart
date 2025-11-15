@@ -55,7 +55,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
       id: selectedPlaylist.id,
       name: selectedPlaylist.name,
       description: selectedPlaylist.description,
-      tracks: selectedPlaylist.tracks,
+      trackIds: selectedPlaylist.trackIds,
       imagePath: path,
     );
     widget.onEdit(editedPlaylist);
@@ -125,7 +125,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     PlaylistNotifier playlistNotifier,
   ) {
     if (optionSelected == OptionSelected.removeFromPlaylist) {
-      handleTrackRemovedFromPlaylist(selectedPlaylist, track, playlistNotifier);
+      handleMultipleTrackRemovedFromPlaylist(selectedPlaylist, [track.id], playlistNotifier);
     } else if (optionSelected == OptionSelected.select) {
       _toggleSelectedTrack(track.id);
     }
@@ -177,13 +177,16 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           const SizedBox(height: 16),
           TextField(
             controller: _titleController,
-            decoration: const InputDecoration(labelText: 'Title'),
+            readOnly: selectedPlaylist.id == favoritePlaylistId,
+            decoration: const InputDecoration(
+              labelText: 'Title',
+            ),
             onTapOutside: (text) {
               final editedPlaylist = Playlist(
                 id: selectedPlaylist.id,
                 name: _titleController.text,
                 description: selectedPlaylist.description,
-                tracks: selectedPlaylist.tracks,
+                trackIds: selectedPlaylist.trackIds,
                 imagePath: selectedPlaylist.imagePath,
               );
               widget.onEdit(editedPlaylist);
@@ -198,7 +201,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 id: selectedPlaylist.id,
                 name: selectedPlaylist.name,
                 description: _descriptionController.text,
-                tracks: selectedPlaylist.tracks,
+                trackIds: selectedPlaylist.trackIds,
                 imagePath: selectedPlaylist.imagePath,
               );
               widget.onEdit(editedPlaylist);
@@ -209,13 +212,14 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             width: 100,
             child: ElevatedButton(
               onPressed: () async {
-                if (selectedPlaylist.tracks.isNotEmpty) {
+                if (selectedPlaylist.trackIds.isNotEmpty) {
                   await playerControllerNotifier.stop();
-                  playerControllerNotifier.setTrackPlayer(JustAudioProvider());
-                  await playerControllerNotifier.setQueue(selectedPlaylist.tracks);
-                  final firstTrack = playerControllerNotifier.getPlayerController().shuffledTrackQueue.first;
+                  playerControllerNotifier.setTrackPlayer(JustAudioProvider()); // TODO: we should set this dinamically depending on the kind of track
+                  await playerControllerNotifier.setPlaylist(selectedPlaylist);
+                  final firstTrackId = playerControllerNotifier.getPlayerController().shuffledTrackQueueIds.first;
+                  final firstTrack = tracks.firstWhere((e) => e.id == firstTrackId);
                   await playerControllerNotifier.setCurrentTrack(firstTrack);
-                  await playerControllerNotifier.play();
+                  await playerControllerNotifier.play(tracks);
                 }
               },
               child: Row(
@@ -228,16 +232,17 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           ),
           const SizedBox(height: 24),
           Column(
-            children: selectedPlaylist.tracks.map((track) {
-              final isSelected = _selectedTrackIds.contains(track.id);
+            children: selectedPlaylist.trackIds.map((trackId) {
+              final isSelected = _selectedTrackIds.contains(trackId);
+              final track = tracks.firstWhere((e) => e.id == trackId);
               return TrackItem(
-                key: Key(track.id),
+                key: Key(trackId),
                 track: track,
                 onTap: (Track track) {
                   if (isInSelectMode) {
                     _toggleSelectedTrack(track.id);
                   } else {
-                    playTrack(track, playerController, playerControllerNotifier);
+                    playTrack(track, tracks, playerController, playerControllerNotifier);
                   }
                 },
                 onLongPress: (Track track) {

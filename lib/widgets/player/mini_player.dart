@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/widgets/player/buttons/play_and_pause.dart';
 import 'package:yampa/widgets/player/mini_slider.dart';
 import 'package:yampa/widgets/player/player_image.dart';
@@ -17,10 +18,12 @@ class MiniPlayer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final track = ref.watch(playerControllerProvider).currentTrack;
-    if (track == null) {
+    final currentTrackId = ref.watch(playerControllerProvider).currentTrackId;
+    if (currentTrackId == null) {
       return Row();
     }
+    final tracks = ref.watch(tracksProvider);
+    final track = tracks.firstWhere((e) => e.id == currentTrackId);
     return InkWell(
       onTap: () => onTap != null ? onTap!() : null,
       child: SizedBox(

@@ -70,7 +70,7 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
                     id: "temp-id",
                     name: _titleController.text,
                     description: _descriptionController.text,
-                    tracks: [],
+                    trackIds: [],
                   )
                 );
                 Navigator.of(context).pop();

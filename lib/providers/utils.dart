@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 import 'package:yampa/core/player/player_controller.dart';
-import 'package:yampa/core/repositories/favorite_tracks/factory.dart';
 import 'package:yampa/core/repositories/player_controller_state/factory.dart';
 import 'package:yampa/core/repositories/playlists/factory.dart';
 import 'package:yampa/core/repositories/stored_paths/factory.dart';
@@ -11,13 +10,10 @@ import 'package:yampa/models/path.dart';
 import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
-import 'package:yampa/providers/favorite_tracks_provider.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
-import 'package:yampa/providers/selected_playlists_provider.dart';
-import 'package:yampa/providers/selected_tracks_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 
 Future<void> doInitialLoad(
@@ -26,7 +22,6 @@ Future<void> doInitialLoad(
   LocalPathsNotifier localPathsNotifier,
   TracksNotifier tracksNotifier,
   PlaylistNotifier playlistNotifier,
-  FavoriteTracksNotifier favoriteTracksNotifier,
   PlayerControllerNotifier playerControllerNotifier,
 ) async {
   if (initialLoadDone) return;
@@ -43,13 +38,10 @@ Future<void> doInitialLoad(
   final playlistsRepo = getPlaylistRepository();
   final playlists = await playlistsRepo.getPlaylists(tracks);
   await playlistsRepo.close();
+  if (playlists.indexWhere((e) => e.id == favoritePlaylistId) == -1) {
+    playlists.insert(0, Playlist(id: favoritePlaylistId, name: "Favorites", description: "", trackIds: []));
+  }
   playlistNotifier.setPlaylists(playlists);
-
-  final favoriteTracksRepository = getFavoriteTracksRepository();
-  final favoriteTrackIds = await favoriteTracksRepository.getFavoriteTrackIds();
-  favoriteTracksRepository.close();
-  final favoriteTracks = tracks.where((e) => favoriteTrackIds.contains(e.id)).toList();
-  favoriteTracksNotifier.selectTracks(favoriteTracks);
 
   await loadPlayerControllerState(playerControllerNotifier, tracks);
 
@@ -135,7 +127,7 @@ Future<void> handlePlaylistCreated(Playlist playlist, PlaylistNotifier playlistN
       name: playlist.name,
       description: playlist.description,
       imagePath: playlist.imagePath,
-      tracks: playlist.tracks,
+      trackIds: playlist.trackIds,
     )
   );
   await playlistRepository.close();
@@ -150,7 +142,7 @@ Future<void> handlePlaylistEdited(Playlist playlist, PlaylistNotifier playlistNo
       name: playlist.name,
       description: playlist.description,
       imagePath: playlist.imagePath,
-      tracks: playlist.tracks,
+      trackIds: playlist.trackIds,
     )
   );
   await playlistRepository.close();
@@ -164,36 +156,18 @@ Future<void> handlePlaylistRemoved(Playlist playlist, PlaylistNotifier playlistN
 }
 
 Future<void> handleTracksAddedToPlaylist(
-  List<Track> tracks,
+  List<String> trackIds,
   List<Playlist> playlists,
   PlaylistNotifier playlistNotifier,
-  SelectedPlaylistNotifier selectedPlaylistsNotifier,
-  SelectedTracksNotifier selectedTracksNotifier,
 ) async {
-  final selectedPlaylistIds = selectedPlaylistsNotifier.getPlaylistIds();
-  final selectedTrackIds = selectedTracksNotifier.getTrackIds();
   final playlistRepository = getPlaylistRepository();
 
-  final Map<String, Track> trackMap = HashMap();
-  final Map<String, Playlist> playlistMap = HashMap();
-
-  for (final track in tracks) {
-    trackMap[track.id] = track;
-  }
-  for (final playlist in playlists) {
-    playlistMap[playlist.id] = playlist;
-  }
-
   final List<Map<String, String>> mapping = [];
-  for (final playlistId in selectedPlaylistIds) {
-    for (final trackId in selectedTrackIds) {
-      final track = trackMap[trackId];
-      final playlist = playlistMap[playlistId];
-      if (track != null && playlist != null) {
-        playlistNotifier.addTrack(playlist, track);
-      }
+  for (final playlist in playlists) {
+    for (final trackId in trackIds) {
+      playlistNotifier.addTrack(playlist, trackId);
       mapping.add({
-        "playlist_id": playlistId,
+        "playlist_id": playlist.id,
         "track_id": trackId,
       });
     }
@@ -203,71 +177,31 @@ Future<void> handleTracksAddedToPlaylist(
   // Or maybe refactor the controller to point to the playlist ID instead of holding the list of tracks
   // indepentendly? Idk I'll figure it out later.
 
-  selectedTracksNotifier.clear();
-  selectedPlaylistsNotifier.clear();
-
   await playlistRepository.linkTracksWithPlaylists(mapping);
-  await playlistRepository.close();
-}
-
-Future<void> handleTrackRemovedFromPlaylist(
-  Playlist playlist,
-  Track track,
-  PlaylistNotifier playlistNotifier,
-) async {
-  playlistNotifier.removeTrack(playlist, track);
-  final playlistRepository = getPlaylistRepository();
-  await playlistRepository.removeTrackFromPlaylist(playlist, track);
   await playlistRepository.close();
 }
 
 Future<void> handleMultipleTrackRemovedFromPlaylist(
   Playlist playlist,
-  List<Track> tracks,
+  List<String> trackIds,
   PlaylistNotifier playlistNotifier,
 ) async {
-  for (final track in tracks) {
-    playlistNotifier.removeTrack(playlist, track);
-  }
+  playlistNotifier.removeTracks(playlist, trackIds);
   final playlistRepository = getPlaylistRepository();
-  await playlistRepository.removeMultipleTracksFromPlaylist(playlist, tracks);
+  await playlistRepository.removeMultipleTracksFromPlaylist(playlist, trackIds);
   await playlistRepository.close();
-}
-
-// I know that in theory we can reuse the playlists logic and have a fixed "Favorites" playlist (kinda like Youtube does)
-// but I feel like that is going to complicate things even more tbh.
-// 
-// You know what, I think I should have reused the playlist logic for all of this.
-// Whatever I'll refactor it later.
-Future<void> handleTracksAddedToFavorites(
-  List<Track> tracks,
-  FavoriteTracksNotifier favoriteTracksNotifier,
-) async {
-  favoriteTracksNotifier.selectTracks(tracks);
-  final favoriteTracksRepository = getFavoriteTracksRepository();
-  await favoriteTracksRepository.addFavoriteTracks(tracks);
-  await favoriteTracksRepository.close();
-}
-
-Future<void> handleTracksRemovedFromFavorites(
-  List<Track> tracks,
-  FavoriteTracksNotifier favoriteTracksNotifier,
-) async {
-  favoriteTracksNotifier.unselectTracks(tracks);
-  final favoriteTracksRepository = getFavoriteTracksRepository();
-  await favoriteTracksRepository.removeTracksFromFavorites(tracks);
-  await favoriteTracksRepository.close();
 }
 
 Future<void> handlePersistPlayerControllerState(PlayerController playerController) async {
   final playerControllerStateRepository = getPlayerControllerStateRepository();
   await playerControllerStateRepository.savePlayerControllerState(
     LastPlayerControllerState(
-      currentTrackId: playerController.currentTrack != null ? playerController.currentTrack?.id : "",
+      currentTrackId: playerController.currentTrackId ?? "",
+      currentPlaylistId: playerController.currentPlaylistId ?? "",
       currentTrackIndex: playerController.currentTrackIndex,
       speed: playerController.speed,
-      trackQueueIds: playerController.trackQueue.map((e) => e.id).toList(),
-      shuffledTrackQueueIds: playerController.shuffledTrackQueue.map((e) => e.id).toList(),
+      trackQueueIds: playerController.trackQueueIds,
+      shuffledTrackQueueIds: playerController.shuffledTrackQueueIds,
       state: playerController.state,
       loopMode: playerController.loopMode,
       shuffleMode: playerController.shuffleMode,

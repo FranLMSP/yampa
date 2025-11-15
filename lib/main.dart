@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:yampa/providers/favorite_tracks_provider.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
@@ -45,14 +44,17 @@ class MyHomePage extends ConsumerStatefulWidget {
 class _MyHomePageState extends ConsumerState<MyHomePage> {
   Timer? _timer;
 
-  @override
-  void initState() {
-    super.initState();
+  void _setTimer() {
+    if (_timer != null) {
+      return;
+    }
+
     _timer = Timer.periodic(const Duration(milliseconds: 2000), (timer) async {
-      final playerController = ref.watch(playerControllerProvider);
-      final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
-      if (playerController.hasTrackFinishedPlaying()) {
-        await playerControllerNotifier.handleNextAutomatically();
+      final playerNotifier = ref.watch(playerControllerProvider.notifier);
+      final player = playerNotifier.getPlayerController();
+      final tracks = ref.watch(tracksProvider);
+      if (player.hasTrackFinishedPlaying()) {
+        await playerNotifier.handleNextAutomatically(tracks);
       }
     });
   }
@@ -63,7 +65,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     LocalPathsNotifier localPathsNotifier,
     TracksNotifier tracksNotifier,
     PlaylistNotifier playlistNotifier,
-    FavoriteTracksNotifier favoriteTracksNotifier,
     PlayerControllerNotifier playerControllerNotifier,
   ) async {
     if (Platform.isAndroid || Platform.isIOS) {
@@ -75,7 +76,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       localPathsNotifier,
       tracksNotifier,
       playlistNotifier,
-      favoriteTracksNotifier,
       playerControllerNotifier,
     );
   }
@@ -135,7 +135,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       final localPathsNotifier = ref.read(localPathsProvider.notifier);
       final tracksNotifier = ref.read(tracksProvider.notifier);
       final playlistsNotifier = ref.read(playlistsProvider.notifier);
-      final favoriteTracksNotifier = ref.read(favoriteTracksProvider.notifier);
       final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
       _load(
         initialLoadDone,
@@ -143,10 +142,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         localPathsNotifier,
         tracksNotifier,
         playlistsNotifier,
-        favoriteTracksNotifier,
         playerControllerNotifier,
       );
     }
+    _setTimer();
     return initialLoadDone
         ? _buildMainContent()
         : _buildMainPageLoader();

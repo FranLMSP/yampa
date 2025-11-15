@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/player_controller.dart';
+import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
 
 class ForwardSecondsButton extends ConsumerWidget {
   const ForwardSecondsButton({super.key});
 
-  Future<void> _forward(PlayerControllerNotifier playerControllerNotifier, PlayerController playerController) async {
-      if (playerController.currentTrack == null) {
+  Future<void> _forward(List<Track> tracks, PlayerControllerNotifier playerControllerNotifier, PlayerController playerController) async {
+      if (playerController.currentTrackId == null) {
         return;
       }
       final currentPosition = await playerController.getCurrentPosition();
       var newPosition = currentPosition + const Duration(seconds: 10);
-      if (newPosition > playerController.currentTrack!.duration) {
-        newPosition = playerController.currentTrack!.duration;
+      final track = tracks.firstWhere((e) => e.id == playerController.currentTrackId);
+      if (newPosition > track.duration) {
+        newPosition = track.duration;
       }
       await playerControllerNotifier.seek(newPosition);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tracks = ref.watch(tracksProvider);
     final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
     final playerController = ref.watch(playerControllerProvider);
 
@@ -27,7 +31,7 @@ class ForwardSecondsButton extends ConsumerWidget {
       icon: const Icon(Icons.forward_10),
       tooltip: 'Forward 10 seconds',
       onPressed: () async {
-        _forward(playerControllerNotifier, playerController);
+        _forward(tracks, playerControllerNotifier, playerController);
       },
     );
   }

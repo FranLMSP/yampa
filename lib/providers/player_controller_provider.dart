@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/track_players/interface.dart';
+import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 
 
@@ -12,8 +13,8 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   @override
   PlayerController build() => PlayerController();
 
-  Future<void> play() async {
-    await state.play();
+  Future<void> play(List<Track> tracks) async {
+    await state.play(tracks);
     state = state.clone();
   }
 
@@ -22,13 +23,13 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = state.clone();
   }
 
-  Future<void> next() async {
-    await state.next(true);
+  Future<void> next(List<Track> tracks) async {
+    await state.next(true, tracks);
     state = state.clone();
   }
 
-  Future<void> prev() async {
-    await state.prev();
+  Future<void> prev(List<Track> tracks) async {
+    await state.prev(tracks);
     state = state.clone();
   }
 
@@ -48,12 +49,12 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> setCurrentTrack(Track track) async {
-    await state.setCurrentTrack(track);
+    await state.setCurrentTrack(track.id);
     state = state.clone();
   }
 
-  Future<void> setQueue(List<Track> tracks) async {
-    await state.setQueue(tracks);
+  Future<void> setPlaylist(Playlist playlist) async {
+    await state.setPlaylist(playlist);
     state = state.clone();
   }
 
@@ -67,8 +68,8 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = state.clone();
   }
 
-  Future<void> handleNextAutomatically() async {
-    await state.handleNextAutomatically();
+  Future<void> handleNextAutomatically(List<Track> tracks) async {
+    await state.handleNextAutomatically(tracks);
     state = state.clone();
   }
 

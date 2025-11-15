@@ -26,8 +26,8 @@ class PlaylistImage extends StatelessWidget {
       width: double.infinity,
       height: 100,
       color: Colors.grey[300],
-      child: const Icon(
-        Icons.playlist_play,
+      child: Icon(
+        playlist.id == favoritePlaylistId ? Icons.favorite : Icons.playlist_play,
         size: 40,
         color: Colors.black54,
       ),

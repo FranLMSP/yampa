@@ -7,7 +7,7 @@ class BackwardSecondsButton extends ConsumerWidget {
   const BackwardSecondsButton({super.key});
 
   Future<void> _backward(PlayerControllerNotifier playerControllerNotifier, PlayerController playerController) async {
-      if (playerController.currentTrack == null) {
+      if (playerController.currentTrackId == null) {
         return;
       }
       final currentPosition = await playerController.getCurrentPosition();

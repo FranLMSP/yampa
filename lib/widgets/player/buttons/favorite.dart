@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yampa/providers/favorite_tracks_provider.dart';
+import 'package:yampa/models/playlist.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/utils.dart';
 
 class FavoriteButton extends ConsumerWidget {
@@ -9,21 +10,22 @@ class FavoriteButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTrack = ref.watch(playerControllerProvider).currentTrack;
-    final favorites = ref.watch(favoriteTracksProvider);
-    final favoritesNotifier = ref.watch(favoriteTracksProvider.notifier);
-    final isFavorite = favorites.contains(currentTrack?.id);
+    final currentTrackId = ref.watch(playerControllerProvider).currentTrackId;
+    final playlists = ref.watch(playlistsProvider);
+    final playlistsNotifier = ref.watch(playlistsProvider.notifier);
+    final favoritesPlaylist = playlists.firstWhere((e) => e.id == favoritePlaylistId);
+    final isFavorite = favoritesPlaylist.trackIds.contains(currentTrackId);
     return IconButton(
       icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
       tooltip: isFavorite ? "Remove from favorites" : "Add to favorites",
       onPressed: () async {
-        if (currentTrack == null) {
+        if (currentTrackId == null) {
           return;
         }
         if (isFavorite) {
-          handleTracksRemovedFromFavorites([currentTrack], favoritesNotifier);
+          handleMultipleTrackRemovedFromPlaylist(favoritesPlaylist, [currentTrackId], playlistsNotifier);
         } else {
-          handleTracksAddedToFavorites([currentTrack], favoritesNotifier);
+          handleTracksAddedToPlaylist([currentTrackId], [favoritesPlaylist], playlistsNotifier);
         }
       },
     );

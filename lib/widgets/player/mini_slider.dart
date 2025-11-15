@@ -2,7 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/enums.dart';
+import 'package:yampa/core/player/player_controller.dart';
+import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
 
 class MiniPlayerSlider extends ConsumerStatefulWidget {
   const MiniPlayerSlider({
@@ -17,13 +20,13 @@ class _MiniPlayerSliderState extends ConsumerState<MiniPlayerSlider> {
   double _currentSliderValue = 0;
   Timer? _timer;
 
-  void _initializeTimer(PlayerControllerNotifier playerControllerNotifier) {
+  void _initializeTimer(List<Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) {
     if (_timer != null) {
       _timer?.cancel();
       _timer = null;
     }
     _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      _getPlayerCurrentPosition(playerControllerNotifier);
+      _getPlayerCurrentPosition(tracks, playerController, playerControllerNotifier);
     });
   }
 
@@ -32,12 +35,15 @@ class _MiniPlayerSliderState extends ConsumerState<MiniPlayerSlider> {
     super.initState();
   }
 
-  Future<void> _getPlayerCurrentPosition(PlayerControllerNotifier playerControllerNotifier) async {
+  Future<void> _getPlayerCurrentPosition(List<Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
     if (!mounted) return;
-    final playerController = playerControllerNotifier.getPlayerController();
+    Track? currentTrack;
+    if (playerController.currentTrackId != null) {
+      currentTrack = tracks.firstWhere((e) => e.id == playerController.currentTrackId);
+    }
     if (
-      playerController.currentTrack == null
-      || playerController.currentTrack!.duration == Duration.zero
+      currentTrack == null
+      || currentTrack.duration == Duration.zero
       || playerController.state == PlayerState.stopped
     ) {
       setState(() {
@@ -45,7 +51,7 @@ class _MiniPlayerSliderState extends ConsumerState<MiniPlayerSlider> {
       });
       return;
     }
-    final totalDuration = playerController.currentTrack!.duration;
+    final totalDuration = currentTrack.duration;
     final currentDuration = await playerController.getCurrentPosition();
     final currentPosition = (currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100;
     if (!mounted) return;
@@ -62,8 +68,10 @@ class _MiniPlayerSliderState extends ConsumerState<MiniPlayerSlider> {
 
   @override
   Widget build(BuildContext context) {
+    final tracks = ref.watch(tracksProvider);
+    final playerController = ref.watch(playerControllerProvider);
     final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
-    _initializeTimer(playerControllerNotifier);
+    _initializeTimer(tracks, playerController, playerControllerNotifier);
     return LinearProgressIndicator(
       value: _currentSliderValue,
     );

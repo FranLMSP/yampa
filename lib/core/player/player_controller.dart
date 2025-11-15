@@ -1,16 +1,19 @@
 import 'package:yampa/core/track_players/interface.dart';
 import 'package:yampa/core/track_players/just_audio.dart';
 import 'package:yampa/models/player_controller_state.dart';
+import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/providers/utils.dart';
 
 class PlayerController {
-  Track? currentTrack;
+  // TODO: consider holding all the tracks here instead of a separate provider
+  String? currentTrackId;
+  String? currentPlaylistId;
   int currentTrackIndex = 0;
   double speed = 1;
-  List<Track> trackQueue = []; // TODO change this to a list of IDs
-  List<Track> shuffledTrackQueue = [];  // TODO change this to a list of IDs
+  List<String> trackQueueIds = [];
+  List<String> shuffledTrackQueueIds = [];
   PlayerState state = PlayerState.stopped;
   LoopMode loopMode = LoopMode.infinite;
   ShuffleMode shuffleMode = ShuffleMode.sequential;
@@ -18,35 +21,40 @@ class PlayerController {
 
   PlayerController();
   factory PlayerController.fromLastState(LastPlayerControllerState lastState, List<Track> tracks) {
-    final existingTrackIds = tracks.map((e) => e.id).toList();
     return PlayerController._clone(
-      currentTrack: lastState.currentTrackId != null && existingTrackIds.contains(lastState.currentTrackId) ? tracks.firstWhere((e) => e.id == lastState.currentTrackId) : null,
+      currentTrackId: lastState.currentTrackId,
+      currentPlaylistId: lastState.currentPlaylistId,
       currentTrackIndex: lastState.currentTrackIndex,
       speed: lastState.speed,
-      trackQueue: tracks.where((e) => lastState.trackQueueIds.contains(e.id)).toList(), // TODO: optimize this, maybe with a map of tracks
-      shuffledTrackQueue: tracks.where((e) => lastState.shuffledTrackQueueIds.contains(e.id)).toList(), // TODO: optimize this, maybe with a map of tracks
+      trackQueueIds: lastState.trackQueueIds,
+      shuffledTrackQueueIds: lastState.shuffledTrackQueueIds,
       state: PlayerState.stopped,
       loopMode: lastState.loopMode,
       shuffleMode: lastState.shuffleMode,
       trackPlayer: JustAudioProvider(), // TODO: store this in sqlite as well
     );
   }
+
   PlayerController._clone({
-    required this.currentTrack,
+    required this.currentTrackId,
+    required this.currentPlaylistId,
     required this.currentTrackIndex,
     required this.speed,
-    required this.trackQueue,
-    required this.shuffledTrackQueue,
+    required this.trackQueueIds,
+    required this.shuffledTrackQueueIds,
     required this.state,
     required this.loopMode,
     required this.shuffleMode,
     required this.trackPlayer,
   });
 
-  Future<void> play() async {
+  Future<void> play(List<Track> tracks) async {
+    if (tracks.indexWhere((e) => e.id == currentTrackId) == -1) {
+      return;
+    }
     if (state != PlayerState.playing && trackPlayer != null) {
-      if (state == PlayerState.stopped && currentTrack != null) {
-        await trackPlayer!.setTrack(currentTrack!);
+      if (state == PlayerState.stopped && currentTrackId != null) {
+        await trackPlayer!.setTrack(tracks.firstWhere((e) => e.id == currentTrackId));
       }
       await setSpeed(speed);
       await trackPlayer!.play();
@@ -69,56 +77,56 @@ class PlayerController {
     }
   }
 
-  Future<void> next(bool forceNext) async {
+  Future<void> next(bool forceNext, List<Track> tracks) async {
     await stop();
     if (loopMode == LoopMode.startToEnd) {
-      if (currentTrackIndex < shuffledTrackQueue.length - 1) {
+      if (currentTrackIndex < shuffledTrackQueueIds.length - 1) {
         currentTrackIndex++;
-        currentTrack = shuffledTrackQueue[currentTrackIndex];
-        await play();
+        await setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
+        await play(tracks);
       } else {
         await seek(Duration.zero);
       }
     } else if (loopMode == LoopMode.infinite || forceNext) {
       currentTrackIndex++;
-      if (currentTrackIndex >= shuffledTrackQueue.length) {
+      if (currentTrackIndex >= shuffledTrackQueueIds.length) {
         currentTrackIndex = 0;
       }
-      if (shuffledTrackQueue.isNotEmpty) {
-        currentTrack = shuffledTrackQueue[currentTrackIndex];
+      if (shuffledTrackQueueIds.isNotEmpty) {
+        await setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
       }
-      await play();
+      await play(tracks);
     }
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> prev() async {
+  Future<void> prev(List<Track> tracks) async {
     await stop();
     if (currentTrackIndex > 0) {
       currentTrackIndex--;
-      if (shuffledTrackQueue.isNotEmpty) {
-        currentTrack = shuffledTrackQueue[currentTrackIndex];
+      if (shuffledTrackQueueIds.isNotEmpty) {
+        await setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
       }
     } else {
       currentTrackIndex = 0;
     }
-    await play();
+    await play(tracks);
     await handlePersistPlayerControllerState(this);
   }
 
   Future<void> suffleTrackQueue() async {
     final shuffleHandler = {
       ShuffleMode.sequential: () {
-        shuffledTrackQueue = trackQueue;
+        shuffledTrackQueueIds = trackQueueIds;
       },
       ShuffleMode.random: () {
-        shuffledTrackQueue = trackQueue;
-        shuffledTrackQueue.shuffle();
+        shuffledTrackQueueIds = trackQueueIds;
+        shuffledTrackQueueIds.shuffle();
       },
       ShuffleMode.randomBasedOnHistory: () {
         // TODO: implement this in the future after collecting statistics of each track
-        shuffledTrackQueue = trackQueue;
-        shuffledTrackQueue.shuffle();
+        shuffledTrackQueueIds = trackQueueIds;
+        shuffledTrackQueueIds.shuffle();
       },
     };
     final handler = shuffleHandler[shuffleMode]!;
@@ -127,7 +135,7 @@ class PlayerController {
   }
 
   Future<void> seek(Duration position) async {
-    if (trackPlayer != null && currentTrack != null) {
+    if (trackPlayer != null && currentTrackId != null) {
       await trackPlayer!.seek(position);
     }
   }
@@ -138,21 +146,22 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> setCurrentTrack(Track track) async {
-    currentTrack = track;
-    if (shuffledTrackQueue.isNotEmpty) {
-      currentTrackIndex = shuffledTrackQueue.indexWhere((e) => e.id == currentTrack?.id);
+  Future<void> setCurrentTrack(String trackId) async {
+    currentTrackId = trackId;
+    if (shuffledTrackQueueIds.isNotEmpty) {
+      currentTrackIndex = shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
     }
     await handlePersistPlayerControllerState(this);
   }
 
   PlayerController clone() {
     return PlayerController._clone(
-      currentTrack: currentTrack,
+      currentTrackId: currentTrackId,
+      currentPlaylistId: currentPlaylistId,
       currentTrackIndex: currentTrackIndex,
       speed: speed,
-      trackQueue: List<Track>.from(trackQueue),
-      shuffledTrackQueue: List<Track>.from(shuffledTrackQueue),
+      trackQueueIds: trackQueueIds,
+      shuffledTrackQueueIds: trackQueueIds,
       state: state,
       loopMode: loopMode,
       shuffleMode: shuffleMode,
@@ -172,9 +181,10 @@ class PlayerController {
     return Duration.zero;
   }
 
-  Future<void> setQueue(List<Track> tracks) async {
-    trackQueue = tracks;
-    shuffledTrackQueue = tracks;
+  Future<void> setPlaylist(Playlist playlist) async {
+    currentPlaylistId = playlist.id;
+    trackQueueIds = playlist.trackIds;
+    shuffledTrackQueueIds = trackQueueIds;
     await suffleTrackQueue();
   }
 
@@ -207,17 +217,17 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> handleNextAutomatically() async {
+  Future<void> handleNextAutomatically(List<Track> tracks) async {
     final nextHandlerMap = {
       LoopMode.singleTrack: () async {
         await stop();
-        await play();
+        await play(tracks);
       },
       LoopMode.infinite: () async {
-        await next(false);
+        await next(false, tracks);
       },
       LoopMode.startToEnd: () async {
-        await next(false);
+        await next(false, tracks);
       },
       LoopMode.none: () async {
         await stop();

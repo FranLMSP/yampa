@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/widgets/player/player_buttons.dart';
 import 'package:yampa/widgets/player/player_image.dart';
 import 'package:yampa/widgets/player/player_slider.dart';
@@ -14,7 +16,12 @@ class BigPlayer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final track = ref.watch(playerControllerProvider).currentTrack;
+    final tracks = ref.watch(tracksProvider);
+    final currentTrackId = ref.watch(playerControllerProvider).currentTrackId;
+    Track? track = null;
+    if (currentTrackId != null) {
+      track = tracks.firstWhere((e) => e.id == currentTrackId);
+    }
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
