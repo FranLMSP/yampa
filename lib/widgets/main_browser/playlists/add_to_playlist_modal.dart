@@ -46,12 +46,14 @@ void addToPlaylistsModal(
             child: const Text('Cancel')
           ),
           TextButton(
-            onPressed: () {
-              handleTracksAddedToPlaylist(
+            onPressed: () async {
+              await handleTracksAddedToPlaylist(
                 selectedTracksNotifier.getTrackIds(),
                 playlists.where((e) => selectedPlaylistsNotifier.getPlaylistIds().contains(e.id)).toList(),
                 playlistNotifier,
               );
+              selectedTracksNotifier.clear();
+              selectedPlaylistsNotifier.clear();
               Navigator.of(context).pop();
             },
             child: const Text('Add')

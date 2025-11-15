@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/models/track.dart';
-import 'package:yampa/providers/favorite_tracks_provider.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
@@ -65,7 +64,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     LocalPathsNotifier localPathsNotifier,
     TracksNotifier tracksNotifier,
     PlaylistNotifier playlistNotifier,
-    FavoriteTracksNotifier favoriteTracksNotifier,
     PlayerControllerNotifier playerControllerNotifier,
   ) async {
     if (Platform.isAndroid || Platform.isIOS) {
@@ -77,7 +75,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       localPathsNotifier,
       tracksNotifier,
       playlistNotifier,
-      favoriteTracksNotifier,
       playerControllerNotifier,
     );
   }
@@ -137,7 +134,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       final localPathsNotifier = ref.read(localPathsProvider.notifier);
       final tracksNotifier = ref.read(tracksProvider.notifier);
       final playlistsNotifier = ref.read(playlistsProvider.notifier);
-      final favoriteTracksNotifier = ref.read(favoriteTracksProvider.notifier);
       final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
       _load(
         initialLoadDone,
@@ -145,7 +141,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         localPathsNotifier,
         tracksNotifier,
         playlistsNotifier,
-        favoriteTracksNotifier,
         playerControllerNotifier,
       );
     }

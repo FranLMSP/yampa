@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 import 'package:yampa/core/player/player_controller.dart';
-import 'package:yampa/core/repositories/favorite_tracks/factory.dart';
 import 'package:yampa/core/repositories/player_controller_state/factory.dart';
 import 'package:yampa/core/repositories/playlists/factory.dart';
 import 'package:yampa/core/repositories/stored_paths/factory.dart';
@@ -11,7 +10,6 @@ import 'package:yampa/models/path.dart';
 import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
-import 'package:yampa/providers/favorite_tracks_provider.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
@@ -24,7 +22,6 @@ Future<void> doInitialLoad(
   LocalPathsNotifier localPathsNotifier,
   TracksNotifier tracksNotifier,
   PlaylistNotifier playlistNotifier,
-  FavoriteTracksNotifier favoriteTracksNotifier,
   PlayerControllerNotifier playerControllerNotifier,
 ) async {
   if (initialLoadDone) return;
@@ -45,12 +42,6 @@ Future<void> doInitialLoad(
     playlists.insert(0, Playlist(id: favoritePlaylistId, name: "Favorites", description: "", trackIds: []));
   }
   playlistNotifier.setPlaylists(playlists);
-
-  final favoriteTracksRepository = getFavoriteTracksRepository();
-  final favoriteTrackIds = await favoriteTracksRepository.getFavoriteTrackIds();
-  favoriteTracksRepository.close();
-  final favoriteTracks = tracks.where((e) => favoriteTrackIds.contains(e.id)).toList();
-  favoriteTracksNotifier.selectTracks(favoriteTracks);
 
   await loadPlayerControllerState(playerControllerNotifier, tracks);
 

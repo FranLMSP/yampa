@@ -5,7 +5,6 @@ import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/core/utils/search_utils.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
-import 'package:yampa/providers/favorite_tracks_provider.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
@@ -52,12 +51,11 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     PlaylistNotifier playlistNotifier,
     SelectedPlaylistNotifier selectedPlaylistsNotifier,
     SelectedTracksNotifier selectedTracksNotifier,
-    FavoriteTracksNotifier favoriteTracksNotifier,
   ) {
     return PopupMenuButton<OptionSelected>(
       initialValue: null,
       onSelected: (OptionSelected item) {
-        _handleItemOptionSelected(context, track, item, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, favoriteTracksNotifier);
+        _handleItemOptionSelected(context, track, item, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
         const PopupMenuItem<OptionSelected>(value: OptionSelected.select, child: Text('Select')),
@@ -115,7 +113,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     PlaylistNotifier playlistNotifier,
     SelectedPlaylistNotifier selectedPlaylistsNotifier,
     SelectedTracksNotifier selectedTracksNotifier,
-    FavoriteTracksNotifier favoriteTracksNotifier,
   ) {
     if (optionSelected == OptionSelected.addToPlaylists) {
       selectedTracksNotifier.clear();
@@ -169,7 +166,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     List<String> selectedTracks,
     SelectedTracksNotifier selectedTracksNotifier,
     SelectedPlaylistNotifier selectedPlaylistsNotifier,
-    FavoriteTracksNotifier favoriteTracksNotifier,
   ) {
     if (selectedTracks.isEmpty) {
       return null;
@@ -225,7 +221,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final selectedPlaylistsNotifier = ref.watch(selectedPlaylistsProvider.notifier);
     final playerController = ref.read(playerControllerProvider);
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
-    final favoriteTracksNotifier = ref.read(favoriteTracksProvider.notifier);
     final isInSelectMode = selectedTracks.isNotEmpty;
     final filteredTracks = _isSearchingEnabled
       ? tracks.where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
@@ -243,7 +238,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         selectedTracks,
         selectedTracksNotifier,
         selectedPlaylistsNotifier,
-        favoriteTracksNotifier,
       ),
       body: ListView(
         children: filteredTracks.map(
@@ -268,7 +262,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
               onTap: onTap,
               onLongPress: onLongPress,
               isSelected: isSelected,
-              trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, favoriteTracksNotifier),
+              trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier),
             );
         }).toList()
       ),
