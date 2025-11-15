@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/models/playlist.dart';
@@ -14,8 +16,8 @@ class PlaylistImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (_isImagePathValid()) {
-      return Image.asset(
-        playlist.imagePath!,
+      return Image.file(
+        File(playlist.imagePath!),
         width: double.infinity,
         fit: BoxFit.cover,
       );
