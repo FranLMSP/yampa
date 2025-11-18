@@ -9,7 +9,6 @@ import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
-import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
@@ -31,19 +30,17 @@ Future<void> doInitialLoad(
   await storedPathsRepository.close();
   localPathsNotifier.setPaths(storedPaths);
 
-  final tracksPlayer = getPlayerBackend();
-  final tracks = await tracksPlayer.fetchTracks(storedPaths);
-  tracksNotifier.setTracks(tracks);
+  await _fetchAndSetTracks(storedPaths, tracksNotifier);
 
   final playlistsRepo = getPlaylistRepository();
-  final playlists = await playlistsRepo.getPlaylists(tracks);
+  final playlists = await playlistsRepo.getPlaylists();
   await playlistsRepo.close();
   if (playlists.indexWhere((e) => e.id == favoritePlaylistId) == -1) {
     playlists.insert(0, Playlist(id: favoritePlaylistId, name: "Favorites", description: "", trackIds: []));
   }
   playlistNotifier.setPlaylists(playlists);
 
-  await loadPlayerControllerState(playerControllerNotifier, tracks);
+  await loadPlayerControllerState(playerControllerNotifier);
 
   initialLoadNotifier.setInitialLoadDone();
 }
@@ -53,8 +50,7 @@ Future<void> _fetchAndSetTracks(
   TracksNotifier tracksNotifier,
 ) async {
   final tracksPlayer = getPlayerBackend();
-  final newTracks = await tracksPlayer.fetchTracks(paths);
-  tracksNotifier.addTracks(newTracks);
+  await tracksPlayer.fetchTracks(paths, tracksNotifier);
 }
 
 Future<void> handlePathsAdded(
@@ -113,8 +109,7 @@ Future<void> handlePathsRemoved(
 
   final newPaths = await storedPathsRepository.getStoredPaths();
   final tracksPlayer = getPlayerBackend();
-  final newTracks = await tracksPlayer.fetchTracks(newPaths);
-  tracksNotifier.setTracks(newTracks);
+  await tracksPlayer.fetchTracks(newPaths, tracksNotifier);
   await storedPathsRepository.close();
 }
 
@@ -211,9 +206,9 @@ Future<void> handlePersistPlayerControllerState(PlayerController playerControlle
 }
 
 
-Future<void> loadPlayerControllerState(PlayerControllerNotifier playerControllerNotifier, List<Track> tracks) async {
+Future<void> loadPlayerControllerState(PlayerControllerNotifier playerControllerNotifier) async {
   final playerControllerStateRepository = getPlayerControllerStateRepository();
   final lastPlayerControllerState = await playerControllerStateRepository.getPlayerControllerState();
-  playerControllerNotifier.setPlayerController(PlayerController.fromLastState(lastPlayerControllerState, tracks));
+  playerControllerNotifier.setPlayerController(PlayerController.fromLastState(lastPlayerControllerState));
   await playerControllerStateRepository.close();
 }

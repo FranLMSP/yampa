@@ -9,6 +9,7 @@ import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/core/utils/id_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/providers/tracks_provider.dart';
 import 'interface.dart';
 
 class JustAudioBackend implements PlayerBackend {
@@ -25,12 +26,15 @@ class JustAudioBackend implements PlayerBackend {
   }
 
   @override
-  Future<List<Track>> fetchTracks(List<GenericPath> paths) async {
-    final Map<String, Track> result = HashMap();
-    final List<Future<Track?>> futures = [];
+  Future<List<Track>> fetchTracks(List<GenericPath> paths, TracksNotifier tracksNotifier) async {
+    final Map<String, Track> foundTracks = HashMap();
     for (final path in paths) {
       if (path.filename != null && isValidMusicPath(path.filename!)) {
-        futures.add(_getTrackMetadataFromGenericPath(path));
+        final track = await _getTrackMetadataFromGenericPath(path);
+        if (track != null && foundTracks[track.id] == null) {
+          foundTracks[track.id] = track;
+          tracksNotifier.addTracks([track]);
+        }
       } else if (path.folder != null) {
         final files = Directory(path.folder!)
           .listSync(recursive: true)
@@ -43,18 +47,15 @@ class JustAudioBackend implements PlayerBackend {
             folder: path.folder,
             filename: file.path,
           );
-          futures.add(_getTrackMetadataFromGenericPath(effectivePath));
+          final track = await _getTrackMetadataFromGenericPath(effectivePath);
+          if (track != null && foundTracks[track.id] == null) {
+            foundTracks[track.id] = track;
+            tracksNotifier.addTracks([track]);
+          }
         }
       }
     }
-    final tracks = await Future.wait(futures);
-    for (final track in tracks) {
-      if (track == null) {
-        continue;
-      }
-      result[track.path] = track;
-    }
-    return result.values.toList();
+    return foundTracks.values.toList();
   }
 
   Future<Track?> _getTrackMetadataFromGenericPath(GenericPath path) async {

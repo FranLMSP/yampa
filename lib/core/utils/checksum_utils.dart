@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'dart:async';
+import 'dart:convert';
 
 typedef HashFunction = Digest Function(List<int> input);
 
@@ -22,6 +23,40 @@ Future<String> computeFileChecksum(String filePath, HashFunction hashFunction) a
     return hash.toString();
   } catch (e) {
     // TODO: log this error
+    return '';
+  }
+}
+
+Future<String> computeFastFileFingerprint(String filePath, {int headBytes = 4096, int tailBytes = 4096}) async {
+  try {
+    final file = File(filePath);
+    if (!await file.exists()) return '';
+
+    final length = await file.length();
+    final stat = await file.stat();
+
+    final raf = await file.open();
+    final int headSize = length < headBytes ? length.toInt() : headBytes;
+    final head = headSize > 0 ? await raf.read(headSize) : <int>[];
+
+    List<int> tail = <int>[];
+    if (length > headBytes && tailBytes > 0) {
+      final int tailSize = length < tailBytes ? length.toInt() : tailBytes;
+      await raf.setPosition(length - tailSize);
+      tail = await raf.read(tailSize);
+    }
+    await raf.close();
+
+    final meta = utf8.encode('$length:${stat.modified.millisecondsSinceEpoch}');
+    final combined = [
+      ...head,
+      ...tail,
+      ...meta,
+    ];
+    final hash = sha1.convert(combined);
+    return hash.toString();
+  } catch (e) {
+    // TODO: log error
     return '';
   }
 }

@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'package:yampa/core/repositories/playlists/playlists.dart';
 import 'package:yampa/core/utils/sqlite_utils.dart';
 import 'package:yampa/models/playlist.dart';
-import 'package:yampa/models/track.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ulid/ulid.dart';
 
@@ -55,7 +54,7 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
   }
 
   @override
-  Future<List<Playlist>> getPlaylists(List<Track> tracks) async {
+  Future<List<Playlist>> getPlaylists() async {
     final db = await _getdb();
     final playlists = await db.rawQuery('SELECT * FROM $playlistsTableName');
     final playlistTracks = await db.rawQuery('SELECT * FROM $playlistsTracksRelationsTableName');
@@ -65,10 +64,6 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
         playlistTracksMap[row["playlist_id"].toString()] = [];
       }
       playlistTracksMap[row["playlist_id"]]?.add(row["track_id"].toString());
-    }
-    final Map<String, Track> tracksMap = HashMap();
-    for (final track in tracks) {
-      tracksMap[track.id] = track;
     }
 
     final List<Playlist> result = [];

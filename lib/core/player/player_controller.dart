@@ -20,7 +20,7 @@ class PlayerController {
   PlayerBackend? playerBackend;
 
   PlayerController();
-  factory PlayerController.fromLastState(LastPlayerControllerState lastState, List<Track> tracks) {
+  factory PlayerController.fromLastState(LastPlayerControllerState lastState) {
     return PlayerController._clone(
       currentTrackId: lastState.currentTrackId,
       currentPlaylistId: lastState.currentPlaylistId,

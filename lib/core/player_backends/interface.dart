@@ -1,8 +1,9 @@
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/providers/tracks_provider.dart';
 
 abstract class PlayerBackend {
-  Future<List<Track>> fetchTracks(List<GenericPath> paths);
+  Future<List<Track>> fetchTracks(List<GenericPath> paths, TracksNotifier tracksNotifier);
   Future<void> setTrack(Track track);
   Future<void> play();
   Future<void> pause();

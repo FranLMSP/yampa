@@ -5,7 +5,6 @@ import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/core/utils/search_utils.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
-import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
@@ -212,7 +211,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
 
   @override
   Widget build(BuildContext context) {
-    final initialLoadDone = ref.watch(initialLoadProvider);
     final tracks = ref.watch(tracksProvider);
     final playlists = ref.watch(playlistsProvider);
     final playlistsNotifier = ref.watch(playlistsProvider.notifier);
@@ -226,7 +224,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
       ? tracks.where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
       : tracks;
 
-    if (initialLoadDone && tracks.isEmpty) {
+    if (tracks.isEmpty) {
       return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));
     }
     return Scaffold(
