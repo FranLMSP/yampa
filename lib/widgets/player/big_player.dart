@@ -18,8 +18,8 @@ class BigPlayer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
     final currentTrackId = ref.watch(playerControllerProvider).currentTrackId;
-    Track? track = null;
-    if (currentTrackId != null) {
+    Track? track;
+    if (tracks.indexWhere((e) => e.id == currentTrackId) != -1) {
       track = tracks.firstWhere((e) => e.id == currentTrackId);
     }
     return Column(
