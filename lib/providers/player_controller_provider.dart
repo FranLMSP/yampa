@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/player_controller.dart';
-import 'package:yampa/core/track_players/interface.dart';
+import 'package:yampa/core/player_backends/interface.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 
@@ -43,7 +43,7 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = state.clone();
   }
 
-  Future<void> setTrackPlayer(TrackPlayer trackPlayer) async {
+  Future<void> setTrackPlayer(PlayerBackend trackPlayer) async {
     await state.setTrackPlayer(trackPlayer);
     state = state.clone();
   }

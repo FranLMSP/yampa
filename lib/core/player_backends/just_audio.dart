@@ -11,10 +11,10 @@ import 'package:yampa/models/path.dart';
 import 'package:yampa/models/track.dart';
 import 'interface.dart';
 
-class JustAudioProvider implements TrackPlayer {
+class JustAudioBackend implements PlayerBackend {
   final AudioPlayer _player = AudioPlayer();
 
-  JustAudioProvider() {
+  JustAudioBackend() {
     if (!Platform.isAndroid && !Platform.isIOS) {
       JustAudioMediaKit.ensureInitialized(
         linux: true,

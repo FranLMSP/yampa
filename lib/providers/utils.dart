@@ -4,7 +4,7 @@ import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/repositories/player_controller_state/factory.dart';
 import 'package:yampa/core/repositories/playlists/factory.dart';
 import 'package:yampa/core/repositories/stored_paths/factory.dart';
-import 'package:yampa/core/track_players/factory.dart';
+import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/player_controller_state.dart';
@@ -31,7 +31,7 @@ Future<void> doInitialLoad(
   await storedPathsRepository.close();
   localPathsNotifier.setPaths(storedPaths);
 
-  final tracksPlayer = getTrackPlayer();
+  final tracksPlayer = getPlayerBackend();
   final tracks = await tracksPlayer.fetchTracks(storedPaths);
   tracksNotifier.setTracks(tracks);
 
@@ -52,7 +52,7 @@ Future<void> _fetchAndSetTracks(
   List<GenericPath> paths,
   TracksNotifier tracksNotifier,
 ) async {
-  final tracksPlayer = getTrackPlayer();
+  final tracksPlayer = getPlayerBackend();
   final newTracks = await tracksPlayer.fetchTracks(paths);
   tracksNotifier.addTracks(newTracks);
 }
@@ -112,7 +112,7 @@ Future<void> handlePathsRemoved(
   await Future.wait(removePathsFutures);
 
   final newPaths = await storedPathsRepository.getStoredPaths();
-  final tracksPlayer = getTrackPlayer();
+  final tracksPlayer = getPlayerBackend();
   final newTracks = await tracksPlayer.fetchTracks(newPaths);
   tracksNotifier.setTracks(newTracks);
   await storedPathsRepository.close();
