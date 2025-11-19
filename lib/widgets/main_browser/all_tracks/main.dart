@@ -5,6 +5,7 @@ import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/core/utils/search_utils.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
@@ -219,6 +220,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final selectedPlaylistsNotifier = ref.watch(selectedPlaylistsProvider.notifier);
     final playerController = ref.read(playerControllerProvider);
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+    final loadedTracksCountNotifier = ref.read(loadedTracksCountProvider.notifier);
     final isInSelectMode = selectedTracks.isNotEmpty;
     final filteredTracks = _isSearchingEnabled
       ? tracks.where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
@@ -237,32 +239,45 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         selectedTracksNotifier,
         selectedPlaylistsNotifier,
       ),
-      body: ListView(
-        children: filteredTracks.map(
-          (track) {
-            Function(Track track)? onTap;
-            Function(Track track)? onLongPress;
-            void onSelect(Track track) {
-              _toggleSelectedTrack(track, selectedTracks, selectedTracksNotifier);
-            }
-            if (isInSelectMode) {
-              onTap = onSelect;
-            } else {
-              onTap = (Track track) {
-                _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
-              };
-              onLongPress = onSelect;
-            }
-            final isSelected = selectedTracks.contains(track.id);
-            return TrackItem(
-              key: Key(track.id),
-              track: track,
-              onTap: onTap,
-              onLongPress: onLongPress,
-              isSelected: isSelected,
-              trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier),
-            );
-        }).toList()
+      body: Column(
+        children: [
+          if (loadedTracksCountNotifier.isLoading())
+            SizedBox(
+              height: 5,
+              child: LinearProgressIndicator(
+                value: loadedTracksCountNotifier.getPercentage(),
+              ),
+            ),
+          Expanded(
+            child: ListView(
+              children: filteredTracks.map(
+                (track) {
+                  Function(Track track)? onTap;
+                  Function(Track track)? onLongPress;
+                  void onSelect(Track track) {
+                    _toggleSelectedTrack(track, selectedTracks, selectedTracksNotifier);
+                  }
+                  if (isInSelectMode) {
+                    onTap = onSelect;
+                  } else {
+                    onTap = (Track track) {
+                      _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
+                    };
+                    onLongPress = onSelect;
+                  }
+                  final isSelected = selectedTracks.contains(track.id);
+                  return TrackItem(
+                    key: Key(track.id),
+                    track: track,
+                    onTap: onTap,
+                    onLongPress: onLongPress,
+                    isSelected: isSelected,
+                    trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier),
+                  );
+              }).toList()
+            ),
+          ),
+        ],
       ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,

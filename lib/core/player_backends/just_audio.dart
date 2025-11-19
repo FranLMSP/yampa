@@ -9,6 +9,7 @@ import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/core/utils/id_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'interface.dart';
 
@@ -26,35 +27,35 @@ class JustAudioBackend implements PlayerBackend {
   }
 
   @override
-  Future<List<Track>> fetchTracks(List<GenericPath> paths, TracksNotifier tracksNotifier) async {
+  Future<List<Track>> fetchTracks(List<GenericPath> paths, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier) async {
+    loadedTracksCountNotifier.reset();
     final Map<String, Track> foundTracks = HashMap();
-    for (final path in paths) {
-      if (path.filename != null && isValidMusicPath(path.filename!)) {
-        final track = await _getTrackMetadataFromGenericPath(path);
-        if (track != null && foundTracks[track.id] == null) {
-          foundTracks[track.id] = track;
-          tracksNotifier.addTracks([track]);
-        }
-      } else if (path.folder != null) {
-        final files = Directory(path.folder!)
+    final List<GenericPath> allEffectivePaths = [
+      ...paths.where((e) => e.filename != null),
+      ...[
+        for (final path in paths.where((e) => e.filename == null && e.folder != null))
+        ...Directory(path.folder!)
           .listSync(recursive: true)
           .whereType<File>()
           .where((file) => isValidMusicPath(file.path))
-          .toList();
-        for (final file in files) {
-          final effectivePath = GenericPath(
+          .map((e) => GenericPath(
             id: path.id,
             folder: path.folder,
-            filename: file.path,
-          );
-          final track = await _getTrackMetadataFromGenericPath(effectivePath);
-          if (track != null && foundTracks[track.id] == null) {
-            foundTracks[track.id] = track;
-            tracksNotifier.addTracks([track]);
-          }
-        }
+            filename: e.path,
+          ))
+      ]
+    ];
+
+    loadedTracksCountNotifier.setTotalTracks(allEffectivePaths.length);
+    for (final path in allEffectivePaths) {
+      final track = await _getTrackMetadataFromGenericPath(path);
+      if (track != null && foundTracks[track.id] == null) {
+        foundTracks[track.id] = track;
+        tracksNotifier.addTracks([track]);
       }
+      loadedTracksCountNotifier.incrementLoadedTrack();
     }
+    loadedTracksCountNotifier.reset();
     return foundTracks.values.toList();
   }
 

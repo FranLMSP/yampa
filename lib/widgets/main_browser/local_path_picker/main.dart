@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
+import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
@@ -46,7 +47,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     );
   }
 
-  void _pickDirectory(LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) async {
+  void _pickDirectory(LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier) async {
     String? result = await FilePicker.platform.getDirectoryPath();
     if (result != null) {
       final genericPath = GenericPath(
@@ -54,11 +55,11 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
         folder: result,
         filename: null,
       );
-      await handlePathsAdded([genericPath], localPathsNotifier, tracksNotifier);
+      await handlePathsAdded([genericPath], localPathsNotifier, tracksNotifier, loadedTracksCountNotifier);
     }
   }
 
-  void _pickIndividualFiles(LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) async {
+  void _pickIndividualFiles(LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result != null) {
       final genericPaths = result.files.map((file) {
@@ -69,16 +70,16 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
         );
       }).toList();
       genericPaths.removeWhere((e) => !isValidMusicPath(e.filename!));
-      handlePathsAdded(genericPaths, localPathsNotifier, tracksNotifier);
+      handlePathsAdded(genericPaths, localPathsNotifier, tracksNotifier, loadedTracksCountNotifier);
     }
   }
 
-  List<Widget> _buildShowActionsWidgets(LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) {
+  List<Widget> _buildShowActionsWidgets(LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier) {
     return [
       if (_showActions) ...[
-        _buildActionWidgets(Icons.file_present, () => _pickIndividualFiles(localPathsNotifier, tracksNotifier)),
+        _buildActionWidgets(Icons.file_present, () => _pickIndividualFiles(localPathsNotifier, tracksNotifier, loadedTracksCountNotifier)),
         SizedBox(height: 10),
-        _buildActionWidgets(Icons.folder, () => _pickDirectory(localPathsNotifier, tracksNotifier)),
+        _buildActionWidgets(Icons.folder, () => _pickDirectory(localPathsNotifier, tracksNotifier, loadedTracksCountNotifier)),
         SizedBox(height: 10),
       ],
       FloatingActionButton(
@@ -103,6 +104,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     final localPaths = ref.watch(localPathsProvider);
     final localPathsNotifier = ref.read(localPathsProvider.notifier);
     final tracksNotifier = ref.read(tracksProvider.notifier);
+    final loadedTracksCountNotifier = ref.read(loadedTracksCountProvider.notifier);
 
     if (!initialLoadDone) {
       return CustomLoader();
@@ -111,7 +113,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
-        children: _buildShowActionsWidgets(localPathsNotifier, tracksNotifier),
+        children: _buildShowActionsWidgets(localPathsNotifier, tracksNotifier, loadedTracksCountNotifier),
       ),
       body: _buildPathsList(localPaths),
     );

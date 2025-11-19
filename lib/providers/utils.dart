@@ -10,6 +10,7 @@ import 'package:yampa/models/path.dart';
 import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
+import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
@@ -22,6 +23,7 @@ Future<void> doInitialLoad(
   TracksNotifier tracksNotifier,
   PlaylistNotifier playlistNotifier,
   PlayerControllerNotifier playerControllerNotifier,
+  LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
 ) async {
   if (initialLoadDone) return;
 
@@ -29,8 +31,6 @@ Future<void> doInitialLoad(
   final storedPaths = await storedPathsRepository.getStoredPaths();
   await storedPathsRepository.close();
   localPathsNotifier.setPaths(storedPaths);
-
-  await _fetchAndSetTracks(storedPaths, tracksNotifier);
 
   final playlistsRepo = getPlaylistRepository();
   final playlists = await playlistsRepo.getPlaylists();
@@ -40,23 +40,26 @@ Future<void> doInitialLoad(
   }
   playlistNotifier.setPlaylists(playlists);
 
-  await loadPlayerControllerState(playerControllerNotifier);
-
   initialLoadNotifier.setInitialLoadDone();
+
+  await _fetchAndSetTracks(storedPaths, tracksNotifier, loadedTracksCountNotifier);
+  await loadPlayerControllerState(playerControllerNotifier);
 }
 
 Future<void> _fetchAndSetTracks(
   List<GenericPath> paths,
   TracksNotifier tracksNotifier,
+  LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
 ) async {
   final tracksPlayer = getPlayerBackend();
-  await tracksPlayer.fetchTracks(paths, tracksNotifier);
+  await tracksPlayer.fetchTracks(paths, tracksNotifier, loadedTracksCountNotifier);
 }
 
 Future<void> handlePathsAdded(
   List<GenericPath> paths,
   LocalPathsNotifier localPathsNotifier,
   TracksNotifier tracksNotifier,
+  LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
 ) async {
   // Try to add to the provider only the tracks related to the paths
   final List<GenericPath> actuallyAddedPaths = [];
@@ -68,7 +71,7 @@ Future<void> handlePathsAdded(
     localPathsNotifier.addPaths([newPath]);
     actuallyAddedPaths.add(newPath);
   }
-  await _fetchAndSetTracks(actuallyAddedPaths, tracksNotifier);
+  await _fetchAndSetTracks(actuallyAddedPaths, tracksNotifier, loadedTracksCountNotifier);
   await storedPathsRepository.close();
 }
 
@@ -107,9 +110,6 @@ Future<void> handlePathsRemoved(
   }
   await Future.wait(removePathsFutures);
 
-  final newPaths = await storedPathsRepository.getStoredPaths();
-  final tracksPlayer = getPlayerBackend();
-  await tracksPlayer.fetchTracks(newPaths, tracksNotifier);
   await storedPathsRepository.close();
 }
 
