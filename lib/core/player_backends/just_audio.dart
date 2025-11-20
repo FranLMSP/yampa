@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:io';
 
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
+import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
@@ -30,21 +31,22 @@ class JustAudioBackend implements PlayerBackend {
   Future<List<Track>> fetchTracks(List<GenericPath> paths, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier) async {
     loadedTracksCountNotifier.reset();
     final Map<String, Track> foundTracks = HashMap();
-    final List<GenericPath> allEffectivePaths = [
-      ...paths.where((e) => e.filename != null),
-      ...[
-        for (final path in paths.where((e) => e.filename == null && e.folder != null))
-        ...Directory(path.folder!)
-          .listSync(recursive: true)
-          .whereType<File>()
-          .where((file) => isValidMusicPath(file.path))
-          .map((e) => GenericPath(
-            id: path.id,
-            folder: path.folder,
-            filename: e.path,
-          ))
-      ]
-    ];
+
+    final List<GenericPath> filePaths = [];
+    filePaths.addAll(paths.where((e) => e.filename != null));
+    for (final path in paths.where((e) => e.filename == null && e.folder != null)) {
+      final dir = Directory(path.folder!);
+      try {
+        await for (final entity in dir.list(recursive: true, followLinks: false)) {
+          if (entity is File && isValidMusicPath(entity.path)) {
+            filePaths.add(GenericPath(id: path.id, folder: path.folder, filename: entity.path));
+          }
+        }
+      } catch (e) {
+        // ignore directories we cannot read
+      }
+    }
+    final allEffectivePaths = filePaths;
 
     loadedTracksCountNotifier.setTotalTracks(allEffectivePaths.length);
     for (final path in allEffectivePaths) {
@@ -61,7 +63,7 @@ class JustAudioBackend implements PlayerBackend {
 
   Future<Track?> _getTrackMetadataFromGenericPath(GenericPath path) async {
     try {
-      final metadata = readMetadata(File(path.filename!), getImage: true);
+      final metadata = await compute(readMetadata, File(path.filename!));
       final tempPlayer = AudioPlayer();
       final duration = await tempPlayer.setFilePath(path.filename!);
       return Track(

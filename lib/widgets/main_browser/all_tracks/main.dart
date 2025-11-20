@@ -220,7 +220,9 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final selectedPlaylistsNotifier = ref.watch(selectedPlaylistsProvider.notifier);
     final playerController = ref.read(playerControllerProvider);
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
-    final loadedTracksCountNotifier = ref.read(loadedTracksCountProvider.notifier);
+    final loadedTracksCount = ref.watch(loadedTracksCountProvider);
+    print(loadedTracksCount);
+    final loadedTracksCountNotifier = ref.watch(loadedTracksCountProvider.notifier);
     final isInSelectMode = selectedTracks.isNotEmpty;
     final filteredTracks = _isSearchingEnabled
       ? tracks.where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
