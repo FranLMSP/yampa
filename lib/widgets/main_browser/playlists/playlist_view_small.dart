@@ -1,7 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yampa/core/track_players/just_audio.dart';
+import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/playlist.dart';
@@ -214,7 +214,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
               onPressed: () async {
                 if (selectedPlaylist.trackIds.isNotEmpty) {
                   await playerControllerNotifier.stop();
-                  playerControllerNotifier.setTrackPlayer(JustAudioProvider()); // TODO: we should set this dinamically depending on the kind of track
+                  playerControllerNotifier.setTrackPlayer(getPlayerBackend()); // TODO: we should set this dinamically depending on the kind of track
                   await playerControllerNotifier.setPlaylist(selectedPlaylist);
                   final firstTrackId = playerControllerNotifier.getPlayerController().shuffledTrackQueueIds.first;
                   final firstTrack = tracks.firstWhere((e) => e.id == firstTrackId);

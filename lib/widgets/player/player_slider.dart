@@ -41,7 +41,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
       return;
     }
     Track? currentTrack;
-    if (player.currentTrackId != null) {
+    if (tracks.indexWhere((e) => e.id == player.currentTrackId) != -1) {
       currentTrack = tracks.firstWhere((e) => e.id == player.currentTrackId);
     }
     if (

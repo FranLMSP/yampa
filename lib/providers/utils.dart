@@ -4,13 +4,13 @@ import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/repositories/player_controller_state/factory.dart';
 import 'package:yampa/core/repositories/playlists/factory.dart';
 import 'package:yampa/core/repositories/stored_paths/factory.dart';
-import 'package:yampa/core/track_players/factory.dart';
+import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
-import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
+import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
@@ -23,6 +23,7 @@ Future<void> doInitialLoad(
   TracksNotifier tracksNotifier,
   PlaylistNotifier playlistNotifier,
   PlayerControllerNotifier playerControllerNotifier,
+  LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
 ) async {
   if (initialLoadDone) return;
 
@@ -31,36 +32,34 @@ Future<void> doInitialLoad(
   await storedPathsRepository.close();
   localPathsNotifier.setPaths(storedPaths);
 
-  final tracksPlayer = getTrackPlayer();
-  final tracks = await tracksPlayer.fetchTracks(storedPaths);
-  tracksNotifier.setTracks(tracks);
-
   final playlistsRepo = getPlaylistRepository();
-  final playlists = await playlistsRepo.getPlaylists(tracks);
+  final playlists = await playlistsRepo.getPlaylists();
   await playlistsRepo.close();
   if (playlists.indexWhere((e) => e.id == favoritePlaylistId) == -1) {
     playlists.insert(0, Playlist(id: favoritePlaylistId, name: "Favorites", description: "", trackIds: []));
   }
   playlistNotifier.setPlaylists(playlists);
 
-  await loadPlayerControllerState(playerControllerNotifier, tracks);
-
   initialLoadNotifier.setInitialLoadDone();
+
+  await _fetchAndSetTracks(storedPaths, tracksNotifier, loadedTracksCountNotifier);
+  await loadPlayerControllerState(playerControllerNotifier);
 }
 
 Future<void> _fetchAndSetTracks(
   List<GenericPath> paths,
   TracksNotifier tracksNotifier,
+  LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
 ) async {
-  final tracksPlayer = getTrackPlayer();
-  final newTracks = await tracksPlayer.fetchTracks(paths);
-  tracksNotifier.addTracks(newTracks);
+  final tracksPlayer = getPlayerBackend();
+  await tracksPlayer.fetchTracks(paths, tracksNotifier, loadedTracksCountNotifier);
 }
 
 Future<void> handlePathsAdded(
   List<GenericPath> paths,
   LocalPathsNotifier localPathsNotifier,
   TracksNotifier tracksNotifier,
+  LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
 ) async {
   // Try to add to the provider only the tracks related to the paths
   final List<GenericPath> actuallyAddedPaths = [];
@@ -72,7 +71,7 @@ Future<void> handlePathsAdded(
     localPathsNotifier.addPaths([newPath]);
     actuallyAddedPaths.add(newPath);
   }
-  await _fetchAndSetTracks(actuallyAddedPaths, tracksNotifier);
+  await _fetchAndSetTracks(actuallyAddedPaths, tracksNotifier, loadedTracksCountNotifier);
   await storedPathsRepository.close();
 }
 
@@ -111,10 +110,6 @@ Future<void> handlePathsRemoved(
   }
   await Future.wait(removePathsFutures);
 
-  final newPaths = await storedPathsRepository.getStoredPaths();
-  final tracksPlayer = getTrackPlayer();
-  final newTracks = await tracksPlayer.fetchTracks(newPaths);
-  tracksNotifier.setTracks(newTracks);
   await storedPathsRepository.close();
 }
 
@@ -211,9 +206,9 @@ Future<void> handlePersistPlayerControllerState(PlayerController playerControlle
 }
 
 
-Future<void> loadPlayerControllerState(PlayerControllerNotifier playerControllerNotifier, List<Track> tracks) async {
+Future<void> loadPlayerControllerState(PlayerControllerNotifier playerControllerNotifier) async {
   final playerControllerStateRepository = getPlayerControllerStateRepository();
   final lastPlayerControllerState = await playerControllerStateRepository.getPlayerControllerState();
-  playerControllerNotifier.setPlayerController(PlayerController.fromLastState(lastPlayerControllerState, tracks));
+  playerControllerNotifier.setPlayerController(PlayerController.fromLastState(lastPlayerControllerState));
   await playerControllerStateRepository.close();
 }

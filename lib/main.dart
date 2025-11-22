@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
+import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
@@ -66,6 +67,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     TracksNotifier tracksNotifier,
     PlaylistNotifier playlistNotifier,
     PlayerControllerNotifier playerControllerNotifier,
+    LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
   ) async {
     if (Platform.isAndroid || Platform.isIOS) {
       await Permission.audio.request();
@@ -77,6 +79,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       tracksNotifier,
       playlistNotifier,
       playerControllerNotifier,
+      loadedTracksCountNotifier,
     );
   }
 
@@ -136,6 +139,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       final tracksNotifier = ref.read(tracksProvider.notifier);
       final playlistsNotifier = ref.read(playlistsProvider.notifier);
       final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+      final loadedTracksCountNotifier = ref.read(loadedTracksCountProvider.notifier);
       _load(
         initialLoadDone,
         initialLoadNotifier,
@@ -143,6 +147,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         tracksNotifier,
         playlistsNotifier,
         playerControllerNotifier,
+        loadedTracksCountNotifier,
       );
     }
     _setTimer();

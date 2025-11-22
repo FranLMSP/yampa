@@ -1,5 +1,5 @@
-import 'package:yampa/core/track_players/interface.dart';
-import 'package:yampa/core/track_players/just_audio.dart';
+import 'package:yampa/core/player_backends/factory.dart';
+import 'package:yampa/core/player_backends/interface.dart';
 import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
@@ -17,10 +17,10 @@ class PlayerController {
   PlayerState state = PlayerState.stopped;
   LoopMode loopMode = LoopMode.infinite;
   ShuffleMode shuffleMode = ShuffleMode.sequential;
-  TrackPlayer? trackPlayer;
+  PlayerBackend? playerBackend;
 
   PlayerController();
-  factory PlayerController.fromLastState(LastPlayerControllerState lastState, List<Track> tracks) {
+  factory PlayerController.fromLastState(LastPlayerControllerState lastState) {
     return PlayerController._clone(
       currentTrackId: lastState.currentTrackId,
       currentPlaylistId: lastState.currentPlaylistId,
@@ -31,7 +31,7 @@ class PlayerController {
       state: PlayerState.stopped,
       loopMode: lastState.loopMode,
       shuffleMode: lastState.shuffleMode,
-      trackPlayer: JustAudioProvider(), // TODO: store this in sqlite as well
+      playerBackend: getPlayerBackend(), // TODO: store this in sqlite as well
     );
   }
 
@@ -45,34 +45,34 @@ class PlayerController {
     required this.state,
     required this.loopMode,
     required this.shuffleMode,
-    required this.trackPlayer,
+    required this.playerBackend,
   });
 
   Future<void> play(List<Track> tracks) async {
     if (tracks.indexWhere((e) => e.id == currentTrackId) == -1) {
       return;
     }
-    if (state != PlayerState.playing && trackPlayer != null) {
+    if (state != PlayerState.playing && playerBackend != null) {
       if (state == PlayerState.stopped && currentTrackId != null) {
-        await trackPlayer!.setTrack(tracks.firstWhere((e) => e.id == currentTrackId));
+        await playerBackend!.setTrack(tracks.firstWhere((e) => e.id == currentTrackId));
       }
       await setSpeed(speed);
-      await trackPlayer!.play();
+      await playerBackend!.play();
       state = PlayerState.playing;
     }
   }
 
   Future<void> pause() async {
-    if (state != PlayerState.paused && trackPlayer != null) {
-      await trackPlayer!.pause();
+    if (state != PlayerState.paused && playerBackend != null) {
+      await playerBackend!.pause();
       state = PlayerState.paused;
     }
   }
 
   Future<void> stop() async {
-    if (trackPlayer != null) {
-      await trackPlayer!.seek(Duration.zero);
-      await trackPlayer!.stop();
+    if (playerBackend != null) {
+      await playerBackend!.seek(Duration.zero);
+      await playerBackend!.stop();
       state = PlayerState.stopped;
     }
   }
@@ -135,14 +135,14 @@ class PlayerController {
   }
 
   Future<void> seek(Duration position) async {
-    if (trackPlayer != null && currentTrackId != null) {
-      await trackPlayer!.seek(position);
+    if (playerBackend != null && currentTrackId != null) {
+      await playerBackend!.seek(position);
     }
   }
 
-  Future<void> setTrackPlayer(TrackPlayer trackPlayer) async {
+  Future<void> setTrackPlayer(PlayerBackend playerBackend) async {
     await stop();
-    this.trackPlayer = trackPlayer;
+    this.playerBackend = playerBackend;
     await handlePersistPlayerControllerState(this);
   }
 
@@ -165,18 +165,18 @@ class PlayerController {
       state: state,
       loopMode: loopMode,
       shuffleMode: shuffleMode,
-      trackPlayer: trackPlayer,
+      playerBackend: playerBackend,
     );
   }
 
   bool hasTrackFinishedPlaying() {
-    if (trackPlayer == null) return false;
-    return trackPlayer!.hasTrackFinishedPlaying();
+    if (playerBackend == null) return false;
+    return playerBackend!.hasTrackFinishedPlaying();
   }
 
   Future<Duration> getCurrentPosition() async {
-    if (trackPlayer != null) {
-      return await trackPlayer!.getCurrentPosition();
+    if (playerBackend != null) {
+      return await playerBackend!.getCurrentPosition();
     }
     return Duration.zero;
   }
@@ -190,8 +190,8 @@ class PlayerController {
 
   Future<void> setSpeed(double value) async {
     speed = value;
-    if (trackPlayer != null) {
-      await trackPlayer!.setSpeed(speed);
+    if (playerBackend != null) {
+      await playerBackend!.setSpeed(speed);
     }
     await handlePersistPlayerControllerState(this);
   }

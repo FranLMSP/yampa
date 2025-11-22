@@ -3,18 +3,21 @@ import 'dart:collection';
 import 'dart:io';
 
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
+import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/core/utils/id_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/providers/loaded_tracks_count_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
 import 'interface.dart';
 
-class JustAudioProvider implements TrackPlayer {
+class JustAudioBackend implements PlayerBackend {
   final AudioPlayer _player = AudioPlayer();
 
-  JustAudioProvider() {
+  JustAudioBackend() {
     if (!Platform.isAndroid && !Platform.isIOS) {
       JustAudioMediaKit.ensureInitialized(
         linux: true,
@@ -25,41 +28,42 @@ class JustAudioProvider implements TrackPlayer {
   }
 
   @override
-  Future<List<Track>> fetchTracks(List<GenericPath> paths) async {
-    final Map<String, Track> result = HashMap();
-    final List<Future<Track?>> futures = [];
-    for (final path in paths) {
-      if (path.filename != null && isValidMusicPath(path.filename!)) {
-        futures.add(_getTrackMetadataFromGenericPath(path));
-      } else if (path.folder != null) {
-        final files = Directory(path.folder!)
-          .listSync(recursive: true)
-          .whereType<File>()
-          .where((file) => isValidMusicPath(file.path))
-          .toList();
-        for (final file in files) {
-          final effectivePath = GenericPath(
-            id: path.id,
-            folder: path.folder,
-            filename: file.path,
-          );
-          futures.add(_getTrackMetadataFromGenericPath(effectivePath));
+  Future<List<Track>> fetchTracks(List<GenericPath> paths, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier) async {
+    loadedTracksCountNotifier.reset();
+    final Map<String, Track> foundTracks = HashMap();
+
+    final List<GenericPath> filePaths = [];
+    filePaths.addAll(paths.where((e) => e.filename != null));
+    for (final path in paths.where((e) => e.filename == null && e.folder != null)) {
+      final dir = Directory(path.folder!);
+      try {
+        await for (final entity in dir.list(recursive: true, followLinks: false)) {
+          if (entity is File && isValidMusicPath(entity.path)) {
+            filePaths.add(GenericPath(id: path.id, folder: path.folder, filename: entity.path));
+          }
         }
+      } catch (e) {
+        // ignore directories we cannot read
       }
     }
-    final tracks = await Future.wait(futures);
-    for (final track in tracks) {
-      if (track == null) {
-        continue;
+    final allEffectivePaths = filePaths;
+
+    loadedTracksCountNotifier.setTotalTracks(allEffectivePaths.length);
+    for (final path in allEffectivePaths) {
+      final track = await _getTrackMetadataFromGenericPath(path);
+      if (track != null && foundTracks[track.id] == null) {
+        foundTracks[track.id] = track;
+        tracksNotifier.addTracks([track]);
       }
-      result[track.path] = track;
+      loadedTracksCountNotifier.incrementLoadedTrack();
     }
-    return result.values.toList();
+    loadedTracksCountNotifier.reset();
+    return foundTracks.values.toList();
   }
 
   Future<Track?> _getTrackMetadataFromGenericPath(GenericPath path) async {
     try {
-      final metadata = readMetadata(File(path.filename!), getImage: true);
+      final metadata = await compute(readMetadata, File(path.filename!));
       final tempPlayer = AudioPlayer();
       final duration = await tempPlayer.setFilePath(path.filename!);
       return Track(

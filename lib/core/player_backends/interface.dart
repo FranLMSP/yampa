@@ -1,8 +1,10 @@
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/providers/loaded_tracks_count_provider.dart';
+import 'package:yampa/providers/tracks_provider.dart';
 
-abstract class TrackPlayer {
-  Future<List<Track>> fetchTracks(List<GenericPath> paths);
+abstract class PlayerBackend {
+  Future<List<Track>> fetchTracks(List<GenericPath> paths, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier);
   Future<void> setTrack(Track track);
   Future<void> play();
   Future<void> pause();

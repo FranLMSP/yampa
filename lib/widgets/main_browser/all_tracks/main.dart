@@ -5,7 +5,7 @@ import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/core/utils/search_utils.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
-import 'package:yampa/providers/initial_load_provider.dart';
+import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
@@ -212,7 +212,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
 
   @override
   Widget build(BuildContext context) {
-    final initialLoadDone = ref.watch(initialLoadProvider);
     final tracks = ref.watch(tracksProvider);
     final playlists = ref.watch(playlistsProvider);
     final playlistsNotifier = ref.watch(playlistsProvider.notifier);
@@ -221,12 +220,15 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final selectedPlaylistsNotifier = ref.watch(selectedPlaylistsProvider.notifier);
     final playerController = ref.read(playerControllerProvider);
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+    final loadedTracksCount = ref.watch(loadedTracksCountProvider);
+    print(loadedTracksCount);
+    final loadedTracksCountNotifier = ref.watch(loadedTracksCountProvider.notifier);
     final isInSelectMode = selectedTracks.isNotEmpty;
     final filteredTracks = _isSearchingEnabled
       ? tracks.where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
       : tracks;
 
-    if (initialLoadDone && tracks.isEmpty) {
+    if (tracks.isEmpty) {
       return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));
     }
     return Scaffold(
@@ -239,32 +241,45 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         selectedTracksNotifier,
         selectedPlaylistsNotifier,
       ),
-      body: ListView(
-        children: filteredTracks.map(
-          (track) {
-            Function(Track track)? onTap;
-            Function(Track track)? onLongPress;
-            void onSelect(Track track) {
-              _toggleSelectedTrack(track, selectedTracks, selectedTracksNotifier);
-            }
-            if (isInSelectMode) {
-              onTap = onSelect;
-            } else {
-              onTap = (Track track) {
-                _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
-              };
-              onLongPress = onSelect;
-            }
-            final isSelected = selectedTracks.contains(track.id);
-            return TrackItem(
-              key: Key(track.id),
-              track: track,
-              onTap: onTap,
-              onLongPress: onLongPress,
-              isSelected: isSelected,
-              trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier),
-            );
-        }).toList()
+      body: Column(
+        children: [
+          if (loadedTracksCountNotifier.isLoading())
+            SizedBox(
+              height: 5,
+              child: LinearProgressIndicator(
+                value: loadedTracksCountNotifier.getPercentage(),
+              ),
+            ),
+          Expanded(
+            child: ListView(
+              children: filteredTracks.map(
+                (track) {
+                  Function(Track track)? onTap;
+                  Function(Track track)? onLongPress;
+                  void onSelect(Track track) {
+                    _toggleSelectedTrack(track, selectedTracks, selectedTracksNotifier);
+                  }
+                  if (isInSelectMode) {
+                    onTap = onSelect;
+                  } else {
+                    onTap = (Track track) {
+                      _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
+                    };
+                    onLongPress = onSelect;
+                  }
+                  final isSelected = selectedTracks.contains(track.id);
+                  return TrackItem(
+                    key: Key(track.id),
+                    track: track,
+                    onTap: onTap,
+                    onLongPress: onLongPress,
+                    isSelected: isSelected,
+                    trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier),
+                  );
+              }).toList()
+            ),
+          ),
+        ],
       ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,

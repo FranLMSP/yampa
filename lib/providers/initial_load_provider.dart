@@ -13,4 +13,3 @@ class InitialLoadNotifier extends Notifier<bool> {
     state = true;
   }
 }
-
