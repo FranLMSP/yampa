@@ -19,11 +19,11 @@ class MiniPlayer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentTrackId = ref.watch(playerControllerProvider).currentTrackId;
-    if (currentTrackId == null) {
+    final tracks = ref.watch(tracksProvider);
+    final track = tracks[currentTrackId];
+    if (track == null) {
       return Row();
     }
-    final tracks = ref.watch(tracksProvider);
-    final track = tracks.firstWhere((e) => e.id == currentTrackId);
     return InkWell(
       onTap: () => onTap != null ? onTap!() : null,
       child: SizedBox(

@@ -25,8 +25,12 @@ class PlaylistButton extends ConsumerWidget {
         if (playerController.currentTrackId == null) {
           return;
         }
+        final track = tracks[playerController.currentTrackId];
+        if (track == null) {
+          return;
+        }
         selectedTracksNotifier.clear();
-        selectedTracksNotifier.selectTrack(tracks.firstWhere((e) => e.id == playerController.currentTrackId));
+        selectedTracksNotifier.selectTrack(track);
         addToPlaylistsModal(context, selectedTracksNotifier.getTrackIds(), playlists, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
       },
     );

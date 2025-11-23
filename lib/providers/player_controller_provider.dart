@@ -13,7 +13,7 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   @override
   PlayerController build() => PlayerController();
 
-  Future<void> play(List<Track> tracks) async {
+  Future<void> play(Map<String, Track> tracks) async {
     await state.play(tracks);
     state = state.clone();
   }
@@ -23,12 +23,12 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = state.clone();
   }
 
-  Future<void> next(List<Track> tracks) async {
+  Future<void> next(Map<String, Track> tracks) async {
     await state.next(true, tracks);
     state = state.clone();
   }
 
-  Future<void> prev(List<Track> tracks) async {
+  Future<void> prev(Map<String, Track> tracks) async {
     await state.prev(tracks);
     state = state.clone();
   }
@@ -68,7 +68,7 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = state.clone();
   }
 
-  Future<void> handleNextAutomatically(List<Track> tracks) async {
+  Future<void> handleNextAutomatically(Map<String, Track> tracks) async {
     await state.handleNextAutomatically(tracks);
     state = state.clone();
   }

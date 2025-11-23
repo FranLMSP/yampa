@@ -21,7 +21,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   bool _changeStarted = false;
   Timer? _timer;
 
-  void _initializeTimer(List<Track> tracks, PlayerController player) {
+  void _initializeTimer(Map<String, Track> tracks, PlayerController player) {
     if (_timer != null) {
       _timer?.cancel();
       _timer = null;
@@ -36,14 +36,11 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
     super.initState();
   }
 
-  Future<void> _getPlayerCurrentPosition(List<Track> tracks, PlayerController player) async {
+  Future<void> _getPlayerCurrentPosition(Map<String, Track> tracks, PlayerController player) async {
     if (_changeStarted) {
       return;
     }
-    Track? currentTrack;
-    if (tracks.indexWhere((e) => e.id == player.currentTrackId) != -1) {
-      currentTrack = tracks.firstWhere((e) => e.id == player.currentTrackId);
-    }
+    Track? currentTrack = tracks[player.currentTrackId];
     if (
       currentTrack == null
       || currentTrack.duration == Duration.zero
@@ -61,11 +58,8 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
     });
   }
 
-  Future<void> _setPlayerCurrentPosition(List<Track> tracks, PlayerController player, double value) async {
-    Track? currentTrack;
-    if (player.currentTrackId != null) {
-      currentTrack = tracks.firstWhere((e) => e.id == player.currentTrackId);
-    }
+  Future<void> _setPlayerCurrentPosition(Map<String, Track> tracks, PlayerController player, double value) async {
+    Track? currentTrack = tracks[player.currentTrackId];
 
     if (currentTrack == null || currentTrack.duration == Duration.zero) {
       return;

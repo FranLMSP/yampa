@@ -48,13 +48,14 @@ class PlayerController {
     required this.playerBackend,
   });
 
-  Future<void> play(List<Track> tracks) async {
-    if (tracks.indexWhere((e) => e.id == currentTrackId) == -1) {
+  Future<void> play(Map<String, Track> tracks) async {
+    final track = tracks[currentTrackId];
+    if (track == null) {
       return;
     }
     if (state != PlayerState.playing && playerBackend != null) {
       if (state == PlayerState.stopped && currentTrackId != null) {
-        await playerBackend!.setTrack(tracks.firstWhere((e) => e.id == currentTrackId));
+        await playerBackend!.setTrack(track);
       }
       await setSpeed(speed);
       await playerBackend!.play();
@@ -77,7 +78,7 @@ class PlayerController {
     }
   }
 
-  Future<void> next(bool forceNext, List<Track> tracks) async {
+  Future<void> next(bool forceNext, Map<String, Track> tracks) async {
     await stop();
     if (loopMode == LoopMode.startToEnd) {
       if (currentTrackIndex < shuffledTrackQueueIds.length - 1) {
@@ -100,7 +101,7 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> prev(List<Track> tracks) async {
+  Future<void> prev(Map<String, Track> tracks) async {
     await stop();
     if (currentTrackIndex > 0) {
       currentTrackIndex--;
@@ -217,7 +218,7 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> handleNextAutomatically(List<Track> tracks) async {
+  Future<void> handleNextAutomatically(Map<String, Track> tracks) async {
     final nextHandlerMap = {
       LoopMode.singleTrack: () async {
         await stop();

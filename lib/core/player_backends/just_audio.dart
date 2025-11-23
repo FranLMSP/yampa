@@ -49,38 +49,37 @@ class JustAudioBackend implements PlayerBackend {
     final allEffectivePaths = filePaths;
 
     loadedTracksCountNotifier.setTotalTracks(allEffectivePaths.length);
+
     for (final path in allEffectivePaths) {
-      final track = await _getTrackMetadataFromGenericPath(path);
-      if (track != null && foundTracks[track.id] == null) {
-        foundTracks[track.id] = track;
-        tracksNotifier.addTracks([track]);
-      }
-      loadedTracksCountNotifier.incrementLoadedTrack();
+      await _getTrackMetadataFromGenericPath(path, tracksNotifier, loadedTracksCountNotifier);
     }
     loadedTracksCountNotifier.reset();
     return foundTracks.values.toList();
   }
 
-  Future<Track?> _getTrackMetadataFromGenericPath(GenericPath path) async {
+  Future<void> _getTrackMetadataFromGenericPath(GenericPath path, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier) async {
     try {
       final metadata = await compute(readMetadata, File(path.filename!));
       final tempPlayer = AudioPlayer();
       final duration = await tempPlayer.setFilePath(path.filename!);
-      return Track(
-        id: await generateTrackId(path.filename!),
-        name: metadata.title ?? "",
-        artist: metadata.artist ?? "",
-        album: metadata.album ?? "",
-        genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
-        trackNumber: metadata.trackNumber ?? 0,
-        path: path.filename!,
-        duration: duration ?? Duration.zero,
-        imageBytes: metadata.pictures.isNotEmpty ? metadata.pictures.first.bytes : null,
-      );
+      tracksNotifier.addTracks([
+        Track(
+          id: await generateTrackId(path.filename!),
+          name: metadata.title ?? "",
+          artist: metadata.artist ?? "",
+          album: metadata.album ?? "",
+          genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
+          trackNumber: metadata.trackNumber ?? 0,
+          path: path.filename!,
+          duration: duration ?? Duration.zero,
+          imageBytes: metadata.pictures.isNotEmpty ? metadata.pictures.first.bytes : null,
+        )
+      ]);
     } catch(e) {
       print(e);
+    } finally {
+      loadedTracksCountNotifier.incrementLoadedTrack();
     }
-    return null;
   }
 
   @override

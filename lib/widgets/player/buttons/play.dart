@@ -7,7 +7,7 @@ import 'package:yampa/providers/tracks_provider.dart';
 class PlayButton extends ConsumerWidget {
   const PlayButton({super.key});
 
-  void _onPressed(BuildContext context, List<Track> tracks, PlayerControllerNotifier playerControllerNotifier) async {
+  void _onPressed(BuildContext context, Map<String, Track> tracks, PlayerControllerNotifier playerControllerNotifier) async {
     await playerControllerNotifier.play(tracks);
   }
 
