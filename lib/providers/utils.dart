@@ -51,7 +51,7 @@ Future<void> _fetchAndSetTracks(
   TracksNotifier tracksNotifier,
   LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
 ) async {
-  final tracksPlayer = getPlayerBackend();
+  final tracksPlayer = await getPlayerBackend();
   await tracksPlayer.fetchTracks(paths, tracksNotifier, loadedTracksCountNotifier);
 }
 
@@ -209,6 +209,6 @@ Future<void> handlePersistPlayerControllerState(PlayerController playerControlle
 Future<void> loadPlayerControllerState(PlayerControllerNotifier playerControllerNotifier) async {
   final playerControllerStateRepository = getPlayerControllerStateRepository();
   final lastPlayerControllerState = await playerControllerStateRepository.getPlayerControllerState();
-  playerControllerNotifier.setPlayerController(PlayerController.fromLastState(lastPlayerControllerState));
+  playerControllerNotifier.setPlayerController(await PlayerController.fromLastState(lastPlayerControllerState));
   await playerControllerStateRepository.close();
 }

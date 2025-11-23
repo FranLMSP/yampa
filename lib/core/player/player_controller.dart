@@ -20,7 +20,7 @@ class PlayerController {
   PlayerBackend? playerBackend;
 
   PlayerController();
-  factory PlayerController.fromLastState(LastPlayerControllerState lastState) {
+  static Future<PlayerController> fromLastState(LastPlayerControllerState lastState) async {
     return PlayerController._clone(
       currentTrackId: lastState.currentTrackId,
       currentPlaylistId: lastState.currentPlaylistId,
@@ -31,7 +31,7 @@ class PlayerController {
       state: PlayerState.stopped,
       loopMode: lastState.loopMode,
       shuffleMode: lastState.shuffleMode,
-      playerBackend: getPlayerBackend(), // TODO: store this in sqlite as well
+      playerBackend: await getPlayerBackend(), // TODO: store this in sqlite as well
     );
   }
 

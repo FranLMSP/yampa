@@ -14,4 +14,5 @@ abstract class PlayerBackend {
   Future<void> setVolume(double volume);
   Future<Duration> getCurrentPosition();
   bool hasTrackFinishedPlaying();
+  Future<void> init();
 } 

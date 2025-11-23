@@ -15,9 +15,11 @@ import 'package:yampa/providers/tracks_provider.dart';
 import 'interface.dart';
 
 class JustAudioBackend implements PlayerBackend {
-  final AudioPlayer _player = AudioPlayer();
+  AudioPlayer? _player;
 
-  JustAudioBackend() {
+  @override
+  Future<void> init() async {
+    _player = AudioPlayer();
     if (!Platform.isAndroid && !Platform.isIOS) {
       JustAudioMediaKit.ensureInitialized(
         linux: true,
@@ -85,46 +87,46 @@ class JustAudioBackend implements PlayerBackend {
   @override
   Future<void> setTrack(Track track) async {
     // TODO: maybe detect here if the path is an URL or not, and call setUrl if that's the case
-    await _player.setFilePath(track.path);
+    await _player!.setFilePath(track.path);
   }
 
   @override
   Future<void> play() async {
-    await _player.play();
+    await _player!.play();
   }
 
   @override
   Future<void> pause() async {
-    await _player.pause();
+    await _player!.pause();
   }
 
   @override
   Future<void> stop() async {
-    await _player.stop();
+    await _player!.stop();
   }
 
   @override
   Future<void> seek(Duration position) async {
-    await _player.seek(position);
+    await _player!.seek(position);
   }
 
   @override
   Future<void> setSpeed(double speed) async {
-    await _player.setSpeed(speed);
+    await _player!.setSpeed(speed);
   }
 
   @override
   Future<void> setVolume(double volume) async {
-    await _player.setVolume(volume);
+    await _player!.setVolume(volume);
   }
 
   @override
   Future<Duration> getCurrentPosition() async {
-    return _player.position;
+    return _player!.position;
   }
 
   @override
   bool hasTrackFinishedPlaying() {
-    return _player.processingState == ProcessingState.completed;
+    return _player!.processingState == ProcessingState.completed;
   }
 }

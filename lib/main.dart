@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
@@ -16,7 +17,12 @@ import 'package:yampa/widgets/main_page_loader.dart';
 import 'package:yampa/widgets/player/big_player.dart';
 import 'package:yampa/widgets/utils.dart';
 
-void main() {
+void main() async {
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
   runApp(ProviderScope(child: const MyApp()));
 }
 
@@ -71,6 +77,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   ) async {
     if (Platform.isAndroid || Platform.isIOS) {
       await Permission.audio.request();
+      await Permission.notification.request();
     }
     await doInitialLoad(
       initialLoadDone,

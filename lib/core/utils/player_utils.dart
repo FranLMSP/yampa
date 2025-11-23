@@ -9,7 +9,7 @@ Future<void> playTrack(Track track, Map<String, Track> tracks, PlayerController 
   }
   if (playerController.playerBackend == null) {
     // TODO: here we want to set the track player type depending on the source type of the track
-    await playerController.setTrackPlayer(getPlayerBackend());
+    await playerController.setTrackPlayer(await getPlayerBackend());
   }
   await playerControllerNotifier.stop();
   await playerControllerNotifier.setCurrentTrack(track);
