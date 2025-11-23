@@ -101,7 +101,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
   Widget _buildItemPopupMenuButton(
     Playlist selectedPlaylist,
     Track track,
-    List<Track> tracks,
+    Map<String, Track> tracks,
     PlaylistNotifier playlistNotifier,
   ) {
     return PopupMenuButton<OptionSelected>(
@@ -121,7 +121,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     Playlist selectedPlaylist,
     Track track,
     OptionSelected? optionSelected,
-    List<Track> tracks,
+    Map<String, Track> tracks,
     PlaylistNotifier playlistNotifier,
   ) {
     if (optionSelected == OptionSelected.removeFromPlaylist) {
@@ -217,9 +217,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                   playerControllerNotifier.setTrackPlayer(getPlayerBackend()); // TODO: we should set this dinamically depending on the kind of track
                   await playerControllerNotifier.setPlaylist(selectedPlaylist);
                   final firstTrackId = playerControllerNotifier.getPlayerController().shuffledTrackQueueIds.first;
-                  final firstTrack = tracks.firstWhere((e) => e.id == firstTrackId);
-                  await playerControllerNotifier.setCurrentTrack(firstTrack);
-                  await playerControllerNotifier.play(tracks);
+                  final firstTrack = tracks[firstTrackId];
+                  if (firstTrack != null) {
+                    await playerControllerNotifier.setCurrentTrack(firstTrack);
+                    await playerControllerNotifier.play(tracks);
+                  }
                 }
               },
               child: Row(
@@ -234,7 +236,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           Column(
             children: selectedPlaylist.trackIds.map((trackId) {
               final isSelected = _selectedTrackIds.contains(trackId);
-              final track = tracks.firstWhere((e) => e.id == trackId);
+              final track = tracks[trackId]!;
               return TrackItem(
                 key: Key(trackId),
                 track: track,

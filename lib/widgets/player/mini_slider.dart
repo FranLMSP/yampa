@@ -20,7 +20,7 @@ class _MiniPlayerSliderState extends ConsumerState<MiniPlayerSlider> {
   double _currentSliderValue = 0;
   Timer? _timer;
 
-  void _initializeTimer(List<Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) {
+  void _initializeTimer(Map<String, Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) {
     if (_timer != null) {
       _timer?.cancel();
       _timer = null;
@@ -35,11 +35,11 @@ class _MiniPlayerSliderState extends ConsumerState<MiniPlayerSlider> {
     super.initState();
   }
 
-  Future<void> _getPlayerCurrentPosition(List<Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
+  Future<void> _getPlayerCurrentPosition(Map<String, Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
     if (!mounted) return;
     Track? currentTrack;
     if (playerController.currentTrackId != null) {
-      currentTrack = tracks.firstWhere((e) => e.id == playerController.currentTrackId);
+      currentTrack = tracks[playerController.currentTrackId];
     }
     if (
       currentTrack == null

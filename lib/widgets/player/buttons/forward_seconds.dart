@@ -8,13 +8,16 @@ import 'package:yampa/providers/tracks_provider.dart';
 class ForwardSecondsButton extends ConsumerWidget {
   const ForwardSecondsButton({super.key});
 
-  Future<void> _forward(List<Track> tracks, PlayerControllerNotifier playerControllerNotifier, PlayerController playerController) async {
+  Future<void> _forward(Map<String, Track> tracks, PlayerControllerNotifier playerControllerNotifier, PlayerController playerController) async {
       if (playerController.currentTrackId == null) {
         return;
       }
       final currentPosition = await playerController.getCurrentPosition();
       var newPosition = currentPosition + const Duration(seconds: 10);
-      final track = tracks.firstWhere((e) => e.id == playerController.currentTrackId);
+      final track = tracks[playerController.currentTrackId];
+      if (track == null) {
+        return;
+      }
       if (newPosition > track.duration) {
         newPosition = track.duration;
       }

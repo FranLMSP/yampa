@@ -30,9 +30,9 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
   void _updateDurations() async {
     final tracks = ref.watch(tracksProvider);
     final player = ref.watch(playerControllerProvider);
-    if (tracks.indexWhere((e) => e.id == player.currentTrackId) != -1) {
-      final currentTrack = tracks.firstWhere((e) => e.id == player.currentTrackId);
-      final totalDuration = currentTrack.duration;
+    final track = tracks[player.currentTrackId];
+    if (track != null) {
+      final totalDuration = track.duration;
       final currentDuration = await player.getCurrentPosition();
       if (mounted) {
         setState(() {

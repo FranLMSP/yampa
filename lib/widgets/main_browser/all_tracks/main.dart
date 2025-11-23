@@ -45,7 +45,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
   Widget _buildItemPopupMenuButton(
     BuildContext context,
     Track track,
-    List<Track> tracks,
+    Map<String, Track> tracks,
     List<Playlist> playlists,
     List<String> selectedTrackIds,
     PlaylistNotifier playlistNotifier,
@@ -108,7 +108,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     BuildContext context,
     Track track,
     OptionSelected? optionSelected,
-    List<Track> tracks,
+    Map<String, Track> tracks,
     List<Playlist> playlists,
     PlaylistNotifier playlistNotifier,
     SelectedPlaylistNotifier selectedPlaylistsNotifier,
@@ -127,7 +127,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     }
   }
 
-  Future<void> _playSelectedTrack(Track track, List<Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
+  Future<void> _playSelectedTrack(Track track, Map<String, Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
     playTrack(track, tracks, playerController, playerControllerNotifier);
   }
 
@@ -160,7 +160,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
 
   PreferredSizeWidget? _buildMultiSelectAppBar(
     BuildContext context,
-    List<Track> tracks,
+    Map<String, Track> tracks,
     List<Playlist> playlists,
     PlaylistNotifier playlistNotifier,
     List<String> selectedTracks,
@@ -185,7 +185,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
           onPressed: () {
             _addToFavoritesModal(
               context,
-              tracks.map((e) => e.id).toList(),
+              tracks.values.map((e) => e.id).toList(),
               selectedTracksNotifier,
               playlistNotifier,
               playlists,
@@ -225,8 +225,8 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final loadedTracksCountNotifier = ref.watch(loadedTracksCountProvider.notifier);
     final isInSelectMode = selectedTracks.isNotEmpty;
     final filteredTracks = _isSearchingEnabled
-      ? tracks.where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
-      : tracks;
+      ? tracks.values.toList().where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
+      : tracks.values.toList();
 
     if (tracks.isEmpty) {
       return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));

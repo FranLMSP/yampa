@@ -3,7 +3,7 @@ import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 
-Future<void> playTrack(Track track, List<Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
+Future<void> playTrack(Track track, Map<String, Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
   if (isTrackCurrentlyBeingPlayed(track, playerController)) {
     return;
   }
