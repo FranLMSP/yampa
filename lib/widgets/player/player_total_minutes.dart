@@ -6,10 +6,8 @@ import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 
 class PlayerTotalMinutes extends ConsumerStatefulWidget {
-  const PlayerTotalMinutes({
-    super.key,
-  });
- 
+  const PlayerTotalMinutes({super.key});
+
   @override
   ConsumerState<PlayerTotalMinutes> createState() => _PlayerTotalMinutesState();
 }
@@ -32,7 +30,7 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
     final player = ref.watch(playerControllerProvider);
     final track = tracks[player.currentTrackId];
     if (track != null) {
-      final totalDuration = track.duration;
+      final totalDuration = player.getCurrentTrackDuration();
       final currentDuration = await player.getCurrentPosition();
       if (mounted) {
         setState(() {
@@ -58,6 +56,8 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
 
   @override
   Widget build(BuildContext context) {
-    return Text("${formatDuration(_currentDuration)} / ${formatDuration(_totalDuration)}");
+    return Text(
+      "${formatDuration(_currentDuration)} / ${formatDuration(_totalDuration)}",
+    );
   }
 }

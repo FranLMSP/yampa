@@ -214,7 +214,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
               onPressed: () async {
                 if (selectedPlaylist.trackIds.isNotEmpty) {
                   await playerControllerNotifier.stop();
-                  playerControllerNotifier.setTrackPlayer(getPlayerBackend()); // TODO: we should set this dinamically depending on the kind of track
+                  playerControllerNotifier.setTrackPlayer(await getPlayerBackend()); // TODO: we should set this dinamically depending on the kind of track
                   await playerControllerNotifier.setPlaylist(selectedPlaylist);
                   final firstTrackId = playerControllerNotifier.getPlayerController().shuffledTrackQueueIds.first;
                   final firstTrack = tracks[firstTrackId];

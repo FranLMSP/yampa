@@ -8,9 +8,7 @@ import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 
 class PlayerSlider extends ConsumerStatefulWidget {
-  const PlayerSlider({
-    super.key,
-  });
+  const PlayerSlider({super.key});
 
   @override
   ConsumerState<PlayerSlider> createState() => _PlayerSliderState();
@@ -36,36 +34,46 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
     super.initState();
   }
 
-  Future<void> _getPlayerCurrentPosition(Map<String, Track> tracks, PlayerController player) async {
+  Future<void> _getPlayerCurrentPosition(
+    Map<String, Track> tracks,
+    PlayerController player,
+  ) async {
     if (_changeStarted) {
       return;
     }
     Track? currentTrack = tracks[player.currentTrackId];
-    if (
-      currentTrack == null
-      || currentTrack.duration == Duration.zero
-      || player.state == PlayerState.stopped
-    ) {
+    if (currentTrack == null ||
+        currentTrack.duration == Duration.zero ||
+        player.state == PlayerState.stopped) {
       _currentSliderValue = 0;
       return;
     }
-    final totalDuration = currentTrack.duration;
+    final totalDuration = player.getCurrentTrackDuration();
     final currentDuration = await player.getCurrentPosition();
-    final currentPosition = (currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100;
+    final currentPosition =
+        ((currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) /
+                100)
+            .clamp(0.0, 1.0);
     if (!mounted) return;
     setState(() {
       _currentSliderValue = currentPosition;
     });
   }
 
-  Future<void> _setPlayerCurrentPosition(Map<String, Track> tracks, PlayerController player, double value) async {
+  Future<void> _setPlayerCurrentPosition(
+    Map<String, Track> tracks,
+    PlayerController player,
+    double value,
+  ) async {
     Track? currentTrack = tracks[player.currentTrackId];
 
     if (currentTrack == null || currentTrack.duration == Duration.zero) {
       return;
     }
-    final totalDuration = currentTrack.duration;
-    final newPosition = Duration(milliseconds: (totalDuration.inMilliseconds * value).toInt());
+    final totalDuration = player.getCurrentTrackDuration();
+    final newPosition = Duration(
+      milliseconds: (totalDuration.inMilliseconds * value).toInt(),
+    );
     await player.seek(newPosition);
     setState(() {
       _currentSliderValue = value;
