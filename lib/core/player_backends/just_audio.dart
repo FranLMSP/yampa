@@ -5,21 +5,25 @@ import 'dart:io';
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/core/utils/id_utils.dart';
+import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'interface.dart';
 
+AudioPlayer? _player;
+
 class JustAudioBackend implements PlayerBackend {
-  AudioPlayer? _player;
+  Duration? _currentTrackDuration;
 
   @override
   Future<void> init() async {
-    _player = AudioPlayer();
+    _player ??= AudioPlayer();
     if (!Platform.isAndroid && !Platform.isIOS) {
       JustAudioMediaKit.ensureInitialized(
         linux: true,
@@ -30,18 +34,33 @@ class JustAudioBackend implements PlayerBackend {
   }
 
   @override
-  Future<List<Track>> fetchTracks(List<GenericPath> paths, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier) async {
+  Future<List<Track>> fetchTracks(
+    List<GenericPath> paths,
+    TracksNotifier tracksNotifier,
+    LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
+  ) async {
     loadedTracksCountNotifier.reset();
     final Map<String, Track> foundTracks = HashMap();
 
     final List<GenericPath> filePaths = [];
     filePaths.addAll(paths.where((e) => e.filename != null));
-    for (final path in paths.where((e) => e.filename == null && e.folder != null)) {
+    for (final path in paths.where(
+      (e) => e.filename == null && e.folder != null,
+    )) {
       final dir = Directory(path.folder!);
       try {
-        await for (final entity in dir.list(recursive: true, followLinks: false)) {
+        await for (final entity in dir.list(
+          recursive: true,
+          followLinks: false,
+        )) {
           if (entity is File && isValidMusicPath(entity.path)) {
-            filePaths.add(GenericPath(id: path.id, folder: path.folder, filename: entity.path));
+            filePaths.add(
+              GenericPath(
+                id: path.id,
+                folder: path.folder,
+                filename: entity.path,
+              ),
+            );
           }
         }
       } catch (e) {
@@ -53,17 +72,23 @@ class JustAudioBackend implements PlayerBackend {
     loadedTracksCountNotifier.setTotalTracks(allEffectivePaths.length);
 
     for (final path in allEffectivePaths) {
-      await _getTrackMetadataFromGenericPath(path, tracksNotifier, loadedTracksCountNotifier);
+      await _getTrackMetadataFromGenericPath(
+        path,
+        tracksNotifier,
+        loadedTracksCountNotifier,
+      );
     }
     loadedTracksCountNotifier.reset();
     return foundTracks.values.toList();
   }
 
-  Future<void> _getTrackMetadataFromGenericPath(GenericPath path, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier) async {
+  Future<void> _getTrackMetadataFromGenericPath(
+    GenericPath path,
+    TracksNotifier tracksNotifier,
+    LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
+  ) async {
     try {
       final metadata = await compute(readMetadata, File(path.filename!));
-      final tempPlayer = AudioPlayer();
-      final duration = await tempPlayer.setFilePath(path.filename!);
       tracksNotifier.addTracks([
         Track(
           id: await generateTrackId(path.filename!),
@@ -73,11 +98,13 @@ class JustAudioBackend implements PlayerBackend {
           genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
           trackNumber: metadata.trackNumber ?? 0,
           path: path.filename!,
-          duration: duration ?? Duration.zero,
-          imageBytes: metadata.pictures.isNotEmpty ? metadata.pictures.first.bytes : null,
-        )
+          duration: metadata.duration ?? Duration.zero,
+          imageBytes: metadata.pictures.isNotEmpty
+              ? metadata.pictures.first.bytes
+              : null,
+        ),
       ]);
-    } catch(e) {
+    } catch (e) {
       print(e);
     } finally {
       loadedTracksCountNotifier.incrementLoadedTrack();
@@ -87,7 +114,25 @@ class JustAudioBackend implements PlayerBackend {
   @override
   Future<void> setTrack(Track track) async {
     // TODO: maybe detect here if the path is an URL or not, and call setUrl if that's the case
-    await _player!.setFilePath(track.path);
+    final duration = await _player!.setAudioSource(
+      AudioSource.uri(
+        Uri.file(track.path),
+        tag: MediaItem(
+          id: track.id,
+          title: track.name,
+          artist: track.artist,
+          artUri: track.imageBytes != null
+              ? bytesToDataUri(track.imageBytes!)
+              : null,
+        ),
+      ),
+    );
+    _currentTrackDuration = duration;
+  }
+
+  @override
+  Duration getCurrentTrackDuration() {
+    return _currentTrackDuration ?? Duration.zero;
   }
 
   @override

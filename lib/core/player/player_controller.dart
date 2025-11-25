@@ -20,7 +20,9 @@ class PlayerController {
   PlayerBackend? playerBackend;
 
   PlayerController();
-  static Future<PlayerController> fromLastState(LastPlayerControllerState lastState) async {
+  static Future<PlayerController> fromLastState(
+    LastPlayerControllerState lastState,
+  ) async {
     return PlayerController._clone(
       currentTrackId: lastState.currentTrackId,
       currentPlaylistId: lastState.currentPlaylistId,
@@ -31,7 +33,8 @@ class PlayerController {
       state: PlayerState.stopped,
       loopMode: lastState.loopMode,
       shuffleMode: lastState.shuffleMode,
-      playerBackend: await getPlayerBackend(), // TODO: store this in sqlite as well
+      playerBackend:
+          await getPlayerBackend(), // TODO: store this in sqlite as well
     );
   }
 
@@ -150,7 +153,9 @@ class PlayerController {
   Future<void> setCurrentTrack(String trackId) async {
     currentTrackId = trackId;
     if (shuffledTrackQueueIds.isNotEmpty) {
-      currentTrackIndex = shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
+      currentTrackIndex = shuffledTrackQueueIds.indexWhere(
+        (e) => e == currentTrackId,
+      );
     }
     await handlePersistPlayerControllerState(this);
   }
@@ -178,6 +183,13 @@ class PlayerController {
   Future<Duration> getCurrentPosition() async {
     if (playerBackend != null) {
       return await playerBackend!.getCurrentPosition();
+    }
+    return Duration.zero;
+  }
+
+  Duration getCurrentTrackDuration() {
+    if (playerBackend != null) {
+      return playerBackend!.getCurrentTrackDuration();
     }
     return Duration.zero;
   }
