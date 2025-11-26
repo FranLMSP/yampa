@@ -252,31 +252,34 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
             ),
           Expanded(
             child: ListView(
-              children: filteredTracks.map(
-                (track) {
-                  Function(Track track)? onTap;
-                  Function(Track track)? onLongPress;
-                  void onSelect(Track track) {
-                    _toggleSelectedTrack(track, selectedTracks, selectedTracksNotifier);
-                  }
-                  if (isInSelectMode) {
-                    onTap = onSelect;
-                  } else {
-                    onTap = (Track track) {
-                      _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
-                    };
-                    onLongPress = onSelect;
-                  }
-                  final isSelected = selectedTracks.contains(track.id);
-                  return TrackItem(
-                    key: Key(track.id),
-                    track: track,
-                    onTap: onTap,
-                    onLongPress: onLongPress,
-                    isSelected: isSelected,
-                    trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier),
-                  );
-              }).toList()
+              children: [
+                ...filteredTracks.map(
+                  (track) {
+                    Function(Track track)? onTap;
+                    Function(Track track)? onLongPress;
+                    void onSelect(Track track) {
+                      _toggleSelectedTrack(track, selectedTracks, selectedTracksNotifier);
+                    }
+                    if (isInSelectMode) {
+                      onTap = onSelect;
+                    } else {
+                      onTap = (Track track) {
+                        _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
+                      };
+                      onLongPress = onSelect;
+                    }
+                    final isSelected = selectedTracks.contains(track.id);
+                    return TrackItem(
+                      key: Key(track.id),
+                      track: track,
+                      onTap: onTap,
+                      onLongPress: onLongPress,
+                      isSelected: isSelected,
+                      trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier),
+                    );
+                }),
+                SizedBox(height: 75),
+              ],
             ),
           ),
         ],
