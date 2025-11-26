@@ -21,6 +21,7 @@ class LocalPathPicker extends ConsumerStatefulWidget {
 class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
   bool _isActive = true;
   bool _showActions = false;
+  final Set<String> _selectedIds = {};
 
   @override
   void dispose() {
@@ -30,6 +31,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
 
   void _showActionsToggle() {
     if (!_isActive) return;
+    if (_selectedIds.isNotEmpty) return;
     setState(() {
       _showActions = !_showActions;
     });
@@ -74,7 +76,59 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     }
   }
 
-  List<Widget> _buildShowActionsWidgets(LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier) {
+  void _toggleSelection(String id) {
+    if (!_isActive) return;
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+      } else {
+        _selectedIds.add(id);
+      }
+      if (_selectedIds.isNotEmpty) _showActions = false;
+    });
+  }
+
+  void _clearSelection() {
+    if (!_isActive) return;
+    setState(() {
+      _selectedIds.clear();
+    });
+  }
+
+  Future<void> _confirmDeleteSelected(LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier, List<GenericPath> currentPaths, BuildContext context) async {
+    if (_selectedIds.isEmpty) return;
+    final selectedPaths = currentPaths.where((p) => _selectedIds.contains(p.id)).toList();
+    final count = selectedPaths.length;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("Delete $count path${count > 1 ? 's' : ''}?"),
+        content: Text("This will stop tracking the selected path${count > 1 ? 's' : ''}. Are you sure?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text("Cancel")),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text("Delete", style: TextStyle(color: Colors.red))),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await handlePathsRemoved(selectedPaths, localPathsNotifier, tracksNotifier);
+      _clearSelection();
+    }
+  }
+
+  List<Widget> _buildShowActionsWidgets(LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier, LoadedTracksCountProviderNotifier loadedTracksCountNotifier, List<GenericPath> currentPaths) {
+    if (_selectedIds.isNotEmpty) {
+      return [
+        FloatingActionButton(
+          onPressed: () => _confirmDeleteSelected(localPathsNotifier, tracksNotifier, loadedTracksCountNotifier, currentPaths, context),
+          backgroundColor: Colors.red,
+          child: Icon(Icons.delete),
+        ),
+      ];
+    }
+
     return [
       if (_showActions) ...[
         _buildActionWidgets(Icons.file_present, () => _pickIndividualFiles(localPathsNotifier, tracksNotifier, loadedTracksCountNotifier)),
@@ -95,7 +149,17 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     }
     return ListView(
       children: [
-        ...paths.map((path) => PathItem(path: path)),
+        ...paths.map((path) => PathItem(
+          path: path,
+          isSelected: _selectedIds.contains(path.id),
+          onLongPress: () => _toggleSelection(path.id),
+          onTap: () {
+            if (_selectedIds.isNotEmpty) {
+              _toggleSelection(path.id);
+            } else {
+            }
+          },
+        )),
         SizedBox(height: 75),
       ],
     );
@@ -105,9 +169,9 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
   Widget build(BuildContext context) {
     final initialLoadDone = ref.watch(initialLoadProvider);
     final localPaths = ref.watch(localPathsProvider);
-    final localPathsNotifier = ref.read(localPathsProvider.notifier);
-    final tracksNotifier = ref.read(tracksProvider.notifier);
-    final loadedTracksCountNotifier = ref.read(loadedTracksCountProvider.notifier);
+    final localPathsNotifier = ref.watch(localPathsProvider.notifier);
+    final tracksNotifier = ref.watch(tracksProvider.notifier);
+    final loadedTracksCountNotifier = ref.watch(loadedTracksCountProvider.notifier);
 
     if (!initialLoadDone) {
       return CustomLoader();
@@ -116,7 +180,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
-        children: _buildShowActionsWidgets(localPathsNotifier, tracksNotifier, loadedTracksCountNotifier),
+        children: _buildShowActionsWidgets(localPathsNotifier, tracksNotifier, loadedTracksCountNotifier, localPaths),
       ),
       body: _buildPathsList(localPaths),
     );
