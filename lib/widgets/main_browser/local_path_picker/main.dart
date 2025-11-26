@@ -94,7 +94,10 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       return Center(child:Text("No paths being tracked. Hit the + button to add some!"));
     }
     return ListView(
-      children: paths.map((path) => PathItem(path: path)).toList()
+      children: [
+        ...paths.map((path) => PathItem(path: path)),
+        SizedBox(height: 75),
+      ],
     );
   }
 
