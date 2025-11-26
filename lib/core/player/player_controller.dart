@@ -56,10 +56,8 @@ class PlayerController {
     if (track == null) {
       return;
     }
-    if (state != PlayerState.playing && playerBackend != null) {
-      if (state == PlayerState.stopped && currentTrackId != null) {
-        await playerBackend!.setTrack(track);
-      }
+    if (playerBackend != null) {
+      await playerBackend!.setTrack(track);
       await setSpeed(speed);
       await playerBackend!.play();
       state = PlayerState.playing;
@@ -67,7 +65,7 @@ class PlayerController {
   }
 
   Future<void> pause() async {
-    if (state != PlayerState.paused && playerBackend != null) {
+    if (playerBackend != null) {
       await playerBackend!.pause();
       state = PlayerState.paused;
     }
@@ -176,7 +174,7 @@ class PlayerController {
   }
 
   bool hasTrackFinishedPlaying() {
-    if (playerBackend == null) return false;
+    if (playerBackend == null) return true;
     return playerBackend!.hasTrackFinishedPlaying();
   }
 
