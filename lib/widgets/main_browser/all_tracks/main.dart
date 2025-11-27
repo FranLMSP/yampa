@@ -185,7 +185,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
           onPressed: () {
             _addToFavoritesModal(
               context,
-              tracks.values.map((e) => e.id).toList(),
+              selectedTracks,
               selectedTracksNotifier,
               playlistNotifier,
               playlists,
@@ -227,6 +227,9 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final filteredTracks = _isSearchingEnabled
       ? tracks.values.toList().where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
       : tracks.values.toList();
+
+    print("Selected tracks:");
+    print(selectedTracks);
 
     if (tracks.isEmpty) {
       return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));
