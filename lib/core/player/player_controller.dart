@@ -51,17 +51,10 @@ class PlayerController {
     required this.playerBackend,
   });
 
-  Future<void> play(Map<String, Track> tracks) async {
-    final track = tracks[currentTrackId];
-    if (track == null) {
-      return;
-    }
-    if (playerBackend != null) {
-      await playerBackend!.setTrack(track);
-      await setSpeed(speed);
-      await playerBackend!.play();
-      state = PlayerState.playing;
-    }
+  Future<void> play() async {
+    await playerBackend!.play();
+    state = PlayerState.playing;
+    await handlePersistPlayerControllerState(this);
   }
 
   Future<void> pause() async {
@@ -81,11 +74,12 @@ class PlayerController {
 
   Future<void> next(bool forceNext, Map<String, Track> tracks) async {
     await stop();
+    final currentTrack = tracks[currentTrackId];
     if (loopMode == LoopMode.startToEnd) {
-      if (currentTrackIndex < shuffledTrackQueueIds.length - 1) {
+      if (currentTrackIndex < shuffledTrackQueueIds.length - 1 && currentTrack != null) {
         currentTrackIndex++;
-        await setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
-        await play(tracks);
+        await setCurrentTrack(currentTrack);
+        await play();
       } else {
         await seek(Duration.zero);
       }
@@ -94,25 +88,26 @@ class PlayerController {
       if (currentTrackIndex >= shuffledTrackQueueIds.length) {
         currentTrackIndex = 0;
       }
-      if (shuffledTrackQueueIds.isNotEmpty) {
-        await setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
+      if (shuffledTrackQueueIds.isNotEmpty && currentTrack != null) {
+        await setCurrentTrack(currentTrack);
       }
-      await play(tracks);
+      await play();
     }
     await handlePersistPlayerControllerState(this);
   }
 
   Future<void> prev(Map<String, Track> tracks) async {
     await stop();
+    final currentTrack = tracks[currentTrackId];
     if (currentTrackIndex > 0) {
       currentTrackIndex--;
-      if (shuffledTrackQueueIds.isNotEmpty) {
-        await setCurrentTrack(shuffledTrackQueueIds[currentTrackIndex]);
+      if (shuffledTrackQueueIds.isNotEmpty && currentTrack != null) {
+        await setCurrentTrack(currentTrack);
       }
     } else {
       currentTrackIndex = 0;
     }
-    await play(tracks);
+    await play();
     await handlePersistPlayerControllerState(this);
   }
 
@@ -148,8 +143,12 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> setCurrentTrack(String trackId) async {
-    currentTrackId = trackId;
+  Future<void> setCurrentTrack(Track track) async {
+    if (playerBackend == null) {
+      return;
+    }
+    await playerBackend?.setTrack(track);
+    currentTrackId = track.id;
     if (shuffledTrackQueueIds.isNotEmpty) {
       currentTrackIndex = shuffledTrackQueueIds.indexWhere(
         (e) => e == currentTrackId,
@@ -229,10 +228,13 @@ class PlayerController {
   }
 
   Future<void> handleNextAutomatically(Map<String, Track> tracks) async {
+    if (state != PlayerState.playing) {
+      return;
+    }
     final nextHandlerMap = {
       LoopMode.singleTrack: () async {
         await stop();
-        await play(tracks);
+        await play();
       },
       LoopMode.infinite: () async {
         await next(false, tracks);

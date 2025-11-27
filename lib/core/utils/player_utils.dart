@@ -18,7 +18,7 @@ Future<void> playTrack(
   }
   await playerControllerNotifier.stop();
   await playerControllerNotifier.setCurrentTrack(track);
-  await playerControllerNotifier.play(tracks);
+  await playerControllerNotifier.play();
 }
 
 bool isTrackCurrentlyBeingPlayed(

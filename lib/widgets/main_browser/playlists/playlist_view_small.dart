@@ -1,7 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/core/utils/filename_utils.dart';
 import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/playlist.dart';
@@ -213,14 +212,9 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             child: ElevatedButton(
               onPressed: () async {
                 if (selectedPlaylist.trackIds.isNotEmpty) {
-                  await playerControllerNotifier.stop();
-                  playerControllerNotifier.setTrackPlayer(await getPlayerBackend()); // TODO: we should set this dinamically depending on the kind of track
-                  await playerControllerNotifier.setPlaylist(selectedPlaylist);
-                  final firstTrackId = playerControllerNotifier.getPlayerController().shuffledTrackQueueIds.first;
-                  final firstTrack = tracks[firstTrackId];
+                  final firstTrack = tracks[selectedPlaylist.trackIds.first];
                   if (firstTrack != null) {
-                    await playerControllerNotifier.setCurrentTrack(firstTrack);
-                    await playerControllerNotifier.play(tracks);
+                    await playTrack(firstTrack, tracks, playerController, playerControllerNotifier);
                   }
                 }
               },
@@ -241,11 +235,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
               return TrackItem(
                 key: Key(trackId),
                 track: track,
-                onTap: (Track track) {
+                onTap: (Track track) async {
                   if (isInSelectMode) {
                     _toggleSelectedTrack(track.id);
                   } else {
-                    playTrack(track, tracks, playerController, playerControllerNotifier);
+                    await playTrack(track, tracks, playerController, playerControllerNotifier);
                   }
                 },
                 onLongPress: (Track track) {

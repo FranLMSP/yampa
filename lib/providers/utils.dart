@@ -211,6 +211,7 @@ Future<void> handlePersistPlayerControllerState(PlayerController playerControlle
 Future<void> loadPlayerControllerState(PlayerControllerNotifier playerControllerNotifier) async {
   final playerControllerStateRepository = getPlayerControllerStateRepository();
   final lastPlayerControllerState = await playerControllerStateRepository.getPlayerControllerState();
-  playerControllerNotifier.setPlayerController(await PlayerController.fromLastState(lastPlayerControllerState));
+  // TODO: set the current track after they are all loaded
+  await playerControllerNotifier.setPlayerController(await PlayerController.fromLastState(lastPlayerControllerState), {});
   await playerControllerStateRepository.close();
 }
