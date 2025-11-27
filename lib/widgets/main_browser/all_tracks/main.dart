@@ -185,7 +185,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
           onPressed: () {
             _addToFavoritesModal(
               context,
-              tracks.values.map((e) => e.id).toList(),
+              selectedTracks,
               selectedTracksNotifier,
               playlistNotifier,
               playlists,

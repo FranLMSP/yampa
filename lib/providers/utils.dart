@@ -34,10 +34,12 @@ Future<void> doInitialLoad(
 
   final playlistsRepo = getPlaylistRepository();
   final playlists = await playlistsRepo.getPlaylists();
-  await playlistsRepo.close();
   if (playlists.indexWhere((e) => e.id == favoritePlaylistId) == -1) {
-    playlists.insert(0, Playlist(id: favoritePlaylistId, name: "Favorites", description: "", trackIds: []));
+    final favoritesPlaylist = Playlist(id: favoritePlaylistId, name: "Favorites", description: "", trackIds: []);
+    playlists.insert(0, favoritesPlaylist);
+    await playlistsRepo.addPlaylist(favoritesPlaylist);
   }
+  await playlistsRepo.close();
   playlistNotifier.setPlaylists(playlists);
 
   initialLoadNotifier.setInitialLoadDone();
