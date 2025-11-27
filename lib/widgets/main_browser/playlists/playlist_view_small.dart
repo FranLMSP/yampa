@@ -236,7 +236,8 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           Column(
             children: selectedPlaylist.trackIds.map((trackId) {
               final isSelected = _selectedTrackIds.contains(trackId);
-              final track = tracks[trackId]!;
+              final track = tracks[trackId];
+              if (track == null) return Row();
               return TrackItem(
                 key: Key(trackId),
                 track: track,

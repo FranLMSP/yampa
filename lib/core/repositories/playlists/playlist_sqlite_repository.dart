@@ -88,7 +88,7 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
   Future<String> addPlaylist(Playlist playlist) async {
     final db = await _getdb();
 
-    final id = Ulid().toString();
+    final id = playlist.id == favoritePlaylistId ? favoritePlaylistId : Ulid().toString();
     await db.insert(
       playlistsTableName,
       {
