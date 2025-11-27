@@ -143,19 +143,25 @@ class JustAudioBackend implements PlayerBackend {
   @override
   Future<void> play() async {
     _ensurePlayerInitialized();
-    await _player!.play();
+    if (!_player!.playing) {
+      await _player!.play();
+    }
   }
 
   @override
   Future<void> pause() async {
     _ensurePlayerInitialized();
-    await _player!.pause();
+    if (_player!.playing) {
+      await _player!.pause();
+    }
   }
 
   @override
   Future<void> stop() async {
     _ensurePlayerInitialized();
-    await _player!.stop();
+    if (_player!.playing) {
+      await _player!.stop();
+    }
   }
 
   @override

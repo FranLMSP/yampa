@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/player_backends/interface.dart';
 import 'package:yampa/models/playlist.dart';
@@ -14,13 +15,31 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   PlayerController build() => PlayerController();
 
   Future<void> play() async {
-    await state.play();
-    state = state.clone();
+    final optimistic = state.clone();
+    optimistic.state = PlayerState.playing;
+    state = optimistic;
+
+    try {
+      await optimistic.play();
+      state = optimistic.clone();
+    } catch (e) {
+      state = state.clone();
+      rethrow;
+    }
   }
 
   Future<void> pause() async {
-    await state.pause();
-    state = state.clone();
+    final optimistic = state.clone();
+    optimistic.state = PlayerState.paused;
+    state = optimistic;
+
+    try {
+      await optimistic.pause();
+      state = optimistic.clone();
+    } catch (e) {
+      state = state.clone();
+      rethrow;
+    }
   }
 
   Future<void> next(Map<String, Track> tracks) async {
@@ -34,8 +53,17 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> stop() async {
-    await state.stop();
-    state = state.clone();
+    final optimistic = state.clone();
+    optimistic.state = PlayerState.stopped;
+    state = optimistic;
+
+    try {
+      await optimistic.stop();
+      state = optimistic.clone();
+    } catch (e) {
+      state = state.clone();
+      rethrow;
+    }
   }
 
   Future<void> seek(Duration duration) async {

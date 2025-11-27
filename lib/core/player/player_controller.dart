@@ -52,23 +52,24 @@ class PlayerController {
   });
 
   Future<void> play() async {
-    await playerBackend!.play();
     state = PlayerState.playing;
-    await handlePersistPlayerControllerState(this);
+    if (playerBackend != null) {
+      await playerBackend!.play();
+    }
   }
 
   Future<void> pause() async {
+    state = PlayerState.paused;
     if (playerBackend != null) {
       await playerBackend!.pause();
-      state = PlayerState.paused;
     }
   }
 
   Future<void> stop() async {
+    state = PlayerState.stopped;
     if (playerBackend != null) {
       await playerBackend!.seek(Duration.zero);
       await playerBackend!.stop();
-      state = PlayerState.stopped;
     }
   }
 
@@ -163,8 +164,8 @@ class PlayerController {
       currentPlaylistId: currentPlaylistId,
       currentTrackIndex: currentTrackIndex,
       speed: speed,
-      trackQueueIds: trackQueueIds,
-      shuffledTrackQueueIds: trackQueueIds,
+      trackQueueIds: List.from(trackQueueIds),
+      shuffledTrackQueueIds: List.from(shuffledTrackQueueIds),
       state: state,
       loopMode: loopMode,
       shuffleMode: shuffleMode,
