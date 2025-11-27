@@ -228,9 +228,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
       ? tracks.values.toList().where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
       : tracks.values.toList();
 
-    print("Selected tracks:");
-    print(selectedTracks);
-
     if (tracks.isEmpty) {
       return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));
     }
