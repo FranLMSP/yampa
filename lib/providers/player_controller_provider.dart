@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/player_backends/interface.dart';
 import 'package:yampa/models/playlist.dart';
@@ -13,14 +14,32 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   @override
   PlayerController build() => PlayerController();
 
-  Future<void> play(Map<String, Track> tracks) async {
-    await state.play(tracks);
-    state = state.clone();
+  Future<void> play() async {
+    final optimistic = state.clone();
+    optimistic.state = PlayerState.playing;
+    state = optimistic;
+
+    try {
+      await optimistic.play();
+      state = optimistic.clone();
+    } catch (e) {
+      state = state.clone();
+      rethrow;
+    }
   }
 
   Future<void> pause() async {
-    await state.pause();
-    state = state.clone();
+    final optimistic = state.clone();
+    optimistic.state = PlayerState.paused;
+    state = optimistic;
+
+    try {
+      await optimistic.pause();
+      state = optimistic.clone();
+    } catch (e) {
+      state = state.clone();
+      rethrow;
+    }
   }
 
   Future<void> next(Map<String, Track> tracks) async {
@@ -34,8 +53,17 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> stop() async {
-    await state.stop();
-    state = state.clone();
+    final optimistic = state.clone();
+    optimistic.state = PlayerState.stopped;
+    state = optimistic;
+
+    try {
+      await optimistic.stop();
+      state = optimistic.clone();
+    } catch (e) {
+      state = state.clone();
+      rethrow;
+    }
   }
 
   Future<void> seek(Duration duration) async {
@@ -49,7 +77,7 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> setCurrentTrack(Track track) async {
-    await state.setCurrentTrack(track.id);
+    await state.setCurrentTrack(track);
     state = state.clone();
   }
 
@@ -77,12 +105,17 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     return state.clone();
   }
 
-  Future<void> setSpeed (double value) async {
+  Future<void> setSpeed(double value) async {
     await state.setSpeed(value);
     state = state.clone();
   }
 
-  void setPlayerController(PlayerController playerController) {
+  Future<void> setPlayerController(PlayerController playerController, Map<String, Track> tracks) async {
+    await playerController.setSpeed(playerController.speed);
+    final currentTrack = tracks[playerController.currentTrackId];
+    if (currentTrack != null) {
+      await playerController.setCurrentTrack(currentTrack);
+    }
     state = playerController;
   }
 }

@@ -19,41 +19,31 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   bool _changeStarted = false;
   Timer? _timer;
 
-  void _initializeTimer(Map<String, Track> tracks, PlayerController player) {
-    if (_timer != null) {
-      _timer?.cancel();
-      _timer = null;
-    }
-    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      _getPlayerCurrentPosition(tracks, player);
-    });
-  }
-
   @override
   void initState() {
     super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) async {
+      await _getPlayerCurrentPosition();
+    });
   }
 
-  Future<void> _getPlayerCurrentPosition(
-    Map<String, Track> tracks,
-    PlayerController player,
-  ) async {
+  Future<void> _getPlayerCurrentPosition() async {
     if (_changeStarted) {
       return;
     }
-    Track? currentTrack = tracks[player.currentTrackId];
-    if (currentTrack == null ||
-        currentTrack.duration == Duration.zero ||
-        player.state == PlayerState.stopped) {
-      _currentSliderValue = 0;
+    final tracks = ref.watch(tracksProvider);
+    final player = ref.watch(playerControllerProvider);
+    final track = tracks[player.currentTrackId];
+    if (track == null || track.duration == Duration.zero || player.state == PlayerState.stopped) {
+      if (!mounted) return;
+      setState(() {
+        _currentSliderValue = 0;
+      });
       return;
     }
     final totalDuration = player.getCurrentTrackDuration();
     final currentDuration = await player.getCurrentPosition();
-    final currentPosition =
-        ((currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) /
-                100)
-            .clamp(0.0, 1.0);
+    final currentPosition = ((currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100).clamp(0.0, 1.0);
     if (!mounted) return;
     setState(() {
       _currentSliderValue = currentPosition;
@@ -90,7 +80,6 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   Widget build(BuildContext context) {
     final tracks = ref.watch(tracksProvider);
     final player = ref.watch(playerControllerProvider);
-    _initializeTimer(tracks, player);
     return Slider(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       value: _currentSliderValue,

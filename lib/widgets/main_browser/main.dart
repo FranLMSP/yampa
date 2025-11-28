@@ -106,9 +106,9 @@ class _MainBrowserState extends ConsumerState<MainBrowser> with SingleTickerProv
           if (_showMiniPlayer)
             MiniPlayer(
               onTap: () {
-                _tabController.animateTo(0);
                 if (mounted) {
                   setState(() {
+                    _tabController.animateTo(0);
                     _showMiniPlayer = false;
                   });
                 }

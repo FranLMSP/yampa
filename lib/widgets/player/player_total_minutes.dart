@@ -20,12 +20,12 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(milliseconds: 300), (timer) {
-      _updateDurations();
+    _timer = Timer.periodic(const Duration(milliseconds: 300), (timer) async {
+      await _updateDurations();
     });
   }
 
-  void _updateDurations() async {
+  Future<void> _updateDurations() async {
     final tracks = ref.watch(tracksProvider);
     final player = ref.watch(playerControllerProvider);
     final track = tracks[player.currentTrackId];
@@ -38,13 +38,11 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
           _totalDuration = totalDuration;
         });
       }
-    } else {
-      if (mounted) {
-        setState(() {
-          _currentDuration = Duration.zero;
-          _totalDuration = Duration.zero;
-        });
-      }
+    } else if (mounted) {
+      setState(() {
+        _currentDuration = Duration.zero;
+        _totalDuration = Duration.zero;
+      });
     }
   }
 

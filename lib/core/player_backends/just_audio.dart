@@ -26,11 +26,15 @@ class JustAudioBackend implements PlayerBackend {
     _player ??= AudioPlayer();
     if (!Platform.isAndroid && !Platform.isIOS) {
       JustAudioMediaKit.ensureInitialized(
-        linux: true,
-        windows: true,
-        macOS: true,
+        linux: Platform.isLinux,
+        windows: Platform.isWindows,
+        macOS: Platform.isMacOS,
       );
     }
+  }
+
+  void _ensurePlayerInitialized() {
+    _player ??= AudioPlayer();
   }
 
   @override
@@ -113,6 +117,7 @@ class JustAudioBackend implements PlayerBackend {
 
   @override
   Future<void> setTrack(Track track) async {
+    _ensurePlayerInitialized();
     // TODO: maybe detect here if the path is an URL or not, and call setUrl if that's the case
     final duration = await _player!.setAudioSource(
       AudioSource.uri(
@@ -137,41 +142,55 @@ class JustAudioBackend implements PlayerBackend {
 
   @override
   Future<void> play() async {
-    await _player!.play();
+    _ensurePlayerInitialized();
+    if (!_player!.playing) {
+      await _player!.play();
+    }
   }
 
   @override
   Future<void> pause() async {
-    await _player!.pause();
+    _ensurePlayerInitialized();
+    if (_player!.playing) {
+      await _player!.pause();
+    }
   }
 
   @override
   Future<void> stop() async {
-    await _player!.stop();
+    _ensurePlayerInitialized();
+    if (_player!.playing) {
+      await _player!.stop();
+    }
   }
 
   @override
   Future<void> seek(Duration position) async {
+    _ensurePlayerInitialized();
     await _player!.seek(position);
   }
 
   @override
   Future<void> setSpeed(double speed) async {
+    _ensurePlayerInitialized();
     await _player!.setSpeed(speed);
   }
 
   @override
   Future<void> setVolume(double volume) async {
+    _ensurePlayerInitialized();
     await _player!.setVolume(volume);
   }
 
   @override
   Future<Duration> getCurrentPosition() async {
+    _ensurePlayerInitialized();
     return _player!.position;
   }
 
   @override
   bool hasTrackFinishedPlaying() {
+    _ensurePlayerInitialized();
     return _player!.processingState == ProcessingState.completed;
   }
 }
