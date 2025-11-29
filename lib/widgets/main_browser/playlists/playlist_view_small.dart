@@ -1,6 +1,6 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/playlist.dart';
@@ -64,12 +64,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
   }
 
   void _changeImage(Playlist selectedPlaylist) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: false);
-    if (result == null) {
-      return;
-    }
-    final path = result.paths.first;
-    if (path == null || !isValidImagePath(path)) {
+    final picker = ImagePicker();
+    final XFile? picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+    final path = picked.path;
+    if (!isValidImagePath(path)) {
       return;
     }
 
