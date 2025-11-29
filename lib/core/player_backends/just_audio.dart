@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
-import 'package:yampa/core/utils/filename_utils.dart';
+import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/core/utils/id_utils.dart';
 import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/path.dart';

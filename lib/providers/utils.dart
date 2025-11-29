@@ -5,7 +5,7 @@ import 'package:yampa/core/repositories/player_controller_state/factory.dart';
 import 'package:yampa/core/repositories/playlists/factory.dart';
 import 'package:yampa/core/repositories/stored_paths/factory.dart';
 import 'package:yampa/core/player_backends/factory.dart';
-import 'package:yampa/core/utils/filename_utils.dart';
+import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
@@ -41,6 +41,8 @@ Future<void> doInitialLoad(
   }
   await playlistsRepo.close();
   playlistNotifier.setPlaylists(playlists);
+
+  // TODO: check here for images in local paths that don't currently have a playlist linked to them.
 
   initialLoadNotifier.setInitialLoadDone();
 
