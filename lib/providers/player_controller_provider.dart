@@ -86,14 +86,16 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = state.clone();
   }
 
-  Future<void> toggleLoopMode() async {
-    await state.toggleLoopMode();
+  Future<LoopMode> toggleLoopMode() async {
+    final newLoopMode = await state.toggleLoopMode();
     state = state.clone();
+    return newLoopMode;
   }
 
-  Future<void> toggleShuffleMode() async {
-    await state.toggleShuffleMode();
+  Future<ShuffleMode> toggleShuffleMode() async {
+    final newShuffleMode = await state.toggleShuffleMode();
     state = state.clone();
+    return newShuffleMode;
   }
 
   Future<void> handleNextAutomatically(Map<String, Track> tracks) async {

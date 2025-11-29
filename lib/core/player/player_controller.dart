@@ -207,7 +207,7 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> toggleLoopMode() async {
+  Future<LoopMode> toggleLoopMode() async {
     final nextLoopModeMap = {
       LoopMode.singleTrack: LoopMode.infinite,
       LoopMode.infinite: LoopMode.startToEnd,
@@ -216,9 +216,10 @@ class PlayerController {
     };
     loopMode = nextLoopModeMap[loopMode]!;
     await handlePersistPlayerControllerState(this);
+    return loopMode;
   }
 
-  Future<void> toggleShuffleMode() async {
+  Future<ShuffleMode> toggleShuffleMode() async {
     final shuffleModeMap = {
       ShuffleMode.sequential: ShuffleMode.random,
       ShuffleMode.random: ShuffleMode.randomBasedOnHistory,
@@ -226,6 +227,7 @@ class PlayerController {
     };
     shuffleMode = shuffleModeMap[shuffleMode]!;
     await handlePersistPlayerControllerState(this);
+    return shuffleMode;
   }
 
   Future<void> handleNextAutomatically(Map<String, Track> tracks) async {
