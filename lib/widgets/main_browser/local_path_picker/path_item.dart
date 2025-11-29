@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yampa/core/utils/filename_utils.dart';
+import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';

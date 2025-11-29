@@ -1,7 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yampa/core/utils/filename_utils.dart';
+import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
@@ -48,14 +48,17 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     _descriptionController = TextEditingController(text: widget.playlist.description);
   }
 
-  void _updateImage(Playlist selectedPlaylist, String? path) {
-    // TODO: here we want to copy the image to a local path in case the user deletes or moves the image in the original location
+  Future<void> _updateImage(Playlist selectedPlaylist, String? path) async {
+    String? newPath;
+    if (path != null) {
+      newPath = await copyImageToLocal(path);
+    }
     final editedPlaylist = Playlist(
       id: selectedPlaylist.id,
       name: selectedPlaylist.name,
       description: selectedPlaylist.description,
       trackIds: selectedPlaylist.trackIds,
-      imagePath: path,
+      imagePath: newPath,
     );
     widget.onEdit(editedPlaylist);
   }
@@ -70,7 +73,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
       return;
     }
 
-    _updateImage(selectedPlaylist, path);
+    await _updateImage(selectedPlaylist, path);
   }
 
   void _showImageOptions(BuildContext context, Playlist selectedPlaylist) async {

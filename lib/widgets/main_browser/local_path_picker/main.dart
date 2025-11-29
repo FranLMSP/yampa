@@ -1,7 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yampa/core/utils/filename_utils.dart';
+import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
