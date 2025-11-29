@@ -23,6 +23,7 @@ class PlayerButtons extends StatelessWidget {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 12.5,
           children: const [
             BackwardSecondsButton(),
             PrevButton(),

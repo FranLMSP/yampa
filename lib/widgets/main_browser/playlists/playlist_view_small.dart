@@ -212,6 +212,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             child: ElevatedButton(
               onPressed: () async {
                 if (selectedPlaylist.trackIds.isNotEmpty) {
+                  playerController.setPlaylist(selectedPlaylist);
                   final firstTrack = tracks[selectedPlaylist.trackIds.first];
                   if (firstTrack != null) {
                     await playTrack(firstTrack, tracks, playerController, playerControllerNotifier);
