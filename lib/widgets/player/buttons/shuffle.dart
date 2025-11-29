@@ -22,12 +22,12 @@ class ShuffleButton extends ConsumerWidget {
       ShuffleMode.random: "Randomized",
       ShuffleMode.randomBasedOnHistory: "Randomized special",
     };
-    return shuffleModeMap[shuffleMode]!;
+    return "Shuffle mode: ${shuffleModeMap[shuffleMode]!}";
   }
 
   Future<void> _toggleShuffleMode(PlayerControllerNotifier playerControllerNotifier) async {
     final newShuffleMode = await playerControllerNotifier.toggleShuffleMode();
-    await showButtonActionMessage("Shuffle mode: ${_getTooltopMessage(newShuffleMode)}");
+    await showButtonActionMessage(_getTooltopMessage(newShuffleMode));
   }
 
   @override

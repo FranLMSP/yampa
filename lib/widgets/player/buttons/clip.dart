@@ -8,7 +8,7 @@ class ClipButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       icon: const Icon(Icons.cut),
-      tooltip: 'Clip',
+      tooltip: 'Create audio clip',
       onPressed: () async {
         print("clicked on clip");
       },

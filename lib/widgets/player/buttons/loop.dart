@@ -24,12 +24,12 @@ class LoopButton extends ConsumerWidget {
       LoopMode.startToEnd: "Playing playlist from start to end",
       LoopMode.none: "Not replaying",
     };
-    return loopModeMap[loopMode]!;
+    return "Replay mode: ${loopModeMap[loopMode]!}";
   }
 
   Future<void> _toggleLoopMode(PlayerControllerNotifier playerControllerNotifier) async {
     final newLoopMode = await playerControllerNotifier.toggleLoopMode();
-    await showButtonActionMessage("Loop mode: ${_getTooltopMessage(newLoopMode)}");
+    await showButtonActionMessage(_getTooltopMessage(newLoopMode));
   }
 
   @override
