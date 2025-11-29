@@ -1,41 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/enums.dart';
-import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/widgets/utils.dart';
 
 class ShuffleButton extends ConsumerWidget {
   const ShuffleButton({super.key});
 
-  IconData _getIcon(PlayerController playerController) {
+  IconData _getIcon(ShuffleMode shuffleMode) {
     final iconMap = {
       ShuffleMode.sequential: Icons.queue_music,
       ShuffleMode.random: Icons.shuffle,
       ShuffleMode.randomBasedOnHistory: Icons.history,
     };
-    return iconMap[playerController.shuffleMode]!;
+    return iconMap[shuffleMode]!;
   }
 
-  String _getTooltop(PlayerController playerController) {
+  String _getTooltopMessage(ShuffleMode shuffleMode) {
     final shuffleModeMap = {
       ShuffleMode.sequential: "Shuffle disabled",
       ShuffleMode.random: "Randomized",
       ShuffleMode.randomBasedOnHistory: "Randomized special",
     };
-    return shuffleModeMap[playerController.shuffleMode]!;
+    return shuffleModeMap[shuffleMode]!;
   }
 
   Future<void> _toggleShuffleMode(PlayerControllerNotifier playerControllerNotifier) async {
-    await playerControllerNotifier.toggleShuffleMode();
+    final newShuffleMode = await playerControllerNotifier.toggleShuffleMode();
+    await showButtonActionMessage("Shuffle mode: ${_getTooltopMessage(newShuffleMode)}");
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerController = ref.watch(playerControllerProvider);
+    final shuffleMode = ref.watch(playerControllerProvider.select((p) => p.shuffleMode));
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
     return IconButton(
-      icon: Icon(_getIcon(playerController)),
-      tooltip: _getTooltop(playerController),
+      icon: Icon(_getIcon(shuffleMode)),
+      tooltip: _getTooltopMessage(shuffleMode),
       onPressed: () async {
         await _toggleShuffleMode(playerControllerNotifier);
       },
