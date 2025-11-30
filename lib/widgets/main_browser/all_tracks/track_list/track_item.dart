@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/utils/format_utils.dart';
-import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 
@@ -31,8 +29,8 @@ class TrackItem extends ConsumerWidget {
     );
   }
 
-  Widget _buildTrackPlaceholder(PlayerController playerController) {
-    final icon = isTrackCurrentlyBeingPlayed(track, playerController)
+  Widget _buildTrackPlaceholder(String? currentTrackId) {
+    final icon = track.id == currentTrackId
       ? Icons.play_arrow
       : Icons.music_note;
     return Container(
@@ -43,12 +41,12 @@ class TrackItem extends ConsumerWidget {
     );
   }
 
-  Widget _buildTrackIcon(PlayerController playerController) {
+  Widget _buildTrackIcon(String? currentTrackId) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
       child: track.imageBytes != null
         ? _buildTrackImage()
-        : _buildTrackPlaceholder(playerController),
+        : _buildTrackPlaceholder(currentTrackId),
     );
   }
 
@@ -58,7 +56,7 @@ class TrackItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerController = ref.watch(playerControllerProvider);
+    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
     return InkWell(
       onTap: () {
         if (onTap != null) {
@@ -73,7 +71,7 @@ class TrackItem extends ConsumerWidget {
       child: Card(
         color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
         child: ListTile(
-          leading: _buildTrackIcon(playerController),
+          leading: _buildTrackIcon(currentTrackId),
           title: Text(track.displayName()),
           subtitle: Row(
             children: [

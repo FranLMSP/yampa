@@ -13,7 +13,7 @@ class PlaylistButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playlistsNotifier = ref.read(playlistsProvider.notifier);
-    final playerController = ref.watch(playerControllerProvider);
+    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
     final selectedPlaylistsNotifier = ref.read(selectedPlaylistsProvider.notifier);
     final selectedTracksNotifier = ref.read(selectedTracksProvider.notifier);
     final tracks = ref.watch(tracksProvider);
@@ -22,10 +22,10 @@ class PlaylistButton extends ConsumerWidget {
       icon: const Icon(Icons.playlist_add),
       tooltip: 'Save to playlist',
       onPressed: () async {
-        if (playerController.currentTrackId == null) {
+        if (currentTrackId == null) {
           return;
         }
-        final track = tracks[playerController.currentTrackId];
+        final track = tracks[currentTrackId];
         if (track == null) {
           return;
         }

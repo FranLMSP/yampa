@@ -207,7 +207,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
 
   @override
   Widget build(BuildContext context) {
-    final playerController = ref.watch(playerControllerProvider);
+    final playerController = ref.read(playerControllerProvider);
     final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
     final playlistNotifier = ref.watch(playlistsProvider.notifier);
     final tracks = ref.watch(tracksProvider);

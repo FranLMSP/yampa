@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/enums.dart';
-import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
@@ -32,17 +31,19 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
       return;
     }
     final tracks = ref.watch(tracksProvider);
-    final player = ref.watch(playerControllerProvider);
-    final track = tracks[player.currentTrackId];
-    if (track == null || track.duration == Duration.zero || player.state == PlayerState.stopped) {
+    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
+    final playerState = ref.watch(playerControllerProvider.select((p) => p.state));
+    final track = tracks[currentTrackId];
+    if (track == null || track.duration == Duration.zero || playerState == PlayerState.stopped) {
       if (!mounted) return;
       setState(() {
         _currentSliderValue = 0;
       });
       return;
     }
-    final totalDuration = player.getCurrentTrackDuration();
-    final currentDuration = await player.getCurrentPosition();
+    final playerController = ref.read(playerControllerProvider);
+    final totalDuration = playerController.getCurrentTrackDuration();
+    final currentDuration = await playerController.getCurrentPosition();
     final currentPosition = ((currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100).clamp(0.0, 1.0);
     if (!mounted) return;
     setState(() {
@@ -52,19 +53,20 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
 
   Future<void> _setPlayerCurrentPosition(
     Map<String, Track> tracks,
-    PlayerController player,
+    String? currentTrackId,
     double value,
   ) async {
-    Track? currentTrack = tracks[player.currentTrackId];
+    Track? currentTrack = tracks[currentTrackId];
 
     if (currentTrack == null || currentTrack.duration == Duration.zero) {
       return;
     }
-    final totalDuration = player.getCurrentTrackDuration();
+    final playerController = ref.read(playerControllerProvider);
+    final totalDuration = playerController.getCurrentTrackDuration();
     final newPosition = Duration(
       milliseconds: (totalDuration.inMilliseconds * value).toInt(),
     );
-    await player.seek(newPosition);
+    await playerController.seek(newPosition);
     setState(() {
       _currentSliderValue = value;
     });
@@ -79,11 +81,11 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   @override
   Widget build(BuildContext context) {
     final tracks = ref.watch(tracksProvider);
-    final player = ref.watch(playerControllerProvider);
+    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
     return Slider(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       value: _currentSliderValue,
-      onChanged: (value) => _setPlayerCurrentPosition(tracks, player, value),
+      onChanged: (value) => _setPlayerCurrentPosition(tracks, currentTrackId, value),
       onChangeStart: (value) {
         setState(() {
           _changeStarted = true;
