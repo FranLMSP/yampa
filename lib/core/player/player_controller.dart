@@ -161,6 +161,7 @@ class PlayerController {
     if (playerBackend == null) {
       return;
     }
+    await stop();
     await playerBackend?.setTrack(track);
     currentTrackId = track.id;
     if (shuffledTrackQueueIds.isNotEmpty) {
