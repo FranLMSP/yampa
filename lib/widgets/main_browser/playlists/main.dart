@@ -41,6 +41,8 @@ class _PlaylistsState extends ConsumerState<Playlists> {
 
   Widget _buildRemoveSelectedTracksButton(PlaylistNotifier playlistNotifier) {
     return FloatingActionButton(
+      backgroundColor: Theme.of(context).colorScheme.error,
+      foregroundColor: Theme.of(context).colorScheme.onError,
       child: Icon(Icons.delete),
       onPressed: () {
         showDialog(
