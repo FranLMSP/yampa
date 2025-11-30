@@ -1,6 +1,10 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/playlist.dart';
@@ -9,6 +13,7 @@ import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/widgets/common/image_cropper_screen.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
@@ -67,12 +72,24 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     final picker = ImagePicker();
     final XFile? picked = await picker.pickImage(source: ImageSource.gallery);
     if (picked == null) return;
-    final path = picked.path;
-    if (!isValidImagePath(path)) {
-      return;
-    }
+  
+    final bytes = await picked.readAsBytes();
+    if (!mounted) return;
 
-    await _updateImage(selectedPlaylist, path);
+    final Uint8List? croppedImage = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ImageCropperScreen(imageData: bytes),
+      ),
+    );
+
+    if (croppedImage == null) return;
+
+    // Save cropped image to a temporary file
+    final tempDir = await getTemporaryDirectory();
+    final tempFile = File('${tempDir.path}/cropped_image_${DateTime.now().millisecondsSinceEpoch}.jpg');
+    await tempFile.writeAsBytes(croppedImage);
+
+    await _updateImage(selectedPlaylist, tempFile.path);
   }
 
   void _showImageOptions(BuildContext context, Playlist selectedPlaylist) async {
