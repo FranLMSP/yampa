@@ -71,7 +71,7 @@ class TrackItem extends ConsumerWidget {
         }
       },
       child: Card(
-        color: isSelected ? Colors.indigo : null, // TODO: grab this from the main theme of the app
+        color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
         child: ListTile(
           leading: _buildTrackIcon(playerController),
           title: Text(track.displayName()),
