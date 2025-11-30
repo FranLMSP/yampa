@@ -128,8 +128,9 @@ class _PlaylistsState extends ConsumerState<Playlists> {
     );
 
     if (selected == 'delete') {
-      // TODO: Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' 
-      _removePlaylistModal(context, playlist, playlistsNotifier);
+      if (context.mounted) {
+        _removePlaylistModal(context, playlist, playlistsNotifier);
+      }
     } else if (selected == 'select') {
       // TODO: handle multi select
     }

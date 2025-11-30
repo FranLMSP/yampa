@@ -54,7 +54,9 @@ void addToPlaylistsModal(
               );
               selectedTracksNotifier.clear();
               selectedPlaylistsNotifier.clear();
-              Navigator.of(context).pop();
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             },
             child: const Text('Add')
           ),
