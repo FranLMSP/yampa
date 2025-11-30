@@ -92,7 +92,7 @@ class PlayerController {
     if (loopMode == LoopMode.startToEnd) {
       if (currentTrackIndex < shuffledTrackQueueIds.length - 1) {
         currentTrackIndex++;
-        _updateCurrentTrackFromIndex(tracks);
+        await _updateCurrentTrackFromIndex(tracks);
         await play();
       } else {
         await seek(Duration.zero);
@@ -102,7 +102,7 @@ class PlayerController {
       if (shuffledTrackQueueIds.isNotEmpty && currentTrackIndex >= shuffledTrackQueueIds.length) {
         currentTrackIndex = 0;
       }
-      _updateCurrentTrackFromIndex(tracks);
+      await _updateCurrentTrackFromIndex(tracks);
       await play();
     } else if (loopMode == LoopMode.singleTrack) {
       await play();
@@ -207,6 +207,22 @@ class PlayerController {
       return playerBackend!.getCurrentTrackDuration();
     }
     return Duration.zero;
+  }
+
+  Future<void> handleTracksAddedToPlaylist(List<Map<String, String>> playlistTrackMapping) async {
+    for (final row in playlistTrackMapping) {
+      final playlistId = row["playlist_id"] ?? "";
+      if (playlistId != currentPlaylistId) {
+        continue;
+      }
+      final trackId = row["track_id"];
+      if (trackId != null) {
+        trackQueueIds.add(trackId);
+        shuffledTrackQueueIds.add(trackId);
+      }
+    }
+
+    await handlePersistPlayerControllerState(this);
   }
 
   Future<void> setPlaylist(Playlist playlist) async {

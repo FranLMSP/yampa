@@ -175,6 +175,7 @@ Future<void> handleTracksAddedToPlaylist(
   List<String> trackIds,
   List<Playlist> playlists,
   PlaylistNotifier playlistNotifier,
+  PlayerControllerNotifier playerNotifier,
 ) async {
   final playlistRepository = getPlaylistRepository();
 
@@ -189,9 +190,7 @@ Future<void> handleTracksAddedToPlaylist(
     }
   }
 
-  // TODO: if the playlist matches the current playlist being played, add it to the controller here.
-  // Or maybe refactor the controller to point to the playlist ID instead of holding the list of tracks
-  // indepentendly? Idk I'll figure it out later.
+  playerNotifier.handleTracksAddedToPlaylist(mapping);
 
   await playlistRepository.linkTracksWithPlaylists(mapping);
   await playlistRepository.close();

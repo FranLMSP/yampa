@@ -14,6 +14,7 @@ class FavoriteButton extends ConsumerWidget {
     final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
     final playlists = ref.watch(playlistsProvider);
     final playlistsNotifier = ref.read(playlistsProvider.notifier);
+    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
     final favoritesPlaylist = playlists.firstWhere((e) => e.id == favoritePlaylistId);
     final isFavorite = favoritesPlaylist.trackIds.contains(currentTrackId);
     return IconButton(
@@ -31,7 +32,7 @@ class FavoriteButton extends ConsumerWidget {
         } else {
           await Future.wait([
             showButtonActionMessage("Track added to favorites"),
-            handleTracksAddedToPlaylist([currentTrackId], [favoritesPlaylist], playlistsNotifier),
+            handleTracksAddedToPlaylist([currentTrackId], [favoritesPlaylist], playlistsNotifier, playerControllerNotifier),
           ]);
         }
       },

@@ -90,6 +90,11 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = state.clone();
   }
 
+  Future<void> handleTracksAddedToPlaylist(List<Map<String, String>> playlistTrackMapping) async {
+    await state.handleTracksAddedToPlaylist(playlistTrackMapping);
+    state = state.clone();
+  }
+
   Future<LoopMode> toggleLoopMode() async {
     final newLoopMode = await state.toggleLoopMode();
     state = state.clone();
