@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yampa/models/playlist.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/providers/selected_tracks_provider.dart';
@@ -13,6 +14,7 @@ void addToPlaylistsModal(
   PlaylistNotifier playlistNotifier,
   SelectedPlaylistNotifier selectedPlaylistsNotifier,
   SelectedTracksNotifier selectedTracksNotifier,
+  PlayerControllerNotifier playerNotifier,
 ) {
   showDialog(
     context: context,
@@ -51,6 +53,7 @@ void addToPlaylistsModal(
                 selectedTracksNotifier.getTrackIds(),
                 playlists.where((e) => selectedPlaylistsNotifier.getPlaylistIds().contains(e.id)).toList(),
                 playlistNotifier,
+                playerNotifier,
               );
               selectedTracksNotifier.clear();
               selectedPlaylistsNotifier.clear();

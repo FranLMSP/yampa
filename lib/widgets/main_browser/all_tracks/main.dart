@@ -51,11 +51,12 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     PlaylistNotifier playlistNotifier,
     SelectedPlaylistNotifier selectedPlaylistsNotifier,
     SelectedTracksNotifier selectedTracksNotifier,
+    PlayerControllerNotifier playerNotifier,
   ) {
     return PopupMenuButton<OptionSelected>(
       initialValue: null,
       onSelected: (OptionSelected item) {
-        _handleItemOptionSelected(context, track, item, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
+        _handleItemOptionSelected(context, track, item, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, playerNotifier);
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
         const PopupMenuItem<OptionSelected>(
@@ -108,6 +109,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     SelectedTracksNotifier selectedTracksNotifier,
     PlaylistNotifier playlistsNotifier,
     List<Playlist> playlists,
+    PlayerControllerNotifier playerNotifier,
   ) {
     showDialog(
       context: context,
@@ -128,6 +130,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                   selectedTrackIds,
                   [favoritesPlaylist],
                   playlistsNotifier,
+                  playerNotifier,
                 );
                 selectedTracksNotifier.clear();
                 Navigator.of(context).pop();
@@ -149,22 +152,23 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     PlaylistNotifier playlistNotifier,
     SelectedPlaylistNotifier selectedPlaylistsNotifier,
     SelectedTracksNotifier selectedTracksNotifier,
+    PlayerControllerNotifier playerNotifier,
   ) {
     if (optionSelected == OptionSelected.addToPlaylists) {
       selectedTracksNotifier.clear();
       selectedTracksNotifier.selectTrack(track);
-      addToPlaylistsModal(context, selectedTracksNotifier.getTrackIds(), playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
+      addToPlaylistsModal(context, selectedTracksNotifier.getTrackIds(), playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, playerNotifier);
     } else if (optionSelected == OptionSelected.select) {
       selectedTracksNotifier.selectTrack(track);
     } else if (optionSelected == OptionSelected.addToFavorites) {
       selectedTracksNotifier.clear();
       selectedTracksNotifier.selectTrack(track);
-      _addToFavoritesModal(context, selectedTracksNotifier.getTrackIds(), selectedTracksNotifier, playlistNotifier, playlists);
+      _addToFavoritesModal(context, selectedTracksNotifier.getTrackIds(), selectedTracksNotifier, playlistNotifier, playlists, playerNotifier);
     }
   }
 
   Future<void> _playSelectedTrack(Track track, Map<String, Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
-    playTrack(track, tracks, playerController, playerControllerNotifier);
+    await playTrack(track, tracks, playerController, playerControllerNotifier);
   }
 
   void _toggleSelectedTrack(Track track, List<String> selectedTracks, SelectedTracksNotifier selectedTracksNotifier) {
@@ -202,6 +206,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     List<String> selectedTracks,
     SelectedTracksNotifier selectedTracksNotifier,
     SelectedPlaylistNotifier selectedPlaylistsNotifier,
+    PlayerControllerNotifier playerNotifier,
   ) {
     if (selectedTracks.isEmpty) {
       return null;
@@ -225,6 +230,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
               selectedTracksNotifier,
               playlistNotifier,
               playlists,
+              playerNotifier,
             );
           },
         ),
@@ -239,6 +245,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
               playlistNotifier,
               selectedPlaylistsNotifier,
               selectedTracksNotifier,
+              playerNotifier,
             );
           },
         ),
@@ -276,6 +283,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         selectedTracks,
         selectedTracksNotifier,
         selectedPlaylistsNotifier,
+        playerControllerNotifier,
       ),
       body: Column(
         children: [
@@ -299,8 +307,8 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                     if (isInSelectMode) {
                       onTap = onSelect;
                     } else {
-                      onTap = (Track track) {
-                        _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
+                      onTap = (Track track) async  {
+                        await _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
                       };
                       onLongPress = onSelect;
                     }
@@ -311,7 +319,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                       onTap: onTap,
                       onLongPress: onLongPress,
                       isSelected: isSelected,
-                      trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier),
+                      trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, playerControllerNotifier),
                     );
                 }),
                 SizedBox(height: 75),

@@ -62,8 +62,9 @@ Future<void> doInitialLoad(
 
   initialLoadNotifier.setInitialLoadDone();
 
-  await _fetchAndSetTracks(storedPaths, tracksNotifier, loadedTracksCountNotifier);
+  // TODO: the player state has to be loaded before fetching the tracks to prevent a bug where the user clicks on a track before all of them have finished loading
   await loadPlayerControllerState(playerControllerNotifier);
+  await _fetchAndSetTracks(storedPaths, tracksNotifier, loadedTracksCountNotifier);
 }
 
 Future<void> _fetchAndSetTracks(
@@ -174,6 +175,7 @@ Future<void> handleTracksAddedToPlaylist(
   List<String> trackIds,
   List<Playlist> playlists,
   PlaylistNotifier playlistNotifier,
+  PlayerControllerNotifier playerNotifier,
 ) async {
   final playlistRepository = getPlaylistRepository();
 
@@ -188,9 +190,7 @@ Future<void> handleTracksAddedToPlaylist(
     }
   }
 
-  // TODO: if the playlist matches the current playlist being played, add it to the controller here.
-  // Or maybe refactor the controller to point to the playlist ID instead of holding the list of tracks
-  // indepentendly? Idk I'll figure it out later.
+  playerNotifier.handleTracksAddedToPlaylist(mapping);
 
   await playlistRepository.linkTracksWithPlaylists(mapping);
   await playlistRepository.close();
