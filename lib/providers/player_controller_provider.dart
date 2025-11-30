@@ -23,6 +23,7 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
       await optimistic.play();
       state = optimistic.clone();
     } catch (e) {
+      log("Couldn't play", error: e);
       state = state.clone();
       rethrow;
     }
@@ -37,6 +38,7 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
       await optimistic.pause();
       state = optimistic.clone();
     } catch (e) {
+      log("Couldn't pause", error: e);
       state = state.clone();
       rethrow;
     }
@@ -61,6 +63,7 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
       await optimistic.stop();
       state = optimistic.clone();
     } catch (e) {
+      log("Couldn't stop", error: e);
       state = state.clone();
       rethrow;
     }

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'dart:async';
@@ -23,7 +24,7 @@ Future<String> computeFileChecksum(String filePath, {HashFunction? hashFunction}
     final hash = hf(chunks);
     return hash.toString();
   } catch (e) {
-    // TODO: log this error
+    log('Error computing file checksum', error: e);
     return '';
   }
 }
@@ -58,7 +59,7 @@ Future<String> computeFastFileFingerprint(String filePath, {int headBytes = 4096
     final hash = sha1.convert(combined);
     return hash.toString();
   } catch (e) {
-    // TODO: log error
+    log('Error computing fast file fingerprint', error: e);
     return '';
   }
 }

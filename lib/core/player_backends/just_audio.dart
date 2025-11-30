@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
@@ -68,7 +69,7 @@ class JustAudioBackend implements PlayerBackend {
           }
         }
       } catch (e) {
-        // ignore directories we cannot read
+        log("Couldn't read directory", error: e);
       }
     }
     final allEffectivePaths = filePaths;
@@ -109,7 +110,7 @@ class JustAudioBackend implements PlayerBackend {
         ),
       ]);
     } catch (e) {
-      print(e);
+      log('Error reading metadata', error: e);
     } finally {
       loadedTracksCountNotifier.incrementLoadedTrack();
     }

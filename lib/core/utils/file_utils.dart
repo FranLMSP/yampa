@@ -102,7 +102,7 @@ Future<String?> copyFileToLocal(String srcPath, String targetFolder) async {
     final copied = await srcFile.copy(destPath);
     return copied.path;
   } catch (e) {
-    // On any error, return null so caller can decide how to proceed
+    log("Couldn't copy file", error: e);
     return null;
   }
 }
