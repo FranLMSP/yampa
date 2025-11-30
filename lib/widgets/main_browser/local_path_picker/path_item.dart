@@ -54,7 +54,7 @@ class _PathItemState extends ConsumerState<PathItem> {
           );
         });
       },
-      icon: Icon(Icons.delete, color: Colors.red),
+      icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
     );
   }
 

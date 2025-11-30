@@ -41,6 +41,8 @@ class _PlaylistsState extends ConsumerState<Playlists> {
 
   Widget _buildRemoveSelectedTracksButton(PlaylistNotifier playlistNotifier) {
     return FloatingActionButton(
+      backgroundColor: Theme.of(context).colorScheme.error,
+      foregroundColor: Theme.of(context).colorScheme.onError,
       child: Icon(Icons.delete),
       onPressed: () {
         showDialog(
@@ -104,18 +106,31 @@ class _PlaylistsState extends ConsumerState<Playlists> {
       items: const [
         PopupMenuItem<String>(
           value: 'delete',
-          child: Text('Delete'),
+          child: Row(
+            children: [
+              Icon(Icons.delete),
+              SizedBox(width: 12),
+              Text('Delete'),
+            ],
+          ),
         ),
         PopupMenuItem<String>(
           value: 'select',
-          child: Text('Select'),
+          child: Row(
+            children: [
+              Icon(Icons.check_box),
+              SizedBox(width: 12),
+              Text('Select'),
+            ],
+          ),
         ),
       ],
     );
 
     if (selected == 'delete') {
-      // TODO: Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' 
-      _removePlaylistModal(context, playlist, playlistsNotifier);
+      if (context.mounted) {
+        _removePlaylistModal(context, playlist, playlistsNotifier);
+      }
     } else if (selected == 'select') {
       // TODO: handle multi select
     }

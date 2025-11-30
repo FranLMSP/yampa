@@ -10,7 +10,7 @@ class ClipButton extends ConsumerWidget {
       icon: const Icon(Icons.cut),
       tooltip: 'Create audio clip',
       onPressed: () async {
-        print("clicked on clip");
+        debugPrint("clicked on clip");
       },
     );
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
@@ -8,13 +7,15 @@ import 'package:yampa/providers/tracks_provider.dart';
 class ForwardSecondsButton extends ConsumerWidget {
   const ForwardSecondsButton({super.key});
 
-  Future<void> _forward(Map<String, Track> tracks, PlayerControllerNotifier playerControllerNotifier, PlayerController playerController) async {
-      if (playerController.currentTrackId == null) {
+  Future<void> _forward(WidgetRef ref, Map<String, Track> tracks, String? currentTrackId) async {
+      if (currentTrackId == null) {
         return;
       }
+      final playerController = ref.read(playerControllerProvider);
+      final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
       final currentPosition = await playerController.getCurrentPosition();
       var newPosition = currentPosition + const Duration(seconds: 10);
-      final track = tracks[playerController.currentTrackId];
+      final track = tracks[currentTrackId];
       if (track == null) {
         return;
       }
@@ -27,14 +28,13 @@ class ForwardSecondsButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
-    final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
-    final playerController = ref.watch(playerControllerProvider);
+    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
 
     return IconButton(
       icon: const Icon(Icons.forward_10),
       tooltip: 'Forward 10 seconds',
       onPressed: () async {
-        _forward(tracks, playerControllerNotifier, playerController);
+        _forward(ref, tracks, currentTrackId);
       },
     );
   }

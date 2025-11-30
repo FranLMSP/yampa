@@ -16,7 +16,7 @@ class BigPlayer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
-    final currentTrackId = ref.watch(playerControllerProvider).currentTrackId;
+    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
     final track = tracks[currentTrackId];
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

@@ -46,8 +46,7 @@ class PlaylistItemList extends ConsumerWidget {
         // TODO: implement functionality to select multiple playlists
       },
       child: Card(
-        // TODO: pick the color depending on the theme
-        color: selectedPlaylists.contains(playlist.id) ? Colors.indigoAccent : null,
+        color: selectedPlaylists.contains(playlist.id) ? Theme.of(context).colorScheme.primaryContainer : null,
         child: ListTile(
           leading: _buildPlaylistIcon(),
           title: Text(playlist.name),
