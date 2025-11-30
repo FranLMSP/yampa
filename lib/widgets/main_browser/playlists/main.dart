@@ -106,11 +106,23 @@ class _PlaylistsState extends ConsumerState<Playlists> {
       items: const [
         PopupMenuItem<String>(
           value: 'delete',
-          child: Text('Delete'),
+          child: Row(
+            children: [
+              Icon(Icons.delete),
+              SizedBox(width: 12),
+              Text('Delete'),
+            ],
+          ),
         ),
         PopupMenuItem<String>(
           value: 'select',
-          child: Text('Select'),
+          child: Row(
+            children: [
+              Icon(Icons.check_box),
+              SizedBox(width: 12),
+              Text('Select'),
+            ],
+          ),
         ),
       ],
     );

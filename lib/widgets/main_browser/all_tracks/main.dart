@@ -58,10 +58,46 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         _handleItemOptionSelected(context, track, item, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier);
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.select, child: Text('Select')),
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.addToPlaylists, child: Text('Add to playlists')),
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.addToFavorites, child: Text('Add to favorites')),
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.info, child: Text('Info')),
+        const PopupMenuItem<OptionSelected>(
+          value: OptionSelected.select,
+          child: Row(
+            children: [
+              Icon(Icons.check_box),
+              SizedBox(width: 12),
+              Text('Select'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<OptionSelected>(
+          value: OptionSelected.addToPlaylists,
+          child: Row(
+            children: [
+              Icon(Icons.playlist_add),
+              SizedBox(width: 12),
+              Text('Add to playlists'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<OptionSelected>(
+          value: OptionSelected.addToFavorites,
+          child: Row(
+            children: [
+              Icon(Icons.favorite),
+              SizedBox(width: 12),
+              Text('Add to favorites'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<OptionSelected>(
+          value: OptionSelected.info,
+          child: Row(
+            children: [
+              Icon(Icons.info),
+              SizedBox(width: 12),
+              Text('Info'),
+            ],
+          ),
+        ),
       ],
     );
   }

@@ -104,8 +104,26 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
         Offset.zero & overlay.size,
       ),
       items: <PopupMenuEntry<ImageTabOptions>>[
-        const PopupMenuItem<ImageTabOptions>(value: ImageTabOptions.changeImage, child: Text('Select another image')),
-        const PopupMenuItem<ImageTabOptions>(value: ImageTabOptions.removeImage, child: Text('Remove image')),
+        const PopupMenuItem<ImageTabOptions>(
+          value: ImageTabOptions.changeImage,
+          child: Row(
+            children: [
+              Icon(Icons.image),
+              SizedBox(width: 12),
+              Text('Select another image'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<ImageTabOptions>(
+          value: ImageTabOptions.removeImage,
+          child: Row(
+            children: [
+              Icon(Icons.delete),
+              SizedBox(width: 12),
+              Text('Remove image'),
+            ],
+          ),
+        ),
       ],
     );
 
@@ -128,9 +146,36 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
         _handleItemOptionSelected(selectedPlaylist, track, item, tracks, playlistNotifier);
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.select, child: Text('Select')),
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.removeFromPlaylist, child: Text('Remove from playlist')),
-        const PopupMenuItem<OptionSelected>(value: OptionSelected.info, child: Text('Info')),
+        const PopupMenuItem<OptionSelected>(
+          value: OptionSelected.select,
+          child: Row(
+            children: [
+              Icon(Icons.check_box),
+              SizedBox(width: 12),
+              Text('Select'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<OptionSelected>(
+          value: OptionSelected.removeFromPlaylist,
+          child: Row(
+            children: [
+              Icon(Icons.playlist_remove),
+              SizedBox(width: 12),
+              Text('Remove from playlist'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<OptionSelected>(
+          value: OptionSelected.info,
+          child: Row(
+            children: [
+              Icon(Icons.info),
+              SizedBox(width: 12),
+              Text('Info'),
+            ],
+          ),
+        ),
       ],
     );
   }
