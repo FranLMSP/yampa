@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:developer';
 
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/repositories/player_controller_state/factory.dart';
@@ -42,7 +43,22 @@ Future<void> doInitialLoad(
   await playlistsRepo.close();
   playlistNotifier.setPlaylists(playlists);
 
-  // TODO: check here for images in local paths that don't currently have a playlist linked to them.
+  // Check for images in local paths that don't currently have a playlist linked to them.
+  final localImages = await listUserImages();
+  final playlistImages = playlists
+      .map((e) => e.imagePath)
+      .where((e) => e != null)
+      .map((e) => e!)
+      .toSet();
+
+  final orphanedImages = localImages.where((image) {
+    return !playlistImages.contains(image);
+  }).toList();
+
+  for (final image in orphanedImages) {
+    log('Deleting orphaned image: $image');
+    await deleteFile(image);
+  }
 
   initialLoadNotifier.setInitialLoadDone();
 

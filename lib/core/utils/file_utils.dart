@@ -1,7 +1,10 @@
+import 'dart:developer';
 import 'dart:io' as io;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:ulid/ulid.dart';
+
+const String kUserImagesFolder = "user_images";
 
 String extractFilenameFromFullPath(String string) {
   if (string.isEmpty) return "";
@@ -108,5 +111,35 @@ Future<String?> copyFileToLocal(String srcPath, String targetFolder) async {
 }
 
 Future<String?> copyImageToLocal(String srcPath) async {
-  return copyFileToLocal(srcPath, "user_images");
+  return copyFileToLocal(srcPath, kUserImagesFolder);
+}
+
+Future<List<String>> listUserImages() async {
+  try {
+    final basePath = await getBasePath();
+    final imagesDirPath = p.join(basePath, kUserImagesFolder);
+    final imagesDir = io.Directory(imagesDirPath);
+    if (!await imagesDir.exists()) {
+      return [];
+    }
+    return await imagesDir
+        .list()
+        .where((entity) => entity is io.File)
+        .map((entity) => entity.path)
+        .toList();
+  } catch (e) {
+    log("Couldn't list user images", error: e);
+    return [];
+  }
+}
+
+Future<void> deleteFile(String path) async {
+  try {
+    final file = io.File(path);
+    if (await file.exists()) {
+      await file.delete();
+    }
+  } catch (e) {
+    log("Couldn't delete file", error: e);
+  }
 }
