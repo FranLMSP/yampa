@@ -17,6 +17,9 @@ import 'package:yampa/widgets/common/image_cropper_screen.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
+import 'package:yampa/core/player/enums.dart';
+import 'package:yampa/core/utils/sort_utils.dart';
+import 'package:yampa/widgets/common/sort_button.dart';
 
 enum ImageTabOptions {
   changeImage,
@@ -221,10 +224,31 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () => widget.onGoBack(),
-              icon: const Icon(Icons.arrow_back),
-              label: const Text('Back'),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton.icon(
+                  onPressed: () => widget.onGoBack(),
+                  icon: const Icon(Icons.arrow_back),
+                  label: const Text('Back'),
+                ),
+                SortButton(
+                  currentSortMode: selectedPlaylist.sortMode,
+                  onSortModeChanged: (SortMode mode) {
+                    playlistNotifier.setSortMode(selectedPlaylist, mode);
+
+                    final editedPlaylist = Playlist(
+                      id: selectedPlaylist.id,
+                      name: selectedPlaylist.name,
+                      description: selectedPlaylist.description,
+                      trackIds: selectedPlaylist.trackIds,
+                      imagePath: selectedPlaylist.imagePath,
+                      sortMode: mode,
+                    );
+                    widget.onEdit(editedPlaylist);
+                  },
+                ),
+              ],
             ),
           ),
           InkWell(
@@ -251,6 +275,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 description: selectedPlaylist.description,
                 trackIds: selectedPlaylist.trackIds,
                 imagePath: selectedPlaylist.imagePath,
+                sortMode: selectedPlaylist.sortMode,
               );
               widget.onEdit(editedPlaylist);
             },
@@ -266,6 +291,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 description: _descriptionController.text,
                 trackIds: selectedPlaylist.trackIds,
                 imagePath: selectedPlaylist.imagePath,
+                sortMode: selectedPlaylist.sortMode,
               );
               widget.onEdit(editedPlaylist);
             },
@@ -293,12 +319,13 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           ),
           const SizedBox(height: 24),
           Column(
-            children: selectedPlaylist.trackIds.map((trackId) {
-              final isSelected = _selectedTrackIds.contains(trackId);
-              final track = tracks[trackId];
-              if (track == null) return Row();
+            children: sortTracks(
+              selectedPlaylist.trackIds.map((e) => tracks[e]).whereType<Track>().toList(),
+              selectedPlaylist.sortMode
+            ).map((track) {
+              final isSelected = _selectedTrackIds.contains(track.id);
               return TrackItem(
-                key: Key(trackId),
+                key: Key(track.id),
                 track: track,
                 onTap: (Track track) async {
                   if (isInSelectMode) {

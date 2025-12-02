@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:yampa/core/repositories/playlists/playlists.dart';
 import 'package:yampa/core/utils/sqlite_utils.dart';
 import 'package:yampa/models/playlist.dart';
+import 'package:yampa/core/player/enums.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ulid/ulid.dart';
 
@@ -18,7 +19,8 @@ Future<void> _initializeDatabase(Database db) async {
           id TEXT PRIMARY KEY,
           name TEXT NULL,
           description TEXT NULL,
-          image_path TEXT NULL
+          image_path TEXT NULL,
+          sort_mode INTEGER NULL
         )
       '''
     ),
@@ -77,6 +79,9 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
           description: playlistData["description"].toString(),
           imagePath: playlistData["image_path"]?.toString(),
           trackIds: trackIds,
+          sortMode: playlistData["sort_mode"] != null
+            ? SortMode.values[int.parse(playlistData["sort_mode"].toString())]
+            : SortMode.titleAtoZ,
         )
       );
     }
@@ -96,6 +101,7 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
         'name': playlist.name,
         'description': playlist.description,
         'image_path': playlist.imagePath,
+        'sort_mode': playlist.sortMode.index,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -111,6 +117,7 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
         'name': playlist.name,
         'description': playlist.description,
         'image_path': playlist.imagePath,
+        'sort_mode': playlist.sortMode.index,
       },
       where: 'id = ?',
       whereArgs: [playlist.id],
