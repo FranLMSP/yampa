@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/playlist.dart';
+import 'package:yampa/core/player/enums.dart';
 
 
 final playlistsProvider = NotifierProvider<PlaylistNotifier, List<Playlist>>(
@@ -48,5 +49,18 @@ class PlaylistNotifier extends Notifier<List<Playlist>> {
     final foundPlaylist = state.firstWhere((e) => e.id == playlist.id);
     foundPlaylist.trackIds.removeWhere((t) => trackIds.contains(t));
     updatePlaylist(foundPlaylist);
+  }
+
+  void setSortMode(Playlist playlist, SortMode sortMode) {
+    final foundPlaylist = state.firstWhere((e) => e.id == playlist.id);
+    final newPlaylist = Playlist(
+      id: foundPlaylist.id,
+      name: foundPlaylist.name,
+      description: foundPlaylist.description,
+      trackIds: foundPlaylist.trackIds,
+      imagePath: foundPlaylist.imagePath,
+      sortMode: sortMode,
+    );
+    updatePlaylist(newPlaylist);
   }
 }
