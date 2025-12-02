@@ -24,3 +24,36 @@ enum SourceType {
   // spotify,
   // youtube,
 }
+
+enum SortMode {
+  // Title
+  titleAtoZ,
+  titleZtoA,
+
+  // Artist
+  artistAtoZ,
+  artistZtoA,
+
+  // Album
+  albumAtoZ,
+  albumZtoA,
+
+  // Genre
+  genreAtoZ,
+  genreZtoA,
+
+  // Play count
+  // mostPlayed, // TODO: implement after track statistics
+  // leastPlayed, // TODO: implement after track statistics
+
+  // Recently played
+  // recentlyPlayed, // TODO: implement after track statistics
+
+  // Duration
+  durationShortToLong,
+  durationLongToShort,
+
+  // Release year
+  newestRelease,
+  oldestRelease,
+}
