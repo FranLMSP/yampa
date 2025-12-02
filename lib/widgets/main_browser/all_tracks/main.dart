@@ -14,6 +14,10 @@ import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart';
+import 'package:yampa/core/player/enums.dart';
+import 'package:yampa/providers/sort_mode_provider.dart';
+import 'package:yampa/core/utils/sort_utils.dart';
+import 'package:yampa/widgets/common/sort_button.dart';
 
 
 enum OptionSelected {
@@ -253,6 +257,30 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     );
   }
 
+  PreferredSizeWidget _buildDefaultAppBar(WidgetRef ref) {
+    final sortMode = ref.watch(allTracksSortModeProvider);
+    return AppBar(
+      title: const Text('All Tracks'),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: () {
+            setState(() {
+              _isSearchingEnabled = true;
+              _searchTextController.text = "";
+            });
+          },
+        ),
+        SortButton(
+          currentSortMode: sortMode,
+          onSortModeChanged: (SortMode item) {
+            ref.read(allTracksSortModeProvider.notifier).setSortMode(item);
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final tracks = ref.watch(tracksProvider);
@@ -267,24 +295,31 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     debugPrint(loadedTracksCount.toString());
     final loadedTracksCountNotifier = ref.watch(loadedTracksCountProvider.notifier);
     final isInSelectMode = selectedTracks.isNotEmpty;
+    final sortMode = ref.watch(allTracksSortModeProvider);
     final filteredTracks = _isSearchingEnabled
-      ? tracks.values.toList().where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e)))
+      ? tracks.values.toList().where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e))).toList()
       : tracks.values.toList();
+
+    final sortedTracks = sortTracks(filteredTracks, sortMode);
 
     if (tracks.isEmpty) {
       return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));
     }
     return Scaffold(
-      appBar: _isSearchingEnabled ? _buildSearchAppBar() : _buildMultiSelectAppBar(
-        context,
-        tracks,
-        playlists,
-        playlistsNotifier,
-        selectedTracks,
-        selectedTracksNotifier,
-        selectedPlaylistsNotifier,
-        playerControllerNotifier,
-      ),
+      appBar: _isSearchingEnabled
+        ? _buildSearchAppBar()
+        : (isInSelectMode
+            ? _buildMultiSelectAppBar(
+                context,
+                tracks,
+                playlists,
+                playlistsNotifier,
+                selectedTracks,
+                selectedTracksNotifier,
+                selectedPlaylistsNotifier,
+                playerControllerNotifier,
+              )
+            : _buildDefaultAppBar(ref)),
       body: Column(
         children: [
           if (loadedTracksCountNotifier.isLoading())
@@ -296,50 +331,31 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
             ),
           Expanded(
             child: ListView(
-              children: [
-                ...filteredTracks.map(
-                  (track) {
-                    Function(Track track)? onTap;
-                    Function(Track track)? onLongPress;
-                    void onSelect(Track track) {
-                      _toggleSelectedTrack(track, selectedTracks, selectedTracksNotifier);
-                    }
-                    if (isInSelectMode) {
-                      onTap = onSelect;
-                    } else {
-                      onTap = (Track track) async  {
-                        await _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
-                      };
-                      onLongPress = onSelect;
-                    }
-                    final isSelected = selectedTracks.contains(track.id);
-                    return TrackItem(
-                      key: Key(track.id),
-                      track: track,
-                      onTap: onTap,
-                      onLongPress: onLongPress,
-                      isSelected: isSelected,
-                      trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, playerControllerNotifier),
-                    );
-                }),
-                SizedBox(height: 75),
-              ],
+              children: sortedTracks.map((track) {
+                Function(Track track)? onTap;
+                Function(Track track)? onLongPress;
+                void onSelect(Track track) {
+                  _toggleSelectedTrack(track, selectedTracks, selectedTracksNotifier);
+                }
+                if (isInSelectMode) {
+                  onTap = onSelect;
+                } else {
+                  onTap = (Track track) async  {
+                    await _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
+                  };
+                  onLongPress = onSelect;
+                }
+                final isSelected = selectedTracks.contains(track.id);
+                return TrackItem(
+                  key: Key(track.id),
+                  track: track,
+                  onTap: onTap,
+                  onLongPress: onLongPress,
+                  isSelected: isSelected,
+                  trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, playerControllerNotifier),
+                );
+              }).toList(),
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                _isSearchingEnabled = true;
-                _searchTextController.text = "";
-              });
-            },
-            child: Icon(Icons.search),
           ),
         ],
       ),
