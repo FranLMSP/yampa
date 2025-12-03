@@ -6,6 +6,7 @@ import 'package:yampa/widgets/player/player_buttons.dart';
 import 'package:yampa/widgets/player/player_image.dart';
 import 'package:yampa/widgets/player/player_slider.dart';
 import 'package:yampa/widgets/player/player_total_minutes.dart';
+import 'package:yampa/widgets/player/neighboring_tracks.dart';
 
 class BigPlayer extends ConsumerWidget {
 
@@ -39,6 +40,8 @@ class BigPlayer extends ConsumerWidget {
         const PlayerButtons(),
         const SizedBox(height: 10),
         const PlayerTotalMinutes(),
+        const SizedBox(height: 20),
+        const NeighboringTracks(),
       ],
     );
   }

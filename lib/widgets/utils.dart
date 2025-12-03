@@ -10,7 +10,7 @@ enum ViewMode {
 }
 
 ViewMode getViewMode(BoxConstraints constraints) {
-  if (constraints.maxWidth <= 800) {
+  if (constraints.maxWidth <= 820) {
     return ViewMode.portrait;
   }
   return ViewMode.landscape;
