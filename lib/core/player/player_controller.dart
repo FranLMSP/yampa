@@ -5,6 +5,7 @@ import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/core/utils/sort_utils.dart';
 
 class PlayerController {
   // TODO: consider holding all the tracks here instead of a separate provider
@@ -17,6 +18,7 @@ class PlayerController {
   PlayerState state = PlayerState.stopped;
   LoopMode loopMode = LoopMode.infinite;
   ShuffleMode shuffleMode = ShuffleMode.sequential;
+  TrackQueueDisplayMode trackQueueDisplayMode = TrackQueueDisplayMode.image;
   PlayerBackend? playerBackend;
 
   PlayerController();
@@ -33,6 +35,7 @@ class PlayerController {
       state: PlayerState.stopped,
       loopMode: lastState.loopMode,
       shuffleMode: lastState.shuffleMode,
+      trackQueueDisplayMode: lastState.trackQueueDisplayMode,
       playerBackend:
           await getPlayerBackend(), // TODO: store this in sqlite as well
     );
@@ -48,6 +51,7 @@ class PlayerController {
     required this.state,
     required this.loopMode,
     required this.shuffleMode,
+    required this.trackQueueDisplayMode,
     required this.playerBackend,
   });
 
@@ -186,6 +190,7 @@ class PlayerController {
       state: state,
       loopMode: loopMode,
       shuffleMode: shuffleMode,
+      trackQueueDisplayMode: trackQueueDisplayMode,
       playerBackend: playerBackend,
     );
   }
@@ -225,12 +230,31 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> setPlaylist(Playlist playlist) async {
+  Future<void> setPlaylist(Playlist playlist, Map<String, Track> tracks) async {
     if (currentPlaylistId == playlist.id) {
       return;
     }
     currentPlaylistId = playlist.id;
-    trackQueueIds = playlist.trackIds;
+
+    // Get sorted track IDs based on playlist's sort mode
+    final sortedTracks = playlist.trackIds.map((e) => tracks[e]).whereType<Track>().toList();
+    sortTracks(sortedTracks, playlist.sortMode);
+    trackQueueIds = sortedTracks.map((e) => e.id).toList();
+
+    shuffledTrackQueueIds = trackQueueIds;
+    await suffleTrackQueue();
+  }
+
+  Future<void> reloadPlaylist(Playlist playlist, Map<String, Track> tracks) async {
+    if (currentPlaylistId != playlist.id) {
+      return;
+    }
+
+    // Get sorted track IDs based on playlist's sort mode
+    final sortedTracks = playlist.trackIds.map((e) => tracks[e]).whereType<Track>().toList();
+    sortTracks(sortedTracks, playlist.sortMode);
+    trackQueueIds = sortedTracks.map((e) => e.id).toList();
+
     shuffledTrackQueueIds = trackQueueIds;
     await suffleTrackQueue();
   }
@@ -330,5 +354,10 @@ class PlayerController {
     }
 
     return tracks[nextTrackId];
+  }
+
+  Future<void> setTrackQueueDisplayMode(TrackQueueDisplayMode mode) async {
+    trackQueueDisplayMode = mode;
+    await handlePersistPlayerControllerState(this);
   }
 }
