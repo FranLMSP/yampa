@@ -117,7 +117,7 @@ class JustAudioBackend implements PlayerBackend {
   }
 
   @override
-  Future<void> setTrack(Track track) async {
+  Future<Duration> setTrack(Track track) async {
     _ensurePlayerInitialized();
     // TODO: maybe detect here if the path is an URL or not, and call setUrl if that's the case
     final duration = await _player!.setAudioSource(
@@ -134,6 +134,7 @@ class JustAudioBackend implements PlayerBackend {
       ),
     );
     _currentTrackDuration = duration;
+    return duration ?? Duration.zero;
   }
 
   @override

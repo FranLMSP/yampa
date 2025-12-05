@@ -20,6 +20,7 @@ class PlayerController {
   ShuffleMode shuffleMode = ShuffleMode.sequential;
   TrackQueueDisplayMode trackQueueDisplayMode = TrackQueueDisplayMode.image;
   PlayerBackend? playerBackend;
+  Duration lastTrackDuration = Duration.zero;
 
   PlayerController();
   static Future<PlayerController> fromLastState(
@@ -36,6 +37,7 @@ class PlayerController {
       loopMode: lastState.loopMode,
       shuffleMode: lastState.shuffleMode,
       trackQueueDisplayMode: lastState.trackQueueDisplayMode,
+      lastTrackDuration: Duration.zero,
       playerBackend:
           await getPlayerBackend(), // TODO: store this in sqlite as well
     );
@@ -53,6 +55,7 @@ class PlayerController {
     required this.shuffleMode,
     required this.trackQueueDisplayMode,
     required this.playerBackend,
+    required this.lastTrackDuration,
   });
 
   Future<void> play() async {
@@ -93,24 +96,24 @@ class PlayerController {
     if (currentTrackIndex <= -1) {
       currentTrackIndex = 0;
     }
-    if (loopMode == LoopMode.startToEnd) {
-      if (currentTrackIndex < shuffledTrackQueueIds.length - 1) {
-        currentTrackIndex++;
-        await _updateCurrentTrackFromIndex(tracks);
-        await play();
-      } else {
-        await seek(Duration.zero);
-      }
-    } else if (loopMode == LoopMode.infinite || forceNext) {
+
+    if (forceNext || loopMode == LoopMode.infinite) {
       currentTrackIndex++;
-      if (shuffledTrackQueueIds.isNotEmpty && currentTrackIndex >= shuffledTrackQueueIds.length) {
+      if (currentTrackIndex >= shuffledTrackQueueIds.length) {
         currentTrackIndex = 0;
       }
-      await _updateCurrentTrackFromIndex(tracks);
-      await play();
-    } else if (loopMode == LoopMode.singleTrack) {
-      await play();
+    } else {
+      if (loopMode == LoopMode.startToEnd) {
+        if (currentTrackIndex < shuffledTrackQueueIds.length - 1) {
+          currentTrackIndex++;
+        } else {
+          await seek(Duration.zero);
+          return;
+        }
+      }
     }
+    await _updateCurrentTrackFromIndex(tracks);
+    await play();
     await handlePersistPlayerControllerState(this);
   }
 
@@ -166,7 +169,8 @@ class PlayerController {
       return;
     }
     await stop();
-    await playerBackend?.setTrack(track);
+    final trackDuration = await playerBackend!.setTrack(track);
+    lastTrackDuration = trackDuration;
     currentTrackId = track.id;
     if (shuffledTrackQueueIds.isNotEmpty) {
       currentTrackIndex = shuffledTrackQueueIds.indexWhere(
@@ -192,6 +196,7 @@ class PlayerController {
       shuffleMode: shuffleMode,
       trackQueueDisplayMode: trackQueueDisplayMode,
       playerBackend: playerBackend,
+      lastTrackDuration: lastTrackDuration,
     );
   }
 
@@ -208,10 +213,7 @@ class PlayerController {
   }
 
   Duration getCurrentTrackDuration() {
-    if (playerBackend != null) {
-      return playerBackend!.getCurrentTrackDuration();
-    }
-    return Duration.zero;
+    return lastTrackDuration;
   }
 
   Future<void> handleTracksAddedToPlaylist(List<Map<String, String>> playlistTrackMapping) async {
