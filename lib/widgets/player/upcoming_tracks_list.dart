@@ -17,10 +17,15 @@ class UpcomingTracksList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerController = ref.watch(playerControllerProvider);
+    final playerControllerState = ref.watch(playerControllerProvider);
+    final playerController = playerControllerState.value;
     final playlists = ref.watch(playlistsProvider);
     final tracks = ref.watch(tracksProvider);
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+
+    if (playerController == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     final currentPlaylist = playlists.firstWhere(
       (p) => p.id == playerController.currentPlaylistId,

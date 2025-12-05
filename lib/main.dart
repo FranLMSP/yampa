@@ -60,7 +60,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       final playerNotifier = ref.watch(playerControllerProvider.notifier);
       final player = playerNotifier.getPlayerController();
       final tracks = ref.watch(tracksProvider);
-      if (player.hasTrackFinishedPlaying()) {
+      if (player != null && player.hasTrackFinishedPlaying()) {
         await playerNotifier.handleNextAutomatically(tracks);
       }
     });

@@ -10,15 +10,12 @@ class PrevButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
     final playerNotifierController = ref.watch(playerControllerProvider.notifier);
-    return ElevatedButton(
+    return IconButton(
       onPressed: () async {
         await playerNotifierController.prev(tracks);
       },
-      style: ElevatedButton.styleFrom(
-        shape: const CircleBorder(),
-        padding: const EdgeInsets.all(20),
-      ),
-      child: const Icon(Icons.skip_previous, size: 20),
+      icon: const Icon(Icons.skip_previous),
+      iconSize: 32,
     );
   }
 }

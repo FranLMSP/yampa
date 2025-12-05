@@ -27,7 +27,9 @@ class _PlayerTotalMinutesState extends ConsumerState<PlayerTotalMinutes> {
 
   Future<void> _updateDurations() async {
     final tracks = ref.watch(tracksProvider);
-    final player = ref.watch(playerControllerProvider);
+    final playerState = ref.watch(playerControllerProvider);
+    final player = playerState.value;
+    if (player == null) return;
     final track = tracks[player.currentTrackId];
     if (track != null) {
       final totalDuration = player.getCurrentTrackDuration();

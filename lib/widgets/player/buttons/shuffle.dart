@@ -32,7 +32,7 @@ class ShuffleButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final shuffleMode = ref.watch(playerControllerProvider.select((p) => p.shuffleMode));
+    final shuffleMode = ref.watch(playerControllerProvider.select((p) => p.value?.shuffleMode ?? ShuffleMode.sequential));
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
     return IconButton(
       icon: Icon(_getIcon(shuffleMode)),

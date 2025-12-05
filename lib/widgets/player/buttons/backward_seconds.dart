@@ -9,7 +9,9 @@ class BackwardSecondsButton extends ConsumerWidget {
       if (currentTrackId == null) {
         return;
       }
-      final playerController = ref.read(playerControllerProvider);
+      final playerControllerState = ref.read(playerControllerProvider);
+      final playerController = playerControllerState.value;
+      if (playerController == null) return;
       final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
       final currentPosition = await playerController.getCurrentPosition();
       var newPosition = currentPosition - const Duration(seconds: 10);
@@ -21,7 +23,7 @@ class BackwardSecondsButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
+    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
 
     return IconButton(
       icon: const Icon(Icons.replay_10),

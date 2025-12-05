@@ -63,7 +63,9 @@ class PlayerController {
   Future<void> play() async {
     state = PlayerState.playing;
     if (playerBackend != null) {
-      await playerBackend!.play();
+      // Do not await play() because just_audio's play() future completes when playback completes (song ends).
+      // We want to return immediately to update the UI.
+      playerBackend!.play();
     }
   }
 

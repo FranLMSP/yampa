@@ -5,22 +5,15 @@ import 'package:yampa/providers/player_controller_provider.dart';
 class PlayButton extends ConsumerWidget {
   const PlayButton({super.key});
 
-  Future<void> _onPressed(BuildContext context, PlayerControllerNotifier playerControllerNotifier) async {
-    await playerControllerNotifier.play();
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
-    return ElevatedButton(
+    return IconButton(
       onPressed: () async {
-        await _onPressed(context, playerControllerNotifier);
+        await playerControllerNotifier.play();
       },
-      style: ElevatedButton.styleFrom(
-        shape: const CircleBorder(),
-        padding: const EdgeInsets.all(20),
-      ),
-      child: const Icon(Icons.play_arrow, size: 30),
+      icon: const Icon(Icons.play_arrow),
+      iconSize: 48,
     );
   }
 }

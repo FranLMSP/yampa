@@ -210,7 +210,8 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
 
   @override
   Widget build(BuildContext context) {
-    final playerController = ref.read(playerControllerProvider);
+    final playerControllerState = ref.read(playerControllerProvider);
+    final playerController = playerControllerState.value;
     final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
     final playlistNotifier = ref.watch(playlistsProvider.notifier);
     final tracks = ref.watch(tracksProvider);
@@ -301,7 +302,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             width: 100,
             child: ElevatedButton(
               onPressed: () async {
-                if (selectedPlaylist.trackIds.isNotEmpty) {
+                if (selectedPlaylist.trackIds.isNotEmpty && playerController != null) {
                   playerController.setPlaylist(selectedPlaylist, tracks);
                   final firstTrack = tracks[selectedPlaylist.trackIds.first];
                   if (firstTrack != null) {
@@ -330,7 +331,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 onTap: (Track track) async {
                   if (isInSelectMode) {
                     _toggleSelectedTrack(track.id);
-                  } else {
+                  } else if (playerController != null) {
                     await playTrack(track, tracks, playerController, playerControllerNotifier);
                   }
                 },
