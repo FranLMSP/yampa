@@ -11,7 +11,7 @@ class PlayButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+    final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
     return ElevatedButton(
       onPressed: () async {
         await _onPressed(context, playerControllerNotifier);

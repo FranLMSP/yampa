@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/core/player_backends/interface.dart';
 import 'package:yampa/models/player_controller_state.dart';
@@ -169,17 +171,13 @@ class PlayerController {
       return;
     }
     await stop();
+    currentTrackId = track.id;
+    currentTrackIndex = shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
+    if (currentTrackIndex <= -1) {
+      currentTrackIndex = 0;
+    }
     final trackDuration = await playerBackend!.setTrack(track);
     lastTrackDuration = trackDuration;
-    currentTrackId = track.id;
-    if (shuffledTrackQueueIds.isNotEmpty) {
-      currentTrackIndex = shuffledTrackQueueIds.indexWhere(
-        (e) => e == currentTrackId,
-      );
-      if (currentTrackIndex <= -1) {
-        currentTrackIndex = 0;
-      }
-    }
     await handlePersistPlayerControllerState(this);
   }
 
@@ -207,7 +205,11 @@ class PlayerController {
 
   Future<Duration> getCurrentPosition() async {
     if (playerBackend != null) {
-      return await playerBackend!.getCurrentPosition();
+      try {
+        return await playerBackend!.getCurrentPosition();
+      } catch(e) {
+        log("Couldn't get current track position", error: e);
+      }
     }
     return Duration.zero;
   }

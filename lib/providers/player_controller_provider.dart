@@ -46,13 +46,15 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> next(Map<String, Track> tracks) async {
-    await state.next(true, tracks);
-    state = state.clone();
+    final player = state.clone();
+    await player.next(true, tracks);
+    state = player.clone();
   }
 
   Future<void> prev(Map<String, Track> tracks) async {
-    await state.prev(tracks);
-    state = state.clone();
+    final player = state.clone();
+    await player.prev(tracks);
+    state = player.clone();
   }
 
   Future<void> stop() async {
@@ -71,45 +73,53 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> seek(Duration duration) async {
-    await state.seek(duration);
-    state = state.clone();
+    final optimistic = state.clone();
+    await optimistic.seek(duration);
+    state = optimistic;
   }
 
   Future<void> setTrackPlayer(PlayerBackend trackPlayer) async {
-    await state.setTrackPlayer(trackPlayer);
-    state = state.clone();
+    final optimistic = state.clone();
+    await optimistic.setTrackPlayer(trackPlayer);
+    state = optimistic;
   }
 
   Future<void> setCurrentTrack(Track track) async {
-    await state.setCurrentTrack(track);
-    state = state.clone();
+    final optimistic = state.clone();
+    await optimistic.setCurrentTrack(track);
+    state = optimistic;
   }
 
   Future<void> setPlaylist(Playlist playlist, Map<String, Track> tracks) async {
-    await state.setPlaylist(playlist, tracks);
-    state = state.clone();
+    final optimistic = state.clone();
+    await optimistic.setPlaylist(playlist, tracks);
+    state = optimistic;
   }
 
   Future<void> handleTracksAddedToPlaylist(List<Map<String, String>> playlistTrackMapping) async {
-    await state.handleTracksAddedToPlaylist(playlistTrackMapping);
-    state = state.clone();
+    final optimistic = state.clone();
+    await optimistic.handleTracksAddedToPlaylist(playlistTrackMapping);
+    state = optimistic;
   }
 
   Future<LoopMode> toggleLoopMode() async {
-    final newLoopMode = await state.toggleLoopMode();
-    state = state.clone();
+    final optimistic = state.clone();
+    final newLoopMode = await optimistic.toggleLoopMode();
+    state = optimistic;
     return newLoopMode;
   }
 
   Future<ShuffleMode> toggleShuffleMode() async {
-    final newShuffleMode = await state.toggleShuffleMode();
-    state = state.clone();
+    final optimistic = state.clone();
+    final newShuffleMode = await optimistic.toggleShuffleMode();
+    state = optimistic;
     return newShuffleMode;
   }
 
   Future<void> handleNextAutomatically(Map<String, Track> tracks) async {
-    await state.handleNextAutomatically(tracks);
-    state = state.clone();
+    final optimistic = state.clone();
+    await optimistic.handleNextAutomatically(tracks);
+    state = optimistic;
   }
 
   PlayerController getPlayerController() {
@@ -117,8 +127,9 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> setSpeed(double value) async {
-    await state.setSpeed(value);
-    state = state.clone();
+    final optimistic = state.clone();
+    await optimistic.setSpeed(value);
+    state = optimistic;
   }
 
   Future<void> setPlayerController(PlayerController playerController, Map<String, Track> tracks) async {
@@ -131,12 +142,14 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> setTrackQueueDisplayMode(TrackQueueDisplayMode mode) async {
-    await state.setTrackQueueDisplayMode(mode);
-    state = state.clone();
+    final optimistic = state.clone();
+    await optimistic.setTrackQueueDisplayMode(mode);
+    state = optimistic;
   }
 
   Future<void> reloadPlaylist(Playlist playlist, Map<String, Track> tracks) async {
-    await state.reloadPlaylist(playlist, tracks);
-    state = state.clone();
+    final optimistic = state.clone();
+    await optimistic.reloadPlaylist(playlist, tracks);
+    state = optimistic;
   }
 }

@@ -31,19 +31,17 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
       return;
     }
     final tracks = ref.watch(tracksProvider);
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
-    final playerState = ref.watch(playerControllerProvider.select((p) => p.state));
-    final track = tracks[currentTrackId];
-    if (track == null || track.duration == Duration.zero || playerState == PlayerState.stopped) {
+    final player = ref.watch(playerControllerProvider);
+    final track = tracks[player.currentTrackId];
+    final totalDuration = player.getCurrentTrackDuration();
+    if (track == null || totalDuration == Duration.zero || player.state == PlayerState.stopped) {
       if (!mounted) return;
       setState(() {
         _currentSliderValue = 0;
       });
       return;
     }
-    final playerController = ref.read(playerControllerProvider);
-    final totalDuration = playerController.getCurrentTrackDuration();
-    final currentDuration = await playerController.getCurrentPosition();
+    final currentDuration = await player.getCurrentPosition();
     final currentPosition = ((currentDuration.inMilliseconds / totalDuration.inMilliseconds * 100) / 100).clamp(0.0, 1.0);
     if (!mounted) return;
     setState(() {
