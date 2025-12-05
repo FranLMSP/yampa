@@ -26,10 +26,10 @@ class _PlaylistsState extends ConsumerState<Playlists> {
           context: context,
           builder: (BuildContext context) {
             return NewPlaylistDialog(
-              onSaved: (newPlaylist) {
-                handlePlaylistCreated(newPlaylist, playlistNotifier);
+              onSaved: (newPlaylist) async {
+                final createdPlaylist = await handlePlaylistCreated(newPlaylist, playlistNotifier);
                 setState(() {
-                  _selectedPlaylist = newPlaylist;
+                  _selectedPlaylist = createdPlaylist;
                 });
               },
             );
