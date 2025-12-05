@@ -20,7 +20,7 @@ class ShuffleButton extends ConsumerWidget {
     final shuffleModeMap = {
       ShuffleMode.sequential: "Shuffle disabled",
       ShuffleMode.random: "Randomized",
-      ShuffleMode.randomBasedOnHistory: "Randomized special",
+      ShuffleMode.randomBasedOnHistory: "Recommended",
     };
     return "Shuffle mode: ${shuffleModeMap[shuffleMode]!}";
   }
@@ -32,7 +32,7 @@ class ShuffleButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final shuffleMode = ref.watch(playerControllerProvider.select((p) => p.shuffleMode));
+    final shuffleMode = ref.watch(playerControllerProvider.select((p) => p.value?.shuffleMode ?? ShuffleMode.sequential));
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
     return IconButton(
       icon: Icon(_getIcon(shuffleMode)),

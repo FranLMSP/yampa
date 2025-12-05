@@ -88,6 +88,7 @@ class PlayerControllerStateSqliteRepository extends PlayerControllerStateReposit
       playerControllerStateTableName,
       {
         "current_track_id": playerControllerState.currentTrackId,
+        "current_playlist_id": playerControllerState.currentPlaylistId,
         "current_track_index": playerControllerState.currentTrackIndex,
         "speed": playerControllerState.speed,
         "track_queue_ids": playerControllerState.trackQueueIds.join(","),

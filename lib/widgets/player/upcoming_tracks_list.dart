@@ -6,7 +6,6 @@ import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
-import 'package:yampa/widgets/common/sort_button.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 
@@ -17,15 +16,23 @@ class UpcomingTracksList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerController = ref.watch(playerControllerProvider);
+    final playerControllerState = ref.watch(playerControllerProvider);
+    final playerController = playerControllerState.value;
     final playlists = ref.watch(playlistsProvider);
     final tracks = ref.watch(tracksProvider);
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
 
-    final currentPlaylist = playlists.firstWhere(
-      (p) => p.id == playerController.currentPlaylistId,
-      orElse: () => playlists.first, // Fallback, though ideally shouldn't happen if playing
-    );
+    if (playerController == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final currentPlaylist = playlists
+        .where((p) => p.id == playerController.currentPlaylistId)
+        .firstOrNull;
+
+    if (currentPlaylist == null) {
+      return const SizedBox.shrink();
+    }
 
     final shuffledTrackIds = playerController.shuffledTrackQueueIds;
 
@@ -48,14 +55,6 @@ class UpcomingTracksList extends ConsumerWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                   overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              SortButton(
-                currentSortMode: currentPlaylist.sortMode,
-                onSortModeChanged: (mode) async {
-                   final playlistsNotifier = ref.read(playlistsProvider.notifier);
-                   playlistsNotifier.setSortMode(currentPlaylist, mode);
-                   await playerControllerNotifier.reloadPlaylist(currentPlaylist, tracks);
-                },
               ),
             ],
           ),

@@ -9,16 +9,14 @@ class NextButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
+
     final playerNotifierController = ref.read(playerControllerProvider.notifier);
-    return ElevatedButton(
+    return IconButton(
       onPressed: () async {
         await playerNotifierController.next(tracks);
       },
-      style: ElevatedButton.styleFrom(
-        shape: const CircleBorder(),
-        padding: const EdgeInsets.all(20),
-      ),
-      child: const Icon(Icons.skip_next, size: 20),
+      icon: const Icon(Icons.skip_next),
+      iconSize: 32,
     );
   }
 }

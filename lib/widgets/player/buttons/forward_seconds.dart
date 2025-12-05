@@ -11,7 +11,9 @@ class ForwardSecondsButton extends ConsumerWidget {
       if (currentTrackId == null) {
         return;
       }
-      final playerController = ref.read(playerControllerProvider);
+      final playerControllerState = ref.read(playerControllerProvider);
+      final playerController = playerControllerState.value;
+      if (playerController == null) return;
       final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
       final currentPosition = await playerController.getCurrentPosition();
       var newPosition = currentPosition + const Duration(seconds: 10);
@@ -28,7 +30,7 @@ class ForwardSecondsButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
+    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
 
     return IconButton(
       icon: const Icon(Icons.forward_10),

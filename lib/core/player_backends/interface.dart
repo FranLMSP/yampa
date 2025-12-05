@@ -9,7 +9,7 @@ abstract class PlayerBackend {
     TracksNotifier tracksNotifier,
     LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
   );
-  Future<void> setTrack(Track track);
+  Future<Duration> setTrack(Track track);
   Future<void> play();
   Future<void> pause();
   Future<void> stop();

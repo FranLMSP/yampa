@@ -19,9 +19,9 @@ class BigPlayer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
+    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
     final track = tracks[currentTrackId];
-    final trackQueueDisplayMode = ref.watch(playerControllerProvider.select((p) => p.trackQueueDisplayMode));
+    final trackQueueDisplayMode = ref.watch(playerControllerProvider.select((p) => p.value?.trackQueueDisplayMode));
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

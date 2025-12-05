@@ -11,7 +11,7 @@ class FavoriteButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.currentTrackId));
+    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
     final playlists = ref.watch(playlistsProvider);
     final playlistsNotifier = ref.read(playlistsProvider.notifier);
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);

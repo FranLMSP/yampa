@@ -8,7 +8,7 @@ class PlayerDisplayModeButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final trackQueueDisplayMode = ref.watch(playerControllerProvider.select((p) => p.trackQueueDisplayMode));
+    final trackQueueDisplayMode = ref.watch(playerControllerProvider.select((p) => p.value?.trackQueueDisplayMode ?? TrackQueueDisplayMode.image));
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
 
     return IconButton(

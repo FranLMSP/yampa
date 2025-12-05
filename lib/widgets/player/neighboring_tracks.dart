@@ -10,8 +10,13 @@ class NeighboringTracks extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerController = ref.watch(playerControllerProvider);
+    final playerControllerState = ref.watch(playerControllerProvider);
+    final playerController = playerControllerState.value;
     final tracks = ref.watch(tracksProvider);
+
+    if (playerController == null) {
+      return const SizedBox.shrink();
+    }
 
     final prevTrack = playerController.getPreviousTrack(tracks);
     final nextTrack = playerController.getNextTrack(tracks);

@@ -13,7 +13,7 @@ class PlayAndPauseButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerState = ref.watch(playerControllerProvider.select((p) => p.state));
+    final playerState = ref.watch(playerControllerProvider.select((p) => p.value?.state));
 
     return playerState == PlayerState.playing
       ? PauseButton()

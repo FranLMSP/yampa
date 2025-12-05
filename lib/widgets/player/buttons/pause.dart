@@ -5,20 +5,15 @@ import 'package:yampa/providers/player_controller_provider.dart';
 class PauseButton extends ConsumerWidget {
   const PauseButton({super.key});
 
-  void _onPressed(PlayerControllerNotifier playerControllerNotifier) async {
-    await playerControllerNotifier.pause();
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
-    return ElevatedButton(
-      onPressed: () => _onPressed(playerControllerNotifier),
-      style: ElevatedButton.styleFrom(
-        shape: const CircleBorder(),
-        padding: const EdgeInsets.all(20),
-      ),
-      child: const Icon(Icons.pause, size: 30),
+    return IconButton(
+      onPressed: () async {
+        await playerControllerNotifier.pause();
+      },
+      icon: const Icon(Icons.pause),
+      iconSize: 48,
     );
   }
 }

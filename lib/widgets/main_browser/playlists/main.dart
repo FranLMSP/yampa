@@ -26,10 +26,10 @@ class _PlaylistsState extends ConsumerState<Playlists> {
           context: context,
           builder: (BuildContext context) {
             return NewPlaylistDialog(
-              onSaved: (newPlaylist) {
-                handlePlaylistCreated(newPlaylist, playlistNotifier);
+              onSaved: (newPlaylist) async {
+                final createdPlaylist = await handlePlaylistCreated(newPlaylist, playlistNotifier);
                 setState(() {
-                  _selectedPlaylist = newPlaylist;
+                  _selectedPlaylist = createdPlaylist;
                 });
               },
             );
@@ -103,17 +103,18 @@ class _PlaylistsState extends ConsumerState<Playlists> {
         details.globalPosition.dx,
         details.globalPosition.dy,
       ),
-      items: const [
-        PopupMenuItem<String>(
-          value: 'delete',
-          child: Row(
-            children: [
-              Icon(Icons.delete),
-              SizedBox(width: 12),
-              Text('Delete'),
-            ],
+      items: [
+        if (playlist.id != favoritePlaylistId)
+          PopupMenuItem<String>(
+            value: 'delete',
+            child: Row(
+              children: [
+                Icon(Icons.delete),
+                SizedBox(width: 12),
+                Text('Delete'),
+              ],
+            ),
           ),
-        ),
         PopupMenuItem<String>(
           value: 'select',
           child: Row(

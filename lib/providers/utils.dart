@@ -134,19 +134,19 @@ Future<void> handlePathsRemoved(
   await storedPathsRepository.close();
 }
 
-Future<void> handlePlaylistCreated(Playlist playlist, PlaylistNotifier playlistNotifier) async {
+Future<Playlist> handlePlaylistCreated(Playlist playlist, PlaylistNotifier playlistNotifier) async {
   final playlistRepository = getPlaylistRepository();
   final id = await playlistRepository.addPlaylist(playlist);
-  playlistNotifier.addPlaylist(
-    Playlist(
-      id: id,
-      name: playlist.name,
-      description: playlist.description,
-      imagePath: playlist.imagePath,
-      trackIds: playlist.trackIds,
-    )
+  final newPlaylist = Playlist(
+    id: id,
+    name: playlist.name,
+    description: playlist.description,
+    imagePath: playlist.imagePath,
+    trackIds: playlist.trackIds,
   );
+  playlistNotifier.addPlaylist(newPlaylist);
   await playlistRepository.close();
+  return newPlaylist;
 }
 
 Future<void> handlePlaylistEdited(Playlist playlist, PlaylistNotifier playlistNotifier) async {

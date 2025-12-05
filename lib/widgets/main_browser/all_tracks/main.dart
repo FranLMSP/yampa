@@ -171,7 +171,8 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     }
   }
 
-  Future<void> _playSelectedTrack(Track track, Map<String, Track> tracks, PlayerController playerController, PlayerControllerNotifier playerControllerNotifier) async {
+  Future<void> _playSelectedTrack(Track track, Map<String, Track> tracks, PlayerController? playerController, PlayerControllerNotifier playerControllerNotifier) async {
+    if (playerController == null) return;
     await playTrack(track, tracks, playerController, playerControllerNotifier);
   }
 
@@ -289,7 +290,8 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final selectedTracks = ref.watch(selectedTracksProvider);
     final selectedTracksNotifier = ref.watch(selectedTracksProvider.notifier);
     final selectedPlaylistsNotifier = ref.watch(selectedPlaylistsProvider.notifier);
-    final playerController = ref.read(playerControllerProvider);
+    final playerControllerState = ref.read(playerControllerProvider);
+    final playerController = playerControllerState.value;
     final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
     final loadedTracksCount = ref.watch(loadedTracksCountProvider);
     debugPrint(loadedTracksCount.toString());
