@@ -234,25 +234,17 @@ class PlayerController {
     if (currentPlaylistId == playlist.id) {
       return;
     }
-    currentPlaylistId = playlist.id;
-
-    // Get sorted track IDs based on playlist's sort mode
-    final sortedTracks = playlist.trackIds.map((e) => tracks[e]).whereType<Track>().toList();
-    sortTracks(sortedTracks, playlist.sortMode);
-    trackQueueIds = sortedTracks.map((e) => e.id).toList();
-
-    shuffledTrackQueueIds = trackQueueIds;
-    await suffleTrackQueue();
+    await reloadPlaylist(playlist, tracks);
   }
 
   Future<void> reloadPlaylist(Playlist playlist, Map<String, Track> tracks) async {
-    if (currentPlaylistId != playlist.id) {
-      return;
-    }
+    currentPlaylistId = playlist.id;
 
     // Get sorted track IDs based on playlist's sort mode
-    final sortedTracks = playlist.trackIds.map((e) => tracks[e]).whereType<Track>().toList();
-    sortTracks(sortedTracks, playlist.sortMode);
+    final sortedTracks = sortTracks(
+      playlist.trackIds.map((e) => tracks[e]).whereType<Track>().toList(),
+      playlist.sortMode
+    );
     trackQueueIds = sortedTracks.map((e) => e.id).toList();
 
     shuffledTrackQueueIds = trackQueueIds;
