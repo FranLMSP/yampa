@@ -20,7 +20,8 @@ Future<void> _initializeDatabase(Database db) async {
           shuffled_track_queue_ids TEXT NULL,
           state TEXT NULL,
           loop_mode TEXT NULL,
-          shuffle_mode TEXT NULL
+          shuffle_mode TEXT NULL,
+          track_queue_display_mode TEXT NULL
         )
       '''
     ),
@@ -62,6 +63,7 @@ class PlayerControllerStateSqliteRepository extends PlayerControllerStateReposit
         state: row["state"] != null ? PlayerState.values[int.parse(row["state"].toString())] : PlayerState.stopped,
         loopMode: row["loop_mode"] != null ? LoopMode.values[int.parse(row["loop_mode"].toString())] : LoopMode.none,
         shuffleMode: row["shuffle_mode"] != null ? ShuffleMode.values[int.parse(row["shuffle_mode"].toString())] : ShuffleMode.sequential,
+        trackQueueDisplayMode: row["track_queue_display_mode"] != null ? TrackQueueDisplayMode.values[int.parse(row["track_queue_display_mode"].toString())] : TrackQueueDisplayMode.image,
       );
     }
     return LastPlayerControllerState(
@@ -73,7 +75,8 @@ class PlayerControllerStateSqliteRepository extends PlayerControllerStateReposit
       shuffledTrackQueueIds: [],
       state: PlayerState.stopped,
       loopMode: LoopMode.none,
-      shuffleMode: ShuffleMode.sequential, 
+      shuffleMode: ShuffleMode.sequential,
+      trackQueueDisplayMode: TrackQueueDisplayMode.image,
     );
   }
 
@@ -92,6 +95,7 @@ class PlayerControllerStateSqliteRepository extends PlayerControllerStateReposit
         "state": playerControllerState.state.index,
         "loop_mode": playerControllerState.loopMode.index,
         "shuffle_mode": playerControllerState.shuffleMode.index,
+        "track_queue_display_mode": playerControllerState.trackQueueDisplayMode.index,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );

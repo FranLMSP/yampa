@@ -7,6 +7,7 @@ import 'package:yampa/widgets/player/buttons/loop.dart';
 import 'package:yampa/widgets/player/buttons/next.dart';
 import 'package:yampa/widgets/player/buttons/play_and_pause.dart';
 import 'package:yampa/widgets/player/buttons/playlist.dart';
+import 'package:yampa/widgets/player/buttons/player_display_mode.dart';
 import 'package:yampa/widgets/player/buttons/prev.dart';
 import 'package:yampa/widgets/player/buttons/shuffle.dart';
 import 'package:yampa/widgets/player/buttons/speed.dart';
@@ -35,6 +36,7 @@ class PlayerButtons extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
+            PlayerDisplayModeButton(),
             FavoriteButton(),
             ClipButton(),
             LoopButton(),

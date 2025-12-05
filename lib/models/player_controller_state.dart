@@ -10,6 +10,7 @@ class LastPlayerControllerState {
   final PlayerState state;
   final LoopMode loopMode;
   final ShuffleMode shuffleMode;
+  final TrackQueueDisplayMode trackQueueDisplayMode;
 
   LastPlayerControllerState({
     required this.currentTrackId,
@@ -21,5 +22,6 @@ class LastPlayerControllerState {
     required this.state,
     required this.loopMode,
     required this.shuffleMode,
+    required this.trackQueueDisplayMode,
   });
 }

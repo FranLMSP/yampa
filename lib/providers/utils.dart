@@ -220,6 +220,7 @@ Future<void> handlePersistPlayerControllerState(PlayerController playerControlle
       state: playerController.state,
       loopMode: playerController.loopMode,
       shuffleMode: playerController.shuffleMode,
+      trackQueueDisplayMode: playerController.trackQueueDisplayMode,
     )
   );
   await playerControllerStateRepository.close();

@@ -85,8 +85,8 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = state.clone();
   }
 
-  Future<void> setPlaylist(Playlist playlist) async {
-    await state.setPlaylist(playlist);
+  Future<void> setPlaylist(Playlist playlist, Map<String, Track> tracks) async {
+    await state.setPlaylist(playlist, tracks);
     state = state.clone();
   }
 
@@ -128,5 +128,15 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
       await playerController.setCurrentTrack(currentTrack);
     }
     state = playerController;
+  }
+
+  Future<void> setTrackQueueDisplayMode(TrackQueueDisplayMode mode) async {
+    await state.setTrackQueueDisplayMode(mode);
+    state = state.clone();
+  }
+
+  Future<void> reloadPlaylist(Playlist playlist, Map<String, Track> tracks) async {
+    await state.reloadPlaylist(playlist, tracks);
+    state = state.clone();
   }
 }

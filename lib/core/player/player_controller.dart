@@ -5,6 +5,7 @@ import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/core/utils/sort_utils.dart';
 
 class PlayerController {
   // TODO: consider holding all the tracks here instead of a separate provider
@@ -17,6 +18,7 @@ class PlayerController {
   PlayerState state = PlayerState.stopped;
   LoopMode loopMode = LoopMode.infinite;
   ShuffleMode shuffleMode = ShuffleMode.sequential;
+  TrackQueueDisplayMode trackQueueDisplayMode = TrackQueueDisplayMode.image;
   PlayerBackend? playerBackend;
 
   PlayerController();
@@ -33,6 +35,7 @@ class PlayerController {
       state: PlayerState.stopped,
       loopMode: lastState.loopMode,
       shuffleMode: lastState.shuffleMode,
+      trackQueueDisplayMode: lastState.trackQueueDisplayMode,
       playerBackend:
           await getPlayerBackend(), // TODO: store this in sqlite as well
     );
@@ -48,6 +51,7 @@ class PlayerController {
     required this.state,
     required this.loopMode,
     required this.shuffleMode,
+    required this.trackQueueDisplayMode,
     required this.playerBackend,
   });
 
@@ -186,6 +190,7 @@ class PlayerController {
       state: state,
       loopMode: loopMode,
       shuffleMode: shuffleMode,
+      trackQueueDisplayMode: trackQueueDisplayMode,
       playerBackend: playerBackend,
     );
   }
@@ -225,12 +230,23 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> setPlaylist(Playlist playlist) async {
+  Future<void> setPlaylist(Playlist playlist, Map<String, Track> tracks) async {
     if (currentPlaylistId == playlist.id) {
       return;
     }
+    await reloadPlaylist(playlist, tracks);
+  }
+
+  Future<void> reloadPlaylist(Playlist playlist, Map<String, Track> tracks) async {
     currentPlaylistId = playlist.id;
-    trackQueueIds = playlist.trackIds;
+
+    // Get sorted track IDs based on playlist's sort mode
+    final sortedTracks = sortTracks(
+      playlist.trackIds.map((e) => tracks[e]).whereType<Track>().toList(),
+      playlist.sortMode
+    );
+    trackQueueIds = sortedTracks.map((e) => e.id).toList();
+
     shuffledTrackQueueIds = trackQueueIds;
     await suffleTrackQueue();
   }
@@ -287,6 +303,53 @@ class PlayerController {
     };
     final nextHandler = nextHandlerMap[loopMode]!;
     await nextHandler();
+    await handlePersistPlayerControllerState(this);
+  }
+
+  Track? getPreviousTrack(Map<String, Track> tracks) {
+    if (shuffledTrackQueueIds.length <= 1) {
+      return null;
+    }
+
+    String? prevTrackId;
+    if (loopMode == LoopMode.infinite) {
+      if (currentTrackIndex == 0) {
+        prevTrackId = shuffledTrackQueueIds.last;
+      } else {
+        prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
+      }
+    } else if (loopMode == LoopMode.startToEnd) {
+      if (currentTrackIndex > 0) {
+        prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
+      }
+    }
+
+    return tracks[prevTrackId];
+  }
+
+  Track? getNextTrack(Map<String, Track> tracks) {
+    if (shuffledTrackQueueIds.length <= 1) {
+      return null;
+    }
+
+    String? nextTrackId;
+    if (loopMode == LoopMode.infinite) {
+      if (currentTrackIndex == shuffledTrackQueueIds.length - 1) {
+        nextTrackId = shuffledTrackQueueIds.first;
+      } else {
+        nextTrackId = shuffledTrackQueueIds[currentTrackIndex + 1];
+      }
+    } else if (loopMode == LoopMode.startToEnd) {
+      if (currentTrackIndex < shuffledTrackQueueIds.length - 1) {
+        nextTrackId = shuffledTrackQueueIds[currentTrackIndex + 1];
+      }
+    }
+
+    return tracks[nextTrackId];
+  }
+
+  Future<void> setTrackQueueDisplayMode(TrackQueueDisplayMode mode) async {
+    trackQueueDisplayMode = mode;
     await handlePersistPlayerControllerState(this);
   }
 }

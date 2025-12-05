@@ -57,3 +57,8 @@ enum SortMode {
   newestRelease,
   oldestRelease,
 }
+
+enum TrackQueueDisplayMode {
+  image,
+  list,
+}
