@@ -20,7 +20,7 @@ class ShuffleButton extends ConsumerWidget {
     final shuffleModeMap = {
       ShuffleMode.sequential: "Shuffle disabled",
       ShuffleMode.random: "Randomized",
-      ShuffleMode.randomBasedOnHistory: "Randomized special",
+      ShuffleMode.randomBasedOnHistory: "Recommended",
     };
     return "Shuffle mode: ${shuffleModeMap[shuffleMode]!}";
   }
