@@ -136,18 +136,18 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> suffleTrackQueue() async {
+  Future<void> shuffleTrackQueue() async {
     final shuffleHandler = {
       ShuffleMode.sequential: () {
-        shuffledTrackQueueIds = trackQueueIds;
+        shuffledTrackQueueIds = List.from(trackQueueIds);
       },
       ShuffleMode.random: () {
-        shuffledTrackQueueIds = trackQueueIds;
+        shuffledTrackQueueIds = List.from(trackQueueIds);
         shuffledTrackQueueIds.shuffle();
       },
       ShuffleMode.randomBasedOnHistory: () {
         // TODO: implement this in the future after collecting statistics of each track
-        shuffledTrackQueueIds = trackQueueIds;
+        shuffledTrackQueueIds = List.from(trackQueueIds);
         shuffledTrackQueueIds.shuffle();
       },
     };
@@ -254,7 +254,7 @@ class PlayerController {
     trackQueueIds = sortedTracks.map((e) => e.id).toList();
 
     shuffledTrackQueueIds = trackQueueIds;
-    await suffleTrackQueue();
+    await shuffleTrackQueue();
   }
 
   Future<void> setSpeed(double value) async {
@@ -284,7 +284,7 @@ class PlayerController {
       ShuffleMode.randomBasedOnHistory: ShuffleMode.sequential,
     };
     shuffleMode = shuffleModeMap[shuffleMode]!;
-    await handlePersistPlayerControllerState(this);
+    await shuffleTrackQueue();
     return shuffleMode;
   }
 
