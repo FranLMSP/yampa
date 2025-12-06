@@ -13,6 +13,7 @@ import 'package:yampa/providers/selected_tracks_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
+import 'package:yampa/widgets/main_browser/all_tracks/track_info_dialog.dart';
 import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart';
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/providers/sort_mode_provider.dart';
@@ -168,6 +169,11 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
       selectedTracksNotifier.clear();
       selectedTracksNotifier.selectTrack(track);
       _addToFavoritesModal(context, selectedTracksNotifier.getTrackIds(), selectedTracksNotifier, playlistNotifier, playlists, playerNotifier);
+    } else if (optionSelected == OptionSelected.info) {
+      showDialog(
+        context: context,
+        builder: (BuildContext ctx) => TrackInfoDialog(track: track),
+      );
     }
   }
 
