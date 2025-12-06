@@ -12,6 +12,7 @@ class Track {
   final int trackNumber;
   final Duration duration;
   final Uint8List? imageBytes;
+  final DateTime? lastModified;
 
   Track({
     required this.id,
@@ -23,6 +24,7 @@ class Track {
     required this.trackNumber,
     required this.duration,
     this.imageBytes,
+    this.lastModified,
   });
 
   String displayName() => name.isNotEmpty ? name : extractFilenameFromFullPath(path);

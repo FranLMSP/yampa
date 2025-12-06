@@ -5,11 +5,13 @@ import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/repositories/player_controller_state/factory.dart';
 import 'package:yampa/core/repositories/playlists/factory.dart';
 import 'package:yampa/core/repositories/stored_paths/factory.dart';
+import 'package:yampa/core/repositories/cached_tracks/factory.dart';
 import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
+import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
@@ -60,20 +62,32 @@ Future<void> doInitialLoad(
     await deleteFile(image);
   }
 
-  initialLoadNotifier.setInitialLoadDone();
-
   // TODO: the player state has to be loaded before fetching the tracks to prevent a bug where the user clicks on a track before all of them have finished loading
   await loadPlayerControllerState(playerControllerNotifier);
-  await _fetchAndSetTracks(storedPaths, tracksNotifier, loadedTracksCountNotifier);
+
+  // Load cached tracks first for immediate UI feedback
+  final cachedTracksRepository = getCachedTracksRepository();
+  final cachedTracks = await cachedTracksRepository.getAll();
+  tracksNotifier.setTracks(cachedTracks);
+
+  initialLoadNotifier.setInitialLoadDone();
+
+  await _fetchAndSetTracks(storedPaths, tracksNotifier, loadedTracksCountNotifier, cachedTracks: cachedTracks);
 }
 
 Future<void> _fetchAndSetTracks(
   List<GenericPath> paths,
   TracksNotifier tracksNotifier,
-  LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
-) async {
+  LoadedTracksCountProviderNotifier loadedTracksCountNotifier, {
+  List<Track>? cachedTracks,
+}) async {
   final tracksPlayer = await getPlayerBackend();
-  await tracksPlayer.fetchTracks(paths, tracksNotifier, loadedTracksCountNotifier);
+  await tracksPlayer.fetchTracks(
+    paths,
+    tracksNotifier,
+    loadedTracksCountNotifier,
+    cachedTracks: cachedTracks,
+  );
 }
 
 Future<void> handlePathsAdded(

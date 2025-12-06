@@ -31,4 +31,12 @@ class TracksNotifier extends Notifier<Map<String, Track>> {
     }
     state = newState;
   }
+
+  void removeTracks(List<String> trackIds) {
+    Map<String, Track> newState = HashMap.from(state);
+    for (final id in trackIds) {
+      newState.remove(id);
+    }
+    state = newState;
+  }
 }
