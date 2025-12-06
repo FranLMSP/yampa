@@ -13,8 +13,11 @@ import 'package:yampa/core/utils/id_utils.dart';
 import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/core/repositories/cached_tracks/cached_tracks.dart';
+import 'package:yampa/core/repositories/cached_tracks/factory.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
+import 'package:path/path.dart' as p;
 import 'interface.dart';
 
 AudioPlayer? _player;
@@ -42,10 +45,17 @@ class JustAudioBackend implements PlayerBackend {
   Future<List<Track>> fetchTracks(
     List<GenericPath> paths,
     TracksNotifier tracksNotifier,
-    LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
-  ) async {
+    LoadedTracksCountProviderNotifier loadedTracksCountNotifier, {
+    List<Track>? cachedTracks,
+  }) async {
     loadedTracksCountNotifier.reset();
     final Map<String, Track> foundTracks = HashMap();
+
+    final Map<String, Track> cachedTracksMap = {
+      if (cachedTracks != null)
+        for (final track in cachedTracks) track.path: track
+    };
+    final cachedTracksRepository = getCachedTracksRepository();
 
     final List<GenericPath> filePaths = [];
     filePaths.addAll(paths.where((e) => e.filename != null));
@@ -77,12 +87,65 @@ class JustAudioBackend implements PlayerBackend {
     loadedTracksCountNotifier.setTotalTracks(allEffectivePaths.length);
 
     for (final path in allEffectivePaths) {
-      await _getTrackMetadataFromGenericPath(
-        path,
-        tracksNotifier,
-        loadedTracksCountNotifier,
-      );
+      final cachedTrack = cachedTracksMap[path.filename];
+      bool useCache = false;
+
+      if (cachedTrack != null) {
+        final file = File(path.filename!);
+        if (await file.exists()) {
+          final lastModified = await file.lastModified();
+          if (cachedTrack.lastModified != null &&
+              cachedTrack.lastModified!.isAtSameMomentAs(lastModified)) {
+            useCache = true;
+          }
+        }
+      }
+
+      if (useCache) {
+        foundTracks[cachedTrack!.id] = cachedTrack;
+        loadedTracksCountNotifier.incrementLoadedTrack();
+      } else {
+        await _getTrackMetadataFromGenericPath(
+          path,
+          tracksNotifier,
+          loadedTracksCountNotifier,
+          cachedTracksRepository,
+        );
+      }
     }
+
+    final List<String> tracksToRemove = [];
+    if (cachedTracks != null) {
+      for (final cachedTrack in cachedTracks) {
+        if (!foundTracks.containsKey(cachedTrack.id)) {
+          bool belongsToScannedPaths = false;
+          for (final rootPath in paths) {
+            if (rootPath.folder != null) {
+              if (p.isWithin(rootPath.folder!, cachedTrack.path)) {
+                belongsToScannedPaths = true;
+                break;
+              }
+            } else if (rootPath.filename != null) {
+              if (cachedTrack.path == rootPath.filename) {
+                belongsToScannedPaths = true;
+                break;
+              }
+            }
+          }
+
+          if (belongsToScannedPaths) {
+            tracksToRemove.add(cachedTrack.id);
+            await cachedTracksRepository.remove(cachedTrack.path);
+          }
+        }
+      }
+    }
+
+    if (tracksToRemove.isNotEmpty) {
+      tracksNotifier.removeTracks(tracksToRemove);
+    }
+    
+    await cachedTracksRepository.close();
     loadedTracksCountNotifier.reset();
     return foundTracks.values.toList();
   }
@@ -91,24 +154,28 @@ class JustAudioBackend implements PlayerBackend {
     GenericPath path,
     TracksNotifier tracksNotifier,
     LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
+    CachedTracksRepository cachedTracksRepository,
   ) async {
     try {
       final metadata = await compute(readMetadata, File(path.filename!));
-      tracksNotifier.addTracks([
-        Track(
-          id: await generateTrackId(path.filename!),
-          name: metadata.title ?? "",
-          artist: metadata.artist ?? "",
-          album: metadata.album ?? "",
-          genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
-          trackNumber: metadata.trackNumber ?? 0,
-          path: path.filename!,
-          duration: metadata.duration ?? Duration.zero,
-          imageBytes: metadata.pictures.isNotEmpty
-              ? metadata.pictures.first.bytes
-              : null,
-        ),
-      ]);
+      final file = File(path.filename!);
+      final lastModified = await file.lastModified();
+      final track = Track(
+        id: await generateTrackId(path.filename!),
+        name: metadata.title ?? "",
+        artist: metadata.artist ?? "",
+        album: metadata.album ?? "",
+        genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
+        trackNumber: metadata.trackNumber ?? 0,
+        path: path.filename!,
+        duration: metadata.duration ?? Duration.zero,
+        imageBytes: metadata.pictures.isNotEmpty
+            ? metadata.pictures.first.bytes
+            : null,
+        lastModified: lastModified,
+      );
+      tracksNotifier.addTracks([track]);
+      await cachedTracksRepository.addOrUpdate(track);
     } catch (e) {
       log('Error reading metadata', error: e);
     } finally {

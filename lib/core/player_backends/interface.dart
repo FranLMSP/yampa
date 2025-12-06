@@ -7,8 +7,9 @@ abstract class PlayerBackend {
   Future<List<Track>> fetchTracks(
     List<GenericPath> paths,
     TracksNotifier tracksNotifier,
-    LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
-  );
+    LoadedTracksCountProviderNotifier loadedTracksCountNotifier, {
+    List<Track>? cachedTracks,
+  });
   Future<Duration> setTrack(Track track);
   Future<void> play();
   Future<void> pause();

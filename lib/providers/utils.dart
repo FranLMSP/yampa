@@ -5,11 +5,14 @@ import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/repositories/player_controller_state/factory.dart';
 import 'package:yampa/core/repositories/playlists/factory.dart';
 import 'package:yampa/core/repositories/stored_paths/factory.dart';
+import 'package:yampa/core/repositories/cached_tracks/factory.dart';
 import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/core/utils/file_utils.dart';
+import 'package:path/path.dart' as p;
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
+import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
@@ -60,20 +63,32 @@ Future<void> doInitialLoad(
     await deleteFile(image);
   }
 
-  initialLoadNotifier.setInitialLoadDone();
-
   // TODO: the player state has to be loaded before fetching the tracks to prevent a bug where the user clicks on a track before all of them have finished loading
   await loadPlayerControllerState(playerControllerNotifier);
-  await _fetchAndSetTracks(storedPaths, tracksNotifier, loadedTracksCountNotifier);
+
+  // Load cached tracks first for immediate UI feedback
+  final cachedTracksRepository = getCachedTracksRepository();
+  final cachedTracks = await cachedTracksRepository.getAll();
+  tracksNotifier.setTracks(cachedTracks);
+
+  initialLoadNotifier.setInitialLoadDone();
+
+  await _fetchAndSetTracks(storedPaths, tracksNotifier, loadedTracksCountNotifier, cachedTracks: cachedTracks);
 }
 
 Future<void> _fetchAndSetTracks(
   List<GenericPath> paths,
   TracksNotifier tracksNotifier,
-  LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
-) async {
+  LoadedTracksCountProviderNotifier loadedTracksCountNotifier, {
+  List<Track>? cachedTracks,
+}) async {
   final tracksPlayer = await getPlayerBackend();
-  await tracksPlayer.fetchTracks(paths, tracksNotifier, loadedTracksCountNotifier);
+  await tracksPlayer.fetchTracks(
+    paths,
+    tracksNotifier,
+    loadedTracksCountNotifier,
+    cachedTracks: cachedTracks,
+  );
 }
 
 Future<void> handlePathsAdded(
@@ -103,6 +118,8 @@ Future<void> handlePathsRemoved(
 ) async {
   // Try to remove from the provider only the tracks related to the removed paths
   final storedPathsRepository = getStoredPathsRepository();
+  final cachedTracksRepository = getCachedTracksRepository();
+  
   localPathsNotifier.removePaths(removedPaths);
   final currentTracks = tracksNotifier.getTracks();
   Map<String, String> removedFolders = HashMap();
@@ -114,16 +131,38 @@ Future<void> handlePathsRemoved(
       removedFolders[path.folder!] = path.folder!;
     }
   }
+  
+  // Collect tracks to remove
+  final List<Track> tracksToRemove = [];
   final filteredTracks = [...currentTracks];
   filteredTracks.removeWhere((track) {
-    return (
-      removedFiles[track.path] != null
-      || (
-        removedFiles[track.path] == null
-        && removedFolders[getParentFolder(track.path)] != null
-      )
-    );
+    bool shouldRemove = false;
+    
+    // Check if track matches a removed file
+    if (removedFiles[track.path] != null) {
+      shouldRemove = true;
+    } else {
+      // Check if track is within any removed folder
+      for (final removedFolder in removedFolders.keys) {
+        if (p.isWithin(removedFolder, track.path)) {
+          shouldRemove = true;
+          break;
+        }
+      }
+    }
+    
+    if (shouldRemove) {
+      tracksToRemove.add(track);
+    }
+    
+    return shouldRemove;
   });
+  
+  // Remove tracks from cache
+  for (final track in tracksToRemove) {
+    await cachedTracksRepository.remove(track.path);
+  }
+  
   tracksNotifier.setTracks(filteredTracks);
   final List<Future> removePathsFutures = [];
   for (final path in removedPaths) {
@@ -132,6 +171,7 @@ Future<void> handlePathsRemoved(
   await Future.wait(removePathsFutures);
 
   await storedPathsRepository.close();
+  await cachedTracksRepository.close();
 }
 
 Future<Playlist> handlePlaylistCreated(Playlist playlist, PlaylistNotifier playlistNotifier) async {
