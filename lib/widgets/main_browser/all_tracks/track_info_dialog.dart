@@ -30,6 +30,7 @@ class TrackInfoDialog extends ConsumerWidget {
           Expanded(
             child: Text(
               value,
+              textAlign: TextAlign.right,
               style: const TextStyle(
                 color: Colors.grey,
               ),
@@ -59,7 +60,7 @@ class TrackInfoDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final trackStatsAsync = ref.watch(trackStatisticsProvider(track.id));
+    final trackStatsAsync = ref.watch(trackStatisticsStreamProvider(track.id));
 
     return AlertDialog(
       title: Text(track.displayName()),
@@ -70,6 +71,21 @@ class TrackInfoDialog extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Track image
+            if (track.imageBytes != null)
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.memory(
+                    track.imageBytes!,
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            if (track.imageBytes != null) const SizedBox(height: 24),
+            
             _buildSection(
               'Metadata',
               [
@@ -106,7 +122,7 @@ class TrackInfoDialog extends ConsumerWidget {
                         _buildInfoRow('Times Completed', formatCount(stats.completionCount)),
                         _buildInfoRow(
                           'Total Playback Time',
-                          formatDurationLong(Duration(minutes: stats.minutesPlayed.round())),
+                          formatDurationLong(Duration(seconds: (stats.minutesPlayed * 60).round())),
                         ),
                         _buildInfoRow('Last Played', formatTimestamp(stats.lastPlayedAt)),
                       ],

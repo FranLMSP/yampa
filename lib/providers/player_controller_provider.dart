@@ -218,4 +218,12 @@ class PlayerControllerNotifier extends AsyncNotifier<PlayerController> {
     });
     state = result;
   }
+
+  Future<void> updatePlaybackStatistics() async {
+    final currentState = state.value;
+    if (currentState == null) return;
+
+    // Don't update UI state, just update statistics in background
+    await currentState.updatePlaybackStatistics();
+  }
 }

@@ -78,13 +78,7 @@ class PlayerController {
   });
 
   Future<void> play() async {
-    final wasPlaying = state == PlayerState.playing;
     state = PlayerState.playing;
-    
-    // Track play event if starting fresh (not resuming)
-    if (!wasPlaying && currentTrackId != null) {
-      await _trackPlayEvent(currentTrackId!);
-    }
     
     lastPlayStartTime = DateTime.now();
     
@@ -213,6 +207,13 @@ class PlayerController {
     if (playerBackend == null) {
       return;
     }
+    
+    // Update playback time for the current track before switching
+    await _updatePlaybackTime();
+    
+    // Track play event for the new track BEFORE stopping
+    await _trackPlayEvent(track.id);
+    
     await stop();
     currentTrackId = track.id;
     currentTrackIndex = shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
@@ -460,6 +461,28 @@ class PlayerController {
       lastPlayStartTime = null;
     } catch (e) {
       log('Error updating playback time', error: e);
+    }
+  }
+
+  // Public method to update playback statistics periodically without stopping playback
+  Future<void> updatePlaybackStatistics() async {
+    if (lastPlayStartTime == null || currentTrackId == null || state != PlayerState.playing) {
+      return;
+    }
+
+    try {
+      final now = DateTime.now();
+      final playbackDuration = now.difference(lastPlayStartTime!);
+      
+      final statsRepo = await getStatisticsRepository();
+      await statsRepo.addPlaybackTime(playbackDuration);
+      await statsRepo.addTrackPlaybackTime(currentTrackId!, playbackDuration);
+      await statsRepo.close();
+      
+      // Reset the timer to start counting from now
+      lastPlayStartTime = now;
+    } catch (e) {
+      log('Error updating playback statistics', error: e);
     }
   }
 }

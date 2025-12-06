@@ -118,7 +118,7 @@ class PlayerStatisticsPage extends ConsumerWidget {
             children: [
               _buildStatCard(
                 'Total Playback Time',
-                formatDurationLong(Duration(minutes: stats.totalMinutesPlayed.round())),
+                formatDurationLong(Duration(seconds: (stats.totalMinutesPlayed * 60).round())),
                 Icons.access_time,
               ),
               _buildStatCard(
