@@ -451,4 +451,16 @@ class PlayerController {
       log('Error updating playback statistics', error: e);
     }
   }
+
+  Future<void> handleTrackUpdated(String oldId, String newId) async {
+    currentTrackId = newId;
+    final queueIdIndex = trackQueueIds.indexOf(oldId);
+    if (queueIdIndex != -1) {
+      trackQueueIds[queueIdIndex] = newId;
+    }
+    final shuffledIdIndex = shuffledTrackQueueIds.indexOf(oldId);
+    if (shuffledIdIndex != -1) {
+      shuffledTrackQueueIds[shuffledIdIndex] = newId;
+    }
+  }
 }

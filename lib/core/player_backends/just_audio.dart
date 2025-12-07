@@ -80,12 +80,12 @@ class JustAudioBackend implements PlayerBackend {
         foundTracks[cachedTrack!.id] = cachedTrack;
         loadedTracksCountNotifier.incrementLoadedTrack();
       } else {
-        await _getTrackMetadataFromGenericPath(
-          path,
-          tracksNotifier,
-          loadedTracksCountNotifier,
-          cachedTracksRepository,
-        );
+        final track = await _getTrackMetadataFromGenericPath(path.filename!);
+        if (track != null) {
+          tracksNotifier.addTracks([track]);
+          await cachedTracksRepository.addOrUpdate(track);
+        }
+        loadedTracksCountNotifier.incrementLoadedTrack();
       }
     }
 
@@ -175,37 +175,29 @@ class JustAudioBackend implements PlayerBackend {
     }
   }
 
-  Future<void> _getTrackMetadataFromGenericPath(
-    GenericPath path,
-    TracksNotifier tracksNotifier,
-    LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
-    CachedTracksRepository cachedTracksRepository,
-  ) async {
+  Future<Track?> _getTrackMetadataFromGenericPath(String path) async {
     try {
-      final metadata = await compute(readMetadata, File(path.filename!));
-      final file = File(path.filename!);
+      final metadata = await compute(readMetadata, File(path));
+      final file = File(path);
       final lastModified = await file.lastModified();
-      final track = Track(
-        id: await generateTrackId(path.filename!),
+      return Track(
+        id: await generateTrackId(path),
         name: metadata.title ?? "",
         artist: metadata.artist ?? "",
         album: metadata.album ?? "",
         genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
         trackNumber: metadata.trackNumber ?? 0,
-        path: path.filename!,
+        path: path,
         duration: metadata.duration ?? Duration.zero,
         imageBytes: metadata.pictures.isNotEmpty
             ? metadata.pictures.first.bytes
             : null,
         lastModified: lastModified,
       );
-      tracksNotifier.addTracks([track]);
-      await cachedTracksRepository.addOrUpdate(track);
     } catch (e) {
       log('Error reading metadata', error: e);
-    } finally {
-      loadedTracksCountNotifier.incrementLoadedTrack();
     }
+    return null;
   }
 
   @override
@@ -288,5 +280,25 @@ class JustAudioBackend implements PlayerBackend {
   bool hasTrackFinishedPlaying() {
     _ensurePlayerInitialized();
     return _player!.processingState == ProcessingState.completed;
+  }
+
+  @override
+  Future<Track> updateTrackMetadata(Track track) async {
+    final file = File(track.path);
+    updateMetadata(
+      file,
+      (metadata) {
+        metadata.setTitle(track.name);
+        metadata.setArtist(track.artist);
+        metadata.setAlbum(track.album);
+        metadata.setTrackNumber(track.trackNumber);
+        metadata.setGenres(track.genre.split(", "));
+        metadata.setPictures([
+          Picture(Uint8List.fromList(track.imageBytes ?? []), "image/png", PictureType.coverFront)
+        ]);
+      },
+    );
+    final updatedTrack = await _getTrackMetadataFromGenericPath(track.path);
+    return updatedTrack!;
   }
 }

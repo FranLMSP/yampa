@@ -310,3 +310,34 @@ Future<void> loadPlayerControllerState(
   );
   await playerControllerStateRepository.close();
 }
+
+Future<void> handleTrackMetadataEdited(
+  Track newTrackInfo,
+  List<Track> allTracks,
+  List<Playlist> allPlaylists,
+  TracksNotifier tracksNotifier,
+  PlaylistNotifier playlistNotifier,
+  PlayerControllerNotifier playerControllerNotifier,
+) async {
+  final existingId = newTrackInfo.id;
+
+  // TODO: get the audio backend depending on the source type of the track
+  final playerBackend = await getPlayerBackend();
+  final updatedTrack = await playerBackend.updateTrackMetadata(newTrackInfo);
+
+  for (final playlist in allPlaylists) {
+    bool didPlaylistChange = false;
+    for (final (index, trackId) in playlist.trackIds.indexed) {
+      if (trackId == existingId) {
+        didPlaylistChange = true;
+        playlist.trackIds[index] = updatedTrack.id;
+        break;
+      }
+    }
+    if (didPlaylistChange) await handlePlaylistEdited(playlist, playlistNotifier);
+  }
+  tracksNotifier.removeTracks([existingId]);
+  tracksNotifier.addTracks([updatedTrack]);
+
+  playerControllerNotifier.handleTrackUpdated(existingId, updatedTrack.id);
+}
