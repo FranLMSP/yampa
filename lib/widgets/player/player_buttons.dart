@@ -3,6 +3,7 @@ import 'package:yampa/widgets/player/buttons/backward_seconds.dart';
 import 'package:yampa/widgets/player/buttons/clip.dart';
 import 'package:yampa/widgets/player/buttons/favorite.dart';
 import 'package:yampa/widgets/player/buttons/forward_seconds.dart';
+import 'package:yampa/widgets/player/buttons/info.dart';
 import 'package:yampa/widgets/player/buttons/loop.dart';
 import 'package:yampa/widgets/player/buttons/next.dart';
 import 'package:yampa/widgets/player/buttons/play_and_pause.dart';
@@ -40,6 +41,7 @@ class PlayerButtons extends StatelessWidget {
             ShuffleButton(),
             SpeedButton(),
             PlaylistButton(),
+            InfoButton(),
           ],
         ),
       ],
