@@ -10,7 +10,9 @@ class NextButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
 
-    final playerNotifierController = ref.read(playerControllerProvider.notifier);
+    final playerNotifierController = ref.read(
+      playerControllerProvider.notifier,
+    );
     return IconButton(
       onPressed: () async {
         await playerNotifierController.next(tracks);

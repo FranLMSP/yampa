@@ -19,5 +19,4 @@ Future<Database> openSqliteDatabase() async {
     var db = await databaseFactory.openDatabase(dbPath);
     return db;
   }
-
 }

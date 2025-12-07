@@ -11,7 +11,7 @@ String formatDurationLong(Duration duration) {
   final hours = duration.inHours;
   final minutes = duration.inMinutes.remainder(60);
   final seconds = duration.inSeconds.remainder(60);
-  
+
   if (hours > 0) {
     if (minutes > 0) {
       return "$hours hour${hours != 1 ? 's' : ''} $minutes minute${minutes != 1 ? 's' : ''}";

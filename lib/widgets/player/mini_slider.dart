@@ -32,7 +32,12 @@ class _MiniPlayerSliderState extends ConsumerState<MiniPlayerSlider> {
     if (track != null) {
       final totalDuration = player.getCurrentTrackDuration();
       final currentPosition = await player.getCurrentPosition();
-      final position = ((currentPosition.inMilliseconds / totalDuration.inMilliseconds * 100) / 100) .clamp(0.0, 1.0);
+      final position =
+          ((currentPosition.inMilliseconds /
+                      totalDuration.inMilliseconds *
+                      100) /
+                  100)
+              .clamp(0.0, 1.0);
       if (mounted) {
         setState(() {
           _currentSliderValue = position;

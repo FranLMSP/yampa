@@ -24,25 +24,20 @@ class PlayerController {
   TrackQueueDisplayMode trackQueueDisplayMode = TrackQueueDisplayMode.image;
   PlayerBackend? playerBackend;
   Duration lastTrackDuration = Duration.zero;
-  
-  // Statistics tracking
+
   DateTime? sessionStartTime;
   DateTime? lastPlayStartTime;
-  Set<String> playedTrackIdsInSession = {};
 
   PlayerController();
   static Future<PlayerController> fromLastState(
     LastPlayerControllerState lastState,
   ) async {
-    // Increment session start counter
-    final statsRepo = await getStatisticsRepository();
-    await statsRepo.incrementTimesStarted();
-    await statsRepo.close();
-    
     return PlayerController._clone(
       currentTrackId: lastState.currentTrackId,
       currentPlaylistId: lastState.currentPlaylistId,
-      currentTrackIndex: lastState.currentTrackIndex >= 0 ? lastState.currentTrackIndex : 0,
+      currentTrackIndex: lastState.currentTrackIndex >= 0
+          ? lastState.currentTrackIndex
+          : 0,
       speed: lastState.speed,
       trackQueueIds: lastState.trackQueueIds,
       shuffledTrackQueueIds: lastState.shuffledTrackQueueIds,
@@ -55,7 +50,6 @@ class PlayerController {
           await getPlayerBackend(), // TODO: store this in sqlite as well
       sessionStartTime: DateTime.now(),
       lastPlayStartTime: null,
-      playedTrackIdsInSession: {},
     );
   }
 
@@ -74,23 +68,18 @@ class PlayerController {
     required this.lastTrackDuration,
     required this.sessionStartTime,
     required this.lastPlayStartTime,
-    required this.playedTrackIdsInSession,
   });
 
   Future<void> play() async {
     state = PlayerState.playing;
-    
     lastPlayStartTime = DateTime.now();
-    
     if (playerBackend != null) {
-      // Do not await play() because just_audio's play() future completes when playback completes (song ends).
-      // We want to return immediately to update the UI.
-      playerBackend!.play();
+      await playerBackend!.play();
     }
   }
 
   Future<void> pause() async {
-    await _updatePlaybackTime();
+    await updatePlaybackStatistics();
     state = PlayerState.paused;
     if (playerBackend != null) {
       await playerBackend!.pause();
@@ -98,7 +87,7 @@ class PlayerController {
   }
 
   Future<void> stop() async {
-    await _updatePlaybackTime();
+    await updatePlaybackStatistics();
     state = PlayerState.stopped;
     if (playerBackend != null) {
       await playerBackend!.seek(Duration.zero);
@@ -106,7 +95,7 @@ class PlayerController {
     }
   }
 
-  Future<void> _updateCurrentTrackFromIndex(Map<String, Track> tracks) async {
+  Future<void> _setCurrentTrackFromIndex(Map<String, Track> tracks) async {
     if (shuffledTrackQueueIds.isEmpty) {
       return;
     }
@@ -117,15 +106,21 @@ class PlayerController {
     }
   }
 
-  Future<void> next(bool forceNext, Map<String, Track> tracks) async {
-    // Track skip if user manually skipped
-    if (forceNext && currentTrackId != null) {
-      await _trackSkipEvent(currentTrackId!);
-    } else if (currentTrackId != null) {
-      // Track completion if track finished naturally
-      await _trackCompletionEvent(currentTrackId!);
+  Future<void> _trackSkipAndCompletionEvents(bool forceNext) async {
+    if (currentTrackId != null) {
+      final trackSkippedManually = forceNext;
+      if (trackSkippedManually) {
+        await _trackSkipEvent(currentTrackId!);
+      }
+      final trackSkippedNaturally = !forceNext;
+      if (trackSkippedNaturally) {
+        await _trackCompletionEvent(currentTrackId!);
+      }
     }
-    
+  }
+
+  Future<void> next(bool forceNext, Map<String, Track> tracks) async {
+    _trackSkipAndCompletionEvents(forceNext);
     await stop();
     if (currentTrackIndex <= -1) {
       currentTrackIndex = 0;
@@ -146,27 +141,27 @@ class PlayerController {
         }
       }
     }
-    await _updateCurrentTrackFromIndex(tracks);
+    await _setCurrentTrackFromIndex(tracks);
     await play();
     await handlePersistPlayerControllerState(this);
   }
 
   Future<void> prev(Map<String, Track> tracks) async {
-    // Track skip when going to previous track
     if (currentTrackId != null) {
       await _trackSkipEvent(currentTrackId!);
     }
-    
+
     await stop();
     if (currentTrackIndex > 0) {
       currentTrackIndex--;
     } else {
       currentTrackIndex = 0;
-      if (shuffledTrackQueueIds.isNotEmpty && (loopMode == LoopMode.infinite || loopMode == LoopMode.startToEnd)) {
+      if (shuffledTrackQueueIds.isNotEmpty &&
+          (loopMode == LoopMode.infinite || loopMode == LoopMode.startToEnd)) {
         currentTrackIndex = shuffledTrackQueueIds.length - 1;
       }
     }
-    await _updateCurrentTrackFromIndex(tracks);
+    await _setCurrentTrackFromIndex(tracks);
     await play();
     await handlePersistPlayerControllerState(this);
   }
@@ -197,7 +192,7 @@ class PlayerController {
     }
   }
 
-  Future<void> setTrackPlayer(PlayerBackend playerBackend) async {
+  Future<void> setPlayerBackend(PlayerBackend playerBackend) async {
     await stop();
     this.playerBackend = playerBackend;
     await handlePersistPlayerControllerState(this);
@@ -207,16 +202,12 @@ class PlayerController {
     if (playerBackend == null) {
       return;
     }
-    
-    // Update playback time for the current track before switching
-    await _updatePlaybackTime();
-    
-    // Track play event for the new track BEFORE stopping
-    await _trackPlayEvent(track.id);
-    
     await stop();
+    await _trackPlayEvent(track.id);
     currentTrackId = track.id;
-    currentTrackIndex = shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
+    currentTrackIndex = shuffledTrackQueueIds.indexWhere(
+      (e) => e == currentTrackId,
+    );
     if (currentTrackIndex <= -1) {
       currentTrackIndex = 0;
     }
@@ -241,7 +232,6 @@ class PlayerController {
       lastTrackDuration: lastTrackDuration,
       sessionStartTime: sessionStartTime,
       lastPlayStartTime: lastPlayStartTime,
-      playedTrackIdsInSession: Set.from(playedTrackIdsInSession),
     );
   }
 
@@ -254,7 +244,7 @@ class PlayerController {
     if (playerBackend != null) {
       try {
         return await playerBackend!.getCurrentPosition();
-      } catch(e) {
+      } catch (e) {
         log("Couldn't get current track position", error: e);
       }
     }
@@ -265,7 +255,9 @@ class PlayerController {
     return lastTrackDuration;
   }
 
-  Future<void> handleTracksAddedToPlaylist(List<Map<String, String>> playlistTrackMapping) async {
+  Future<void> handleTracksAddedToPlaylist(
+    List<Map<String, String>> playlistTrackMapping,
+  ) async {
     for (final row in playlistTrackMapping) {
       final playlistId = row["playlist_id"] ?? "";
       if (playlistId != currentPlaylistId) {
@@ -288,13 +280,16 @@ class PlayerController {
     await reloadPlaylist(playlist, tracks);
   }
 
-  Future<void> reloadPlaylist(Playlist playlist, Map<String, Track> tracks) async {
+  Future<void> reloadPlaylist(
+    Playlist playlist,
+    Map<String, Track> tracks,
+  ) async {
     currentPlaylistId = playlist.id;
 
     // Get sorted track IDs based on playlist's sort mode
     final sortedTracks = sortTracks(
       playlist.trackIds.map((e) => tracks[e]).whereType<Track>().toList(),
-      playlist.sortMode
+      playlist.sortMode,
     );
     trackQueueIds = sortedTracks.map((e) => e.id).toList();
 
@@ -404,17 +399,10 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  // Statistics tracking helper methods
   Future<void> _trackPlayEvent(String trackId) async {
     try {
       final statsRepo = await getStatisticsRepository();
-      
-      // Track if this is a new unique track in this session
-      if (!playedTrackIdsInSession.contains(trackId)) {
-        playedTrackIdsInSession.add(trackId);
-      }
-      
-      // Record track play
+
       await statsRepo.incrementTrackPlayCount(trackId);
       await statsRepo.recordTrackPlayed(trackId);
       await statsRepo.close();
@@ -444,42 +432,20 @@ class PlayerController {
     }
   }
 
-  Future<void> _updatePlaybackTime() async {
-    if (lastPlayStartTime == null || currentTrackId == null) {
-      return;
-    }
-
-    try {
-      final now = DateTime.now();
-      final playbackDuration = now.difference(lastPlayStartTime!);
-      
-      final statsRepo = await getStatisticsRepository();
-      await statsRepo.addPlaybackTime(playbackDuration);
-      await statsRepo.addTrackPlaybackTime(currentTrackId!, playbackDuration);
-      await statsRepo.close();
-      
-      lastPlayStartTime = null;
-    } catch (e) {
-      log('Error updating playback time', error: e);
-    }
-  }
-
-  // Public method to update playback statistics periodically without stopping playback
   Future<void> updatePlaybackStatistics() async {
-    if (lastPlayStartTime == null || currentTrackId == null || state != PlayerState.playing) {
+    if (lastPlayStartTime == null ||
+        currentTrackId == null ||
+        state != PlayerState.playing) {
       return;
     }
 
     try {
       final now = DateTime.now();
       final playbackDuration = now.difference(lastPlayStartTime!);
-      
       final statsRepo = await getStatisticsRepository();
       await statsRepo.addPlaybackTime(playbackDuration);
       await statsRepo.addTrackPlaybackTime(currentTrackId!, playbackDuration);
       await statsRepo.close();
-      
-      // Reset the timer to start counting from now
       lastPlayStartTime = now;
     } catch (e) {
       log('Error updating playback statistics', error: e);

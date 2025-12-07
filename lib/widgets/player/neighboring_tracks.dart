@@ -32,13 +32,23 @@ class NeighboringTracks extends ConsumerWidget {
         children: [
           Expanded(
             child: prevTrack != null
-                ? _buildTrackInfo(context, prevTrack, "Previous", CrossAxisAlignment.start)
+                ? _buildTrackInfo(
+                    context,
+                    prevTrack,
+                    "Previous",
+                    CrossAxisAlignment.start,
+                  )
                 : const SizedBox.shrink(),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: nextTrack != null
-                ? _buildTrackInfo(context, nextTrack, "Next", CrossAxisAlignment.end)
+                ? _buildTrackInfo(
+                    context,
+                    nextTrack,
+                    "Next",
+                    CrossAxisAlignment.end,
+                  )
                 : const SizedBox.shrink(),
           ),
         ],
@@ -58,9 +68,9 @@ class NeighboringTracks extends ConsumerWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: Colors.grey,
-                fontWeight: FontWeight.bold,
-              ),
+            color: Colors.grey,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 4),
         Row(
@@ -92,19 +102,9 @@ class NeighboringTracks extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              PlayerImage(
-                track: track,
-                width: 40,
-                height: 40,
-                iconSize: 20,
-              ),
+              PlayerImage(track: track, width: 40, height: 40, iconSize: 20),
             ] else ...[
-              PlayerImage(
-                track: track,
-                width: 40,
-                height: 40,
-                iconSize: 20,
-              ),
+              PlayerImage(track: track, width: 40, height: 40, iconSize: 20),
               const SizedBox(width: 8),
               Flexible(
                 child: Column(

@@ -27,5 +27,6 @@ class Track {
     this.lastModified,
   });
 
-  String displayName() => name.isNotEmpty ? name : extractFilenameFromFullPath(path);
+  String displayName() =>
+      name.isNotEmpty ? name : extractFilenameFromFullPath(path);
 }

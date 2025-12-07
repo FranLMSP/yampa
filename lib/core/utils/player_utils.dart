@@ -14,7 +14,7 @@ Future<void> playTrack(
 ) async {
   if (playerController.playerBackend == null) {
     // TODO: here we want to set the track player type depending on the source type of the track
-    await playerControllerNotifier.setTrackPlayer(await getPlayerBackend());
+    await playerControllerNotifier.setPlayerBackend(await getPlayerBackend());
   }
   await playerControllerNotifier.stop();
   await playerControllerNotifier.setCurrentTrack(track);

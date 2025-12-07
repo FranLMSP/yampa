@@ -61,12 +61,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       final playerNotifier = ref.watch(playerControllerProvider.notifier);
       final player = playerNotifier.getPlayerController();
       final tracks = ref.watch(tracksProvider);
-      
+
       // Check if track finished playing
       if (player != null && player.hasTrackFinishedPlaying()) {
         await playerNotifier.handleNextAutomatically(tracks);
       }
-      
+
       // Update playback statistics every 10 seconds (every 5th tick)
       _timerTicks++;
       if (_timerTicks >= 5) {
@@ -113,9 +113,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         if (viewMode == ViewMode.portrait) {
           return Scaffold(
             body: SafeArea(
-              child: Center(
-                child: MainBrowser(viewMode: viewMode),
-              ),
+              child: Center(child: MainBrowser(viewMode: viewMode)),
             ),
           );
         } else {
@@ -128,11 +126,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                       width: 500,
                       child: MainBrowser(viewMode: viewMode),
                     ),
-                    Expanded(
-                      child: Center(
-                        child: BigPlayer(),
-                      ),
-                    ),
+                    Expanded(child: Center(child: BigPlayer())),
                   ],
                 ),
               ),
@@ -157,8 +151,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       final localPathsNotifier = ref.read(localPathsProvider.notifier);
       final tracksNotifier = ref.read(tracksProvider.notifier);
       final playlistsNotifier = ref.read(playlistsProvider.notifier);
-      final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
-      final loadedTracksCountNotifier = ref.read(loadedTracksCountProvider.notifier);
+      final playerControllerNotifier = ref.read(
+        playerControllerProvider.notifier,
+      );
+      final loadedTracksCountNotifier = ref.read(
+        loadedTracksCountProvider.notifier,
+      );
       _load(
         initialLoadDone,
         initialLoadNotifier,
@@ -170,8 +168,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       );
     }
     _setTimer();
-    return initialLoadDone
-        ? _buildMainContent()
-        : _buildMainPageLoader();
+    return initialLoadDone ? _buildMainContent() : _buildMainPageLoader();
   }
 }

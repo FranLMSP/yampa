@@ -18,7 +18,6 @@ String extractFilenameFromFullPath(String string) {
   return string; // If no separator, return the original string
 }
 
-
 String getParentFolder(String folder) {
   if (folder.isEmpty) return "";
   // Normalize separators
@@ -32,33 +31,27 @@ String getParentFolder(String folder) {
   return trimmed.substring(0, lastSlash);
 }
 
-
 bool isValidMusicPath(String path) {
   // TODO: maybe check for mimetype here as well?
 
-  return (
-    path.endsWith(".mp4")  ||
-    path.endsWith(".m4a")  ||
-    path.endsWith(".mp3")  ||
-    path.endsWith(".ogg")  ||
-    path.endsWith(".ogg")  ||
-    path.endsWith(".opus") ||
-    path.endsWith(".wav")  ||
-    path.endsWith(".flac")
-  );
+  return (path.endsWith(".mp4") ||
+      path.endsWith(".m4a") ||
+      path.endsWith(".mp3") ||
+      path.endsWith(".ogg") ||
+      path.endsWith(".ogg") ||
+      path.endsWith(".opus") ||
+      path.endsWith(".wav") ||
+      path.endsWith(".flac"));
 }
 
 bool isValidImagePath(String path) {
   // TODO: maybe check for mimetype here as well?
 
-  return (
-    path.endsWith(".gif") ||
-    path.endsWith(".jpg") ||
-    path.endsWith(".jpeg") ||
-    path.endsWith(".webp") ||
-    path.endsWith(".png") &&
-    io.File(path).existsSync()
-  );
+  return (path.endsWith(".gif") ||
+      path.endsWith(".jpg") ||
+      path.endsWith(".jpeg") ||
+      path.endsWith(".webp") ||
+      path.endsWith(".png") && io.File(path).existsSync());
 }
 
 Future<String> getBasePath() async {
@@ -71,16 +64,32 @@ Future<String> getBasePath() async {
   if (io.Platform.isLinux) {
     final xdg = io.Platform.environment['XDG_DATA_HOME'];
     basePath = (xdg != null && xdg.isNotEmpty)
-      ? p.join(xdg, 'yampa')
-      : p.join(io.Platform.environment['HOME'] ?? '.', '.local', 'share', 'yampa');
+        ? p.join(xdg, 'yampa')
+        : p.join(
+            io.Platform.environment['HOME'] ?? '.',
+            '.local',
+            'share',
+            'yampa',
+          );
   } else if (io.Platform.isWindows) {
-    final appdata = io.Platform.environment['APPDATA'] ??
-      p.join(io.Platform.environment['USERPROFILE'] ?? '.', 'AppData', 'Roaming');
+    final appdata =
+        io.Platform.environment['APPDATA'] ??
+        p.join(
+          io.Platform.environment['USERPROFILE'] ?? '.',
+          'AppData',
+          'Roaming',
+        );
     basePath = p.join(appdata, 'yampa');
   } else if (io.Platform.isMacOS) {
-    basePath = p.join(io.Platform.environment['HOME'] ?? '.', 'Library', 'Application Support', 'yampa');
+    basePath = p.join(
+      io.Platform.environment['HOME'] ?? '.',
+      'Library',
+      'Application Support',
+      'yampa',
+    );
   } else {
-    final io.Directory appDocumentsDir = await getApplicationDocumentsDirectory();
+    final io.Directory appDocumentsDir =
+        await getApplicationDocumentsDirectory();
     basePath = p.join(appDocumentsDir.path, 'yampa');
   }
   return basePath;

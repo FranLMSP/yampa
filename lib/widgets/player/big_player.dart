@@ -11,17 +11,18 @@ import 'package:yampa/widgets/player/upcoming_tracks_list.dart';
 import 'package:yampa/core/player/enums.dart';
 
 class BigPlayer extends ConsumerWidget {
-
-  const BigPlayer({
-    super.key,
-  });
+  const BigPlayer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
+    final currentTrackId = ref.watch(
+      playerControllerProvider.select((p) => p.value?.currentTrackId),
+    );
     final track = tracks[currentTrackId];
-    final trackQueueDisplayMode = ref.watch(playerControllerProvider.select((p) => p.value?.trackQueueDisplayMode));
+    final trackQueueDisplayMode = ref.watch(
+      playerControllerProvider.select((p) => p.value?.trackQueueDisplayMode),
+    );
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

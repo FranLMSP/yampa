@@ -27,15 +27,23 @@ class LoopButton extends ConsumerWidget {
     return "Replay mode: ${loopModeMap[loopMode]!}";
   }
 
-  Future<void> _toggleLoopMode(PlayerControllerNotifier playerControllerNotifier) async {
+  Future<void> _toggleLoopMode(
+    PlayerControllerNotifier playerControllerNotifier,
+  ) async {
     final newLoopMode = await playerControllerNotifier.toggleLoopMode();
     await showButtonActionMessage(_getTooltopMessage(newLoopMode));
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final loopMode = ref.watch(playerControllerProvider.select((p) => p.value?.loopMode ?? LoopMode.none));
-    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+    final loopMode = ref.watch(
+      playerControllerProvider.select(
+        (p) => p.value?.loopMode ?? LoopMode.none,
+      ),
+    );
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
     return IconButton(
       icon: Icon(_getIcon(loopMode)),
       tooltip: _getTooltopMessage(loopMode),

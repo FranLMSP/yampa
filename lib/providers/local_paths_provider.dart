@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/path.dart';
 
-final localPathsProvider = NotifierProvider<LocalPathsNotifier, List<GenericPath>>(
-  () => LocalPathsNotifier(),
-);
+final localPathsProvider =
+    NotifierProvider<LocalPathsNotifier, List<GenericPath>>(
+      () => LocalPathsNotifier(),
+    );
 
 class LocalPathsNotifier extends Notifier<List<GenericPath>> {
   @override
@@ -14,10 +15,7 @@ class LocalPathsNotifier extends Notifier<List<GenericPath>> {
   }
 
   void addPaths(List<GenericPath> paths) {
-    state = [
-      ...state,
-      ...paths,
-    ];
+    state = [...state, ...paths];
   }
 
   void removePaths(List<GenericPath> paths) {

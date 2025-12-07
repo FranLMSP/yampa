@@ -1,21 +1,8 @@
-enum PlayerState {
-  playing,
-  paused,
-  stopped,
-}
+enum PlayerState { playing, paused, stopped }
 
-enum LoopMode {
-  singleTrack,
-  infinite,
-  startToEnd,
-  none,
-}
+enum LoopMode { singleTrack, infinite, startToEnd, none }
 
-enum ShuffleMode {
-  sequential,
-  random,
-  randomBasedOnHistory,
-}
+enum ShuffleMode { sequential, random, randomBasedOnHistory }
 
 enum SourceType {
   file,
@@ -58,7 +45,4 @@ enum SortMode {
   oldestRelease,
 }
 
-enum TrackQueueDisplayMode {
-  image,
-  list,
-}
+enum TrackQueueDisplayMode { image, list }

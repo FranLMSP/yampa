@@ -11,11 +11,17 @@ class FavoriteButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
+    final currentTrackId = ref.watch(
+      playerControllerProvider.select((p) => p.value?.currentTrackId),
+    );
     final playlists = ref.watch(playlistsProvider);
     final playlistsNotifier = ref.read(playlistsProvider.notifier);
-    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
-    final favoritesPlaylist = playlists.firstWhere((e) => e.id == favoritePlaylistId);
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
+    final favoritesPlaylist = playlists.firstWhere(
+      (e) => e.id == favoritePlaylistId,
+    );
     final isFavorite = favoritesPlaylist.trackIds.contains(currentTrackId);
     return IconButton(
       icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
@@ -27,12 +33,19 @@ class FavoriteButton extends ConsumerWidget {
         if (isFavorite) {
           await Future.wait([
             showButtonActionMessage("Track removed from favorites"),
-            handleMultipleTrackRemovedFromPlaylist(favoritesPlaylist, [currentTrackId], playlistsNotifier),
+            handleMultipleTrackRemovedFromPlaylist(favoritesPlaylist, [
+              currentTrackId,
+            ], playlistsNotifier),
           ]);
         } else {
           await Future.wait([
             showButtonActionMessage("Track added to favorites"),
-            handleTracksAddedToPlaylist([currentTrackId], [favoritesPlaylist], playlistsNotifier, playerControllerNotifier),
+            handleTracksAddedToPlaylist(
+              [currentTrackId],
+              [favoritesPlaylist],
+              playlistsNotifier,
+              playerControllerNotifier,
+            ),
           ]);
         }
       },

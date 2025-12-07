@@ -4,7 +4,6 @@ import 'package:yampa/models/playlist.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 
-
 class PlaylistItemList extends ConsumerWidget {
   const PlaylistItemList({super.key, required this.playlist, this.onTap});
 
@@ -24,12 +23,12 @@ class PlaylistItemList extends ConsumerWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
       child: playlist.imagePath != null
-        ? SizedBox(
-          width: 50,
-          height: 50,
-          child: PlaylistImage(playlist: playlist)
-        )
-        : _buildPlaylistPlaceholder(),
+          ? SizedBox(
+              width: 50,
+              height: 50,
+              child: PlaylistImage(playlist: playlist),
+            )
+          : _buildPlaylistPlaceholder(),
     );
   }
 
@@ -46,7 +45,9 @@ class PlaylistItemList extends ConsumerWidget {
         // TODO: implement functionality to select multiple playlists
       },
       child: Card(
-        color: selectedPlaylists.contains(playlist.id) ? Theme.of(context).colorScheme.primaryContainer : null,
+        color: selectedPlaylists.contains(playlist.id)
+            ? Theme.of(context).colorScheme.primaryContainer
+            : null,
         child: ListTile(
           leading: _buildPlaylistIcon(),
           title: Text(playlist.name),

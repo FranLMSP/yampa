@@ -32,21 +32,16 @@ Future<void> _initializeDatabase(Database db) async {
     )
   ''');
 
-  // Initialize player statistics row if it doesn't exist
-  await db.insert(
-    playerStatisticsTableName,
-    {
-      'id': 1,
-      'totalMinutesPlayed': 0.0,
-      'totalTracksPlayed': 0,
-      'totalUniqueTracksPlayed': 0,
-      'uptime': 0,
-      'timesStarted': 0,
-      'lastPlayedAt': null,
-      'totalSkips': 0,
-    },
-    conflictAlgorithm: ConflictAlgorithm.ignore,
-  );
+  await db.insert(playerStatisticsTableName, {
+    'id': 1,
+    'totalMinutesPlayed': 0.0,
+    'totalTracksPlayed': 0,
+    'totalUniqueTracksPlayed': 0,
+    'uptime': 0,
+    'timesStarted': 0,
+    'lastPlayedAt': null,
+    'totalSkips': 0,
+  }, conflictAlgorithm: ConflictAlgorithm.ignore);
 }
 
 class StatisticsSqlite extends StatisticsRepository {
@@ -128,13 +123,16 @@ class StatisticsSqlite extends StatisticsRepository {
   Future<void> addPlaybackTime(Duration duration) async {
     final db = await _getdb();
     final minutes = duration.inSeconds / 60.0;
-    await db.rawUpdate('''
-      UPDATE $playerStatisticsTableName
-      SET totalMinutesPlayed = totalMinutesPlayed + ?,
-          uptime = uptime + ?,
-          lastPlayedAt = ?
-      WHERE id = 1
-    ''', [minutes, duration.inMilliseconds, DateTime.now().millisecondsSinceEpoch]);
+    await db.rawUpdate(
+      '''
+        UPDATE $playerStatisticsTableName
+        SET totalMinutesPlayed = totalMinutesPlayed + ?,
+            uptime = uptime + ?,
+            lastPlayedAt = ?
+        WHERE id = 1
+      ''',
+      [minutes, duration.inMilliseconds, DateTime.now().millisecondsSinceEpoch],
+    );
   }
 
   @override
@@ -150,18 +148,21 @@ class StatisticsSqlite extends StatisticsRepository {
   @override
   Future<void> recordTrackPlayed(String trackId) async {
     final db = await _getdb();
-    
+
     // Check if this is a new unique track
     final trackStats = await getTrackStatistics(trackId);
     final isNewTrack = trackStats.timesPlayed == 0;
-    
-    await db.rawUpdate('''
+
+    await db.rawUpdate(
+      '''
       UPDATE $playerStatisticsTableName
       SET totalTracksPlayed = totalTracksPlayed + 1,
           totalUniqueTracksPlayed = totalUniqueTracksPlayed + ?,
           lastPlayedAt = ?
       WHERE id = 1
-    ''', [isNewTrack ? 1 : 0, DateTime.now().millisecondsSinceEpoch]);
+    ''',
+      [isNewTrack ? 1 : 0, DateTime.now().millisecondsSinceEpoch],
+    );
   }
 
   @override
@@ -194,7 +195,7 @@ class StatisticsSqlite extends StatisticsRepository {
   Future<Map<String, TrackStatistics>> getAllTrackStatistics() async {
     final db = await _getdb();
     final results = await db.query(trackStatisticsTableName);
-    
+
     final Map<String, TrackStatistics> statsMap = {};
     for (final row in results) {
       final stats = TrackStatistics(
@@ -209,99 +210,103 @@ class StatisticsSqlite extends StatisticsRepository {
       );
       statsMap[stats.trackId] = stats;
     }
-    
+
     return statsMap;
   }
 
   @override
   Future<void> updateTrackStatistics(TrackStatistics stats) async {
     final db = await _getdb();
-    await db.insert(
-      trackStatisticsTableName,
-      {
-        'trackId': stats.trackId,
-        'timesPlayed': stats.timesPlayed,
-        'timesSkipped': stats.timesSkipped,
-        'minutesPlayed': stats.minutesPlayed,
-        'lastPlayedAt': stats.lastPlayedAt?.millisecondsSinceEpoch,
-        'completionCount': stats.completionCount,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.insert(trackStatisticsTableName, {
+      'trackId': stats.trackId,
+      'timesPlayed': stats.timesPlayed,
+      'timesSkipped': stats.timesSkipped,
+      'minutesPlayed': stats.minutesPlayed,
+      'lastPlayedAt': stats.lastPlayedAt?.millisecondsSinceEpoch,
+      'completionCount': stats.completionCount,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   @override
   Future<void> incrementTrackPlayCount(String trackId) async {
     final db = await _getdb();
-    
+
     // Ensure track exists
     await _ensureTrackExists(trackId);
-    
-    await db.rawUpdate('''
+
+    await db.rawUpdate(
+      '''
       UPDATE $trackStatisticsTableName
       SET timesPlayed = timesPlayed + 1,
           lastPlayedAt = ?
       WHERE trackId = ?
-    ''', [DateTime.now().millisecondsSinceEpoch, trackId]);
+    ''',
+      [DateTime.now().millisecondsSinceEpoch, trackId],
+    );
   }
 
   @override
   Future<void> incrementTrackSkipCount(String trackId) async {
     final db = await _getdb();
-    
+
     // Ensure track exists
     await _ensureTrackExists(trackId);
-    
-    await db.rawUpdate('''
+
+    await db.rawUpdate(
+      '''
       UPDATE $trackStatisticsTableName
       SET timesSkipped = timesSkipped + 1
       WHERE trackId = ?
-    ''', [trackId]);
+    ''',
+      [trackId],
+    );
   }
 
   @override
   Future<void> incrementTrackCompletionCount(String trackId) async {
     final db = await _getdb();
-    
+
     // Ensure track exists
     await _ensureTrackExists(trackId);
-    
-    await db.rawUpdate('''
+
+    await db.rawUpdate(
+      '''
       UPDATE $trackStatisticsTableName
       SET completionCount = completionCount + 1
       WHERE trackId = ?
-    ''', [trackId]);
+    ''',
+      [trackId],
+    );
   }
 
   @override
   Future<void> addTrackPlaybackTime(String trackId, Duration duration) async {
     final db = await _getdb();
     final minutes = duration.inSeconds / 60.0;
-    
+
     // Ensure track exists
     await _ensureTrackExists(trackId);
-    
-    await db.rawUpdate('''
+
+    await db.rawUpdate(
+      '''
       UPDATE $trackStatisticsTableName
       SET minutesPlayed = minutesPlayed + ?
       WHERE trackId = ?
-    ''', [minutes, trackId]);
+    ''',
+      [minutes, trackId],
+    );
   }
 
   Future<void> _ensureTrackExists(String trackId) async {
     final db = await _getdb();
-    await db.insert(
-      trackStatisticsTableName,
-      {
-        'trackId': trackId,
-        'timesPlayed': 0,
-        'timesSkipped': 0,
-        'minutesPlayed': 0.0,
-        'lastPlayedAt': null,
-        'completionCount': 0,
-      },
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
+    await db.insert(trackStatisticsTableName, {
+      'trackId': trackId,
+      'timesPlayed': 0,
+      'timesSkipped': 0,
+      'minutesPlayed': 0.0,
+      'lastPlayedAt': null,
+      'completionCount': 0,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
   }
 
   @override

@@ -6,24 +6,28 @@ class BackwardSecondsButton extends ConsumerWidget {
   const BackwardSecondsButton({super.key});
 
   Future<void> _backward(WidgetRef ref, String? currentTrackId) async {
-      if (currentTrackId == null) {
-        return;
-      }
-      final playerControllerState = ref.read(playerControllerProvider);
-      final playerController = playerControllerState.value;
-      if (playerController == null) return;
-      final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
-      final currentPosition = await playerController.getCurrentPosition();
-      var newPosition = currentPosition - const Duration(seconds: 10);
-      if (newPosition.isNegative) {
-        newPosition = Duration.zero;
-      }
-      await playerControllerNotifier.seek(newPosition);
+    if (currentTrackId == null) {
+      return;
+    }
+    final playerControllerState = ref.read(playerControllerProvider);
+    final playerController = playerControllerState.value;
+    if (playerController == null) return;
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
+    final currentPosition = await playerController.getCurrentPosition();
+    var newPosition = currentPosition - const Duration(seconds: 10);
+    if (newPosition.isNegative) {
+      newPosition = Duration.zero;
+    }
+    await playerControllerNotifier.seek(newPosition);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
+    final currentTrackId = ref.watch(
+      playerControllerProvider.select((p) => p.value?.currentTrackId),
+    );
 
     return IconButton(
       icon: const Icon(Icons.replay_10),

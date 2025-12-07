@@ -25,15 +25,23 @@ class ShuffleButton extends ConsumerWidget {
     return "Shuffle mode: ${shuffleModeMap[shuffleMode]!}";
   }
 
-  Future<void> _toggleShuffleMode(PlayerControllerNotifier playerControllerNotifier) async {
+  Future<void> _toggleShuffleMode(
+    PlayerControllerNotifier playerControllerNotifier,
+  ) async {
     final newShuffleMode = await playerControllerNotifier.toggleShuffleMode();
     await showButtonActionMessage(_getTooltopMessage(newShuffleMode));
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final shuffleMode = ref.watch(playerControllerProvider.select((p) => p.value?.shuffleMode ?? ShuffleMode.sequential));
-    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+    final shuffleMode = ref.watch(
+      playerControllerProvider.select(
+        (p) => p.value?.shuffleMode ?? ShuffleMode.sequential,
+      ),
+    );
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
     return IconButton(
       icon: Icon(_getIcon(shuffleMode)),
       tooltip: _getTooltopMessage(shuffleMode),

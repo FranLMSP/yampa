@@ -20,7 +20,6 @@ import 'package:yampa/providers/sort_mode_provider.dart';
 import 'package:yampa/core/utils/sort_utils.dart';
 import 'package:yampa/widgets/common/sort_button.dart';
 
-
 enum OptionSelected {
   select,
   addToPlaylists,
@@ -61,7 +60,17 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     return PopupMenuButton<OptionSelected>(
       initialValue: null,
       onSelected: (OptionSelected item) {
-        _handleItemOptionSelected(context, track, item, tracks, playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, playerNotifier);
+        _handleItemOptionSelected(
+          context,
+          track,
+          item,
+          tracks,
+          playlists,
+          playlistNotifier,
+          selectedPlaylistsNotifier,
+          selectedTracksNotifier,
+          playerNotifier,
+        );
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
         const PopupMenuItem<OptionSelected>(
@@ -97,11 +106,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         const PopupMenuItem<OptionSelected>(
           value: OptionSelected.info,
           child: Row(
-            children: [
-              Icon(Icons.info),
-              SizedBox(width: 12),
-              Text('Info'),
-            ],
+            children: [Icon(Icons.info), SizedBox(width: 12), Text('Info')],
           ),
         ),
       ],
@@ -126,11 +131,13 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No')
+              child: const Text('No'),
             ),
             TextButton(
               onPressed: () {
-                final favoritesPlaylist = playlists.firstWhere((e) => e.id == favoritePlaylistId);
+                final favoritesPlaylist = playlists.firstWhere(
+                  (e) => e.id == favoritePlaylistId,
+                );
                 handleTracksAddedToPlaylist(
                   selectedTrackIds,
                   [favoritesPlaylist],
@@ -140,14 +147,14 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                 selectedTracksNotifier.clear();
                 Navigator.of(context).pop();
               },
-              child: const Text('Yes')
+              child: const Text('Yes'),
             ),
           ],
         );
-      }
+      },
     );
   }
- 
+
   void _handleItemOptionSelected(
     BuildContext context,
     Track track,
@@ -162,13 +169,28 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     if (optionSelected == OptionSelected.addToPlaylists) {
       selectedTracksNotifier.clear();
       selectedTracksNotifier.selectTrack(track);
-      addToPlaylistsModal(context, selectedTracksNotifier.getTrackIds(), playlists, playlistNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, playerNotifier);
+      addToPlaylistsModal(
+        context,
+        selectedTracksNotifier.getTrackIds(),
+        playlists,
+        playlistNotifier,
+        selectedPlaylistsNotifier,
+        selectedTracksNotifier,
+        playerNotifier,
+      );
     } else if (optionSelected == OptionSelected.select) {
       selectedTracksNotifier.selectTrack(track);
     } else if (optionSelected == OptionSelected.addToFavorites) {
       selectedTracksNotifier.clear();
       selectedTracksNotifier.selectTrack(track);
-      _addToFavoritesModal(context, selectedTracksNotifier.getTrackIds(), selectedTracksNotifier, playlistNotifier, playlists, playerNotifier);
+      _addToFavoritesModal(
+        context,
+        selectedTracksNotifier.getTrackIds(),
+        selectedTracksNotifier,
+        playlistNotifier,
+        playlists,
+        playerNotifier,
+      );
     } else if (optionSelected == OptionSelected.info) {
       showDialog(
         context: context,
@@ -177,12 +199,21 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     }
   }
 
-  Future<void> _playSelectedTrack(Track track, Map<String, Track> tracks, PlayerController? playerController, PlayerControllerNotifier playerControllerNotifier) async {
+  Future<void> _playSelectedTrack(
+    Track track,
+    Map<String, Track> tracks,
+    PlayerController? playerController,
+    PlayerControllerNotifier playerControllerNotifier,
+  ) async {
     if (playerController == null) return;
     await playTrack(track, tracks, playerController, playerControllerNotifier);
   }
 
-  void _toggleSelectedTrack(Track track, List<String> selectedTracks, SelectedTracksNotifier selectedTracksNotifier) {
+  void _toggleSelectedTrack(
+    Track track,
+    List<String> selectedTracks,
+    SelectedTracksNotifier selectedTracksNotifier,
+  ) {
     if (selectedTracks.contains(track.id)) {
       selectedTracksNotifier.unselectTrack(track);
     } else {
@@ -295,39 +326,55 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final playlistsNotifier = ref.watch(playlistsProvider.notifier);
     final selectedTracks = ref.watch(selectedTracksProvider);
     final selectedTracksNotifier = ref.watch(selectedTracksProvider.notifier);
-    final selectedPlaylistsNotifier = ref.watch(selectedPlaylistsProvider.notifier);
+    final selectedPlaylistsNotifier = ref.watch(
+      selectedPlaylistsProvider.notifier,
+    );
     final playerControllerState = ref.read(playerControllerProvider);
     final playerController = playerControllerState.value;
-    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
     final loadedTracksCount = ref.watch(loadedTracksCountProvider);
     debugPrint(loadedTracksCount.toString());
-    final loadedTracksCountNotifier = ref.watch(loadedTracksCountProvider.notifier);
+    final loadedTracksCountNotifier = ref.watch(
+      loadedTracksCountProvider.notifier,
+    );
     final isInSelectMode = selectedTracks.isNotEmpty;
     final sortMode = ref.watch(allTracksSortModeProvider);
     final filteredTracks = _isSearchingEnabled
-      ? tracks.values.toList().where((e) => checkSearchMatch(_searchTextController.text, stringifyTrackProperties(e))).toList()
-      : tracks.values.toList();
+        ? tracks.values
+              .toList()
+              .where(
+                (e) => checkSearchMatch(
+                  _searchTextController.text,
+                  stringifyTrackProperties(e),
+                ),
+              )
+              .toList()
+        : tracks.values.toList();
 
     final sortedTracks = sortTracks(filteredTracks, sortMode);
 
     if (tracks.isEmpty) {
-      return Center(child:Text("No tracks found. Go to the Added Paths tab to add some!"));
+      return Center(
+        child: Text("No tracks found. Go to the Added Paths tab to add some!"),
+      );
     }
     return Scaffold(
       appBar: _isSearchingEnabled
-        ? _buildSearchAppBar()
-        : (isInSelectMode
-            ? _buildMultiSelectAppBar(
-                context,
-                tracks,
-                playlists,
-                playlistsNotifier,
-                selectedTracks,
-                selectedTracksNotifier,
-                selectedPlaylistsNotifier,
-                playerControllerNotifier,
-              )
-            : _buildDefaultAppBar(ref)),
+          ? _buildSearchAppBar()
+          : (isInSelectMode
+                ? _buildMultiSelectAppBar(
+                    context,
+                    tracks,
+                    playlists,
+                    playlistsNotifier,
+                    selectedTracks,
+                    selectedTracksNotifier,
+                    selectedPlaylistsNotifier,
+                    playerControllerNotifier,
+                  )
+                : _buildDefaultAppBar(ref)),
       body: Column(
         children: [
           if (loadedTracksCountNotifier.isLoading())
@@ -343,13 +390,23 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                 Function(Track track)? onTap;
                 Function(Track track)? onLongPress;
                 void onSelect(Track track) {
-                  _toggleSelectedTrack(track, selectedTracks, selectedTracksNotifier);
+                  _toggleSelectedTrack(
+                    track,
+                    selectedTracks,
+                    selectedTracksNotifier,
+                  );
                 }
+
                 if (isInSelectMode) {
                   onTap = onSelect;
                 } else {
-                  onTap = (Track track) async  {
-                    await _playSelectedTrack(track, tracks, playerController, playerControllerNotifier);
+                  onTap = (Track track) async {
+                    await _playSelectedTrack(
+                      track,
+                      tracks,
+                      playerController,
+                      playerControllerNotifier,
+                    );
                   };
                   onLongPress = onSelect;
                 }
@@ -360,7 +417,19 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                   onTap: onTap,
                   onLongPress: onLongPress,
                   isSelected: isSelected,
-                  trailing: isInSelectMode ? null : _buildItemPopupMenuButton(context, track, tracks, playlists, selectedTracks, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, playerControllerNotifier),
+                  trailing: isInSelectMode
+                      ? null
+                      : _buildItemPopupMenuButton(
+                          context,
+                          track,
+                          tracks,
+                          playlists,
+                          selectedTracks,
+                          playlistsNotifier,
+                          selectedPlaylistsNotifier,
+                          selectedTracksNotifier,
+                          playerControllerNotifier,
+                        ),
                 );
               }).toList(),
             ),

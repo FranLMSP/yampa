@@ -8,17 +8,15 @@ import 'package:yampa/widgets/player/player_image.dart';
 import 'package:yampa/widgets/player/player_total_minutes.dart';
 
 class MiniPlayer extends ConsumerWidget {
-
-  const MiniPlayer({
-    super.key,
-    this.onTap,
-  });
+  const MiniPlayer({super.key, this.onTap});
 
   final Function? onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
+    final currentTrackId = ref.watch(
+      playerControllerProvider.select((p) => p.value?.currentTrackId),
+    );
     final tracks = ref.watch(tracksProvider);
     final track = tracks[currentTrackId];
     if (track == null) {
@@ -55,12 +53,7 @@ class MiniPlayer extends ConsumerWidget {
                     ],
                   ),
                 ),
-                Row(
-                  children: [
-                    PlayerTotalMinutes(),
-                    PlayAndPauseButton(),
-                  ],
-                ),
+                Row(children: [PlayerTotalMinutes(), PlayAndPauseButton()]),
               ],
             ),
           ],
