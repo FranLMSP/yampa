@@ -285,19 +285,20 @@ class JustAudioBackend implements PlayerBackend {
   @override
   Future<Track> updateTrackMetadata(Track track) async {
     final file = File(track.path);
-    updateMetadata(
-      file,
-      (metadata) {
-        metadata.setTitle(track.name);
-        metadata.setArtist(track.artist);
-        metadata.setAlbum(track.album);
-        metadata.setTrackNumber(track.trackNumber);
-        metadata.setGenres(track.genre.split(", "));
-        metadata.setPictures([
-          Picture(Uint8List.fromList(track.imageBytes ?? []), "image/png", PictureType.coverFront)
-        ]);
-      },
-    );
+    updateMetadata(file, (metadata) {
+      metadata.setTitle(track.name);
+      metadata.setArtist(track.artist);
+      metadata.setAlbum(track.album);
+      metadata.setTrackNumber(track.trackNumber);
+      metadata.setGenres(track.genre.split(", "));
+      metadata.setPictures([
+        Picture(
+          Uint8List.fromList(track.imageBytes ?? []),
+          "image/png",
+          PictureType.coverFront,
+        ),
+      ]);
+    });
     final updatedTrack = await _getTrackMetadataFromGenericPath(track.path);
     return updatedTrack!;
   }

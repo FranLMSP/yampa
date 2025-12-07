@@ -313,7 +313,7 @@ Future<void> loadPlayerControllerState(
 
 Future<void> handleTrackMetadataEdited(
   Track newTrackInfo,
-  List<Track> allTracks,
+  Map<String, Track> allTracks,
   List<Playlist> allPlaylists,
   TracksNotifier tracksNotifier,
   PlaylistNotifier playlistNotifier,
@@ -334,7 +334,8 @@ Future<void> handleTrackMetadataEdited(
         break;
       }
     }
-    if (didPlaylistChange) await handlePlaylistEdited(playlist, playlistNotifier);
+    if (didPlaylistChange)
+      await handlePlaylistEdited(playlist, playlistNotifier);
   }
   tracksNotifier.removeTracks([existingId]);
   tracksNotifier.addTracks([updatedTrack]);
