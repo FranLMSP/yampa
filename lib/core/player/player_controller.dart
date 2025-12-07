@@ -401,7 +401,7 @@ class PlayerController {
 
   Future<void> _trackPlayEvent(String trackId) async {
     try {
-      final statsRepo = await getStatisticsRepository();
+      final statsRepo = getStatisticsRepository();
 
       await statsRepo.incrementTrackPlayCount(trackId);
       await statsRepo.recordTrackPlayed(trackId);
@@ -413,7 +413,7 @@ class PlayerController {
 
   Future<void> _trackSkipEvent(String trackId) async {
     try {
-      final statsRepo = await getStatisticsRepository();
+      final statsRepo = getStatisticsRepository();
       await statsRepo.incrementTrackSkipCount(trackId);
       await statsRepo.incrementTotalSkips();
       await statsRepo.close();
@@ -424,7 +424,7 @@ class PlayerController {
 
   Future<void> _trackCompletionEvent(String trackId) async {
     try {
-      final statsRepo = await getStatisticsRepository();
+      final statsRepo = getStatisticsRepository();
       await statsRepo.incrementTrackCompletionCount(trackId);
       await statsRepo.close();
     } catch (e) {
@@ -442,7 +442,7 @@ class PlayerController {
     try {
       final now = DateTime.now();
       final playbackDuration = now.difference(lastPlayStartTime!);
-      final statsRepo = await getStatisticsRepository();
+      final statsRepo = getStatisticsRepository();
       await statsRepo.addPlaybackTime(playbackDuration);
       await statsRepo.addTrackPlaybackTime(currentTrackId!, playbackDuration);
       await statsRepo.close();

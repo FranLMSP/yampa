@@ -32,7 +32,7 @@ Future<void> doInitialLoad(
 ) async {
   if (initialLoadDone) return;
 
-  final statsRepo = await getStatisticsRepository();
+  final statsRepo = getStatisticsRepository();
   await statsRepo.incrementTimesStarted();
   await statsRepo.close();
 
