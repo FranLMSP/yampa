@@ -57,32 +57,7 @@ class JustAudioBackend implements PlayerBackend {
     };
     final cachedTracksRepository = getCachedTracksRepository();
 
-    final List<GenericPath> filePaths = [];
-    filePaths.addAll(paths.where((e) => e.filename != null));
-    for (final path in paths.where(
-      (e) => e.filename == null && e.folder != null,
-    )) {
-      final dir = Directory(path.folder!);
-      try {
-        await for (final entity in dir.list(
-          recursive: true,
-          followLinks: false,
-        )) {
-          if (entity is File && isValidMusicPath(entity.path)) {
-            filePaths.add(
-              GenericPath(
-                id: path.id,
-                folder: path.folder,
-                filename: entity.path,
-              ),
-            );
-          }
-        }
-      } catch (e) {
-        log("Couldn't read directory", error: e);
-      }
-    }
-    final allEffectivePaths = filePaths;
+    final allEffectivePaths = await _gatherEffectivePaths(paths);
 
     loadedTracksCountNotifier.setTotalTracks(allEffectivePaths.length);
 
@@ -114,29 +89,81 @@ class JustAudioBackend implements PlayerBackend {
       }
     }
 
+    await _removeStaleCachedTracks(
+      cachedTracks,
+      foundTracks,
+      paths,
+      cachedTracksRepository,
+      tracksNotifier,
+    );
+
+    await cachedTracksRepository.close();
+    loadedTracksCountNotifier.reset();
+    return foundTracks.values.toList();
+  }
+
+  Future<List<GenericPath>> _gatherEffectivePaths(List<GenericPath> paths) async {
+    final List<GenericPath> filePaths = [];
+    filePaths.addAll(paths.where((e) => e.filename != null));
+
+    for (final path in paths.where(
+      (e) => e.filename == null && e.folder != null,
+    )) {
+      final dir = Directory(path.folder!);
+      try {
+        await for (final entity in dir.list(
+          recursive: true,
+          followLinks: false,
+        )) {
+          if (entity is File && isValidMusicPath(entity.path)) {
+            filePaths.add(
+              GenericPath(
+                id: path.id,
+                folder: path.folder,
+                filename: entity.path,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        log("Couldn't read directory", error: e);
+      }
+    }
+
+    return filePaths;
+  }
+
+  Future<void> _removeStaleCachedTracks(
+    List<Track>? cachedTracks,
+    Map<String, Track> foundTracks,
+    List<GenericPath> rootPaths,
+    CachedTracksRepository cachedTracksRepository,
+    TracksNotifier tracksNotifier,
+  ) async {
+    if (cachedTracks == null) return;
+
     final List<String> tracksToRemove = [];
-    if (cachedTracks != null) {
-      for (final cachedTrack in cachedTracks) {
-        if (!foundTracks.containsKey(cachedTrack.id)) {
-          bool belongsToScannedPaths = false;
-          for (final rootPath in paths) {
-            if (rootPath.folder != null) {
-              if (p.isWithin(rootPath.folder!, cachedTrack.path)) {
-                belongsToScannedPaths = true;
-                break;
-              }
-            } else if (rootPath.filename != null) {
-              if (cachedTrack.path == rootPath.filename) {
-                belongsToScannedPaths = true;
-                break;
-              }
+
+    for (final cachedTrack in cachedTracks) {
+      if (!foundTracks.containsKey(cachedTrack.id)) {
+        bool belongsToScannedPaths = false;
+        for (final rootPath in rootPaths) {
+          if (rootPath.folder != null) {
+            if (p.isWithin(rootPath.folder!, cachedTrack.path)) {
+              belongsToScannedPaths = true;
+              break;
+            }
+          } else if (rootPath.filename != null) {
+            if (cachedTrack.path == rootPath.filename) {
+              belongsToScannedPaths = true;
+              break;
             }
           }
+        }
 
-          if (belongsToScannedPaths) {
-            tracksToRemove.add(cachedTrack.id);
-            await cachedTracksRepository.remove(cachedTrack.path);
-          }
+        if (belongsToScannedPaths) {
+          tracksToRemove.add(cachedTrack.id);
+          await cachedTracksRepository.remove(cachedTrack.path);
         }
       }
     }
@@ -144,10 +171,6 @@ class JustAudioBackend implements PlayerBackend {
     if (tracksToRemove.isNotEmpty) {
       tracksNotifier.removeTracks(tracksToRemove);
     }
-    
-    await cachedTracksRepository.close();
-    loadedTracksCountNotifier.reset();
-    return foundTracks.values.toList();
   }
 
   Future<void> _getTrackMetadataFromGenericPath(
