@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -167,12 +168,14 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(widget.track.displayName()),
-          IconButton(
-            icon: Icon(_isEditing ? Icons.close : Icons.edit),
-            onPressed: () {
-              setState(() => _isEditing = !_isEditing);
-            },
-          ),
+          // TODO: metadata editing doesn't currently work on Android (permission issue)
+          if (!Platform.isAndroid && !Platform.isIOS)
+            IconButton(
+              icon: Icon(_isEditing ? Icons.close : Icons.edit),
+              onPressed: () {
+                setState(() => _isEditing = !_isEditing);
+              },
+            ),
         ],
       ),
       scrollable: true,

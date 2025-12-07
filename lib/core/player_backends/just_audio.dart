@@ -4,10 +4,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
-import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/core/utils/id_utils.dart';
 import 'package:yampa/core/utils/player_utils.dart';
@@ -177,15 +177,15 @@ class JustAudioBackend implements PlayerBackend {
 
   Future<Track?> _getTrackMetadataFromGenericPath(String path) async {
     try {
-      final metadata = await compute(readMetadata, File(path));
       final file = File(path);
+      final metadata = readMetadata(file);
       final lastModified = await file.lastModified();
       return Track(
         id: await generateTrackId(path),
         name: metadata.title ?? "",
         artist: metadata.artist ?? "",
         album: metadata.album ?? "",
-        genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
+        genre: metadata.genres.isNotEmpty ? metadata.genres.join(", ") : "",
         trackNumber: metadata.trackNumber ?? 0,
         path: path,
         duration: metadata.duration ?? Duration.zero,
@@ -289,8 +289,12 @@ class JustAudioBackend implements PlayerBackend {
 
   @override
   Future<Track> updateTrackMetadata(Track track) async {
-    final file = File(track.path);
+    final hasStorageAccess = Platform.isAndroid || Platform.isIOS ? await Permission.storage.isGranted : true;
+    if(!hasStorageAccess){
+      await Permission.storage.request();
+    }
 
+    final file = File(track.path);
     Picture? picture;
     if (track.imageBytes != null) {
       final jpegImageBytes = await convertToJpeg(track.imageBytes!);
