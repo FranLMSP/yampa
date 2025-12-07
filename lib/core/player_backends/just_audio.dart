@@ -4,10 +4,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
-import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/core/utils/id_utils.dart';
 import 'package:yampa/core/utils/player_utils.dart';
@@ -80,12 +80,12 @@ class JustAudioBackend implements PlayerBackend {
         foundTracks[cachedTrack!.id] = cachedTrack;
         loadedTracksCountNotifier.incrementLoadedTrack();
       } else {
-        await _getTrackMetadataFromGenericPath(
-          path,
-          tracksNotifier,
-          loadedTracksCountNotifier,
-          cachedTracksRepository,
-        );
+        final track = await _getTrackMetadataFromGenericPath(path.filename!);
+        if (track != null) {
+          tracksNotifier.addTracks([track]);
+          await cachedTracksRepository.addOrUpdate(track);
+        }
+        loadedTracksCountNotifier.incrementLoadedTrack();
       }
     }
 
@@ -175,56 +175,53 @@ class JustAudioBackend implements PlayerBackend {
     }
   }
 
-  Future<void> _getTrackMetadataFromGenericPath(
-    GenericPath path,
-    TracksNotifier tracksNotifier,
-    LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
-    CachedTracksRepository cachedTracksRepository,
-  ) async {
+  Future<Track?> _getTrackMetadataFromGenericPath(String path) async {
     try {
-      final metadata = await compute(readMetadata, File(path.filename!));
-      final file = File(path.filename!);
+      final file = File(path);
+      final metadata = readMetadata(file);
       final lastModified = await file.lastModified();
-      final track = Track(
-        id: await generateTrackId(path.filename!),
+      return Track(
+        id: await generateTrackId(path),
         name: metadata.title ?? "",
         artist: metadata.artist ?? "",
         album: metadata.album ?? "",
-        genre: metadata.genres.isEmpty ? metadata.genres.join(", ") : "",
+        genre: metadata.genres.isNotEmpty ? metadata.genres.join(", ") : "",
         trackNumber: metadata.trackNumber ?? 0,
-        path: path.filename!,
+        path: path,
         duration: metadata.duration ?? Duration.zero,
         imageBytes: metadata.pictures.isNotEmpty
             ? metadata.pictures.first.bytes
             : null,
         lastModified: lastModified,
       );
-      tracksNotifier.addTracks([track]);
-      await cachedTracksRepository.addOrUpdate(track);
     } catch (e) {
       log('Error reading metadata', error: e);
-    } finally {
-      loadedTracksCountNotifier.incrementLoadedTrack();
     }
+    return null;
   }
 
   @override
   Future<Duration> setTrack(Track track) async {
     _ensurePlayerInitialized();
     // TODO: maybe detect here if the path is an URL or not, and call setUrl if that's the case
-    final duration = await _player!.setAudioSource(
-      AudioSource.uri(
+    final artUri = track.imageBytes != null
+      ? bytesToDataUri(track.imageBytes!)
+      : null;
+    Duration? duration;
+    try {
+      final audioSource = AudioSource.uri(
         Uri.file(track.path),
         tag: MediaItem(
           id: track.id,
-          title: track.name,
+          title: track.displayName(),
           artist: track.artist,
-          artUri: track.imageBytes != null
-              ? bytesToDataUri(track.imageBytes!)
-              : null,
+          artUri: artUri,
         ),
-      ),
-    );
+      );
+      duration = await _player!.setAudioSource(audioSource);
+    } catch (e) {
+      log("Unable to set audio source", error: e);
+    }
     _currentTrackDuration = duration;
     return duration ?? Duration.zero;
   }
@@ -288,5 +285,37 @@ class JustAudioBackend implements PlayerBackend {
   bool hasTrackFinishedPlaying() {
     _ensurePlayerInitialized();
     return _player!.processingState == ProcessingState.completed;
+  }
+
+  @override
+  Future<Track> updateTrackMetadata(Track track) async {
+    final hasStorageAccess = Platform.isAndroid || Platform.isIOS ? await Permission.storage.isGranted : true;
+    if(!hasStorageAccess){
+      await Permission.storage.request();
+    }
+
+    final file = File(track.path);
+    Picture? picture;
+    if (track.imageBytes != null) {
+      final jpegImageBytes = await convertToJpeg(track.imageBytes!);
+      picture = Picture(
+        jpegImageBytes,
+        "image/jpeg",
+        PictureType.coverFront,
+      );
+    }
+    updateMetadata(file, (metadata) {
+      metadata.setTitle(track.name);
+      metadata.setArtist(track.artist);
+      metadata.setAlbum(track.album);
+      metadata.setTrackNumber(track.trackNumber);
+      metadata.setGenres(track.genre.split(", "));
+      metadata.setPictures([]);
+      if (picture != null) {
+        metadata.setPictures([picture]);
+      }
+    });
+    final updatedTrack = await _getTrackMetadataFromGenericPath(track.path);
+    return updatedTrack!;
   }
 }

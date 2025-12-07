@@ -8,7 +8,7 @@ import 'package:yampa/models/track_statistics.dart';
 final statisticsRepositoryProvider = FutureProvider<StatisticsRepository>((
   ref,
 ) async {
-  return await getStatisticsRepository();
+  return getStatisticsRepository();
 });
 
 final playerStatisticsProvider = FutureProvider<PlayerStatistics>((ref) async {
@@ -20,14 +20,14 @@ final playerStatisticsProvider = FutureProvider<PlayerStatistics>((ref) async {
 final trackStatisticsStreamProvider = StreamProvider.autoDispose
     .family<TrackStatistics, String>((ref, trackId) async* {
       // Emit initial value
-      final repo = await getStatisticsRepository();
+      final repo = getStatisticsRepository();
       final stats = await repo.getTrackStatistics(trackId);
       await repo.close();
       yield stats;
 
       // Refresh every 5 seconds
       await for (final _ in Stream.periodic(const Duration(seconds: 5))) {
-        final repo = await getStatisticsRepository();
+        final repo = getStatisticsRepository();
         final stats = await repo.getTrackStatistics(trackId);
         await repo.close();
         yield stats;

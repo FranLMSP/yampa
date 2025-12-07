@@ -21,4 +21,5 @@ abstract class PlayerBackend {
   bool hasTrackFinishedPlaying();
   Duration getCurrentTrackDuration();
   Future<void> init();
+  Future<Track> updateTrackMetadata(Track track);
 }

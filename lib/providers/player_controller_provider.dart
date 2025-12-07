@@ -233,4 +233,16 @@ class PlayerControllerNotifier extends AsyncNotifier<PlayerController> {
     // Don't update UI state, just update statistics in background
     await currentState.updatePlaybackStatistics();
   }
+
+  Future<void> handleTrackUpdated(String oldId, String newId) async {
+    final currentState = state.value;
+    if (currentState == null) return;
+
+    final result = await AsyncValue.guard(() async {
+      final optimistic = currentState.clone();
+      await optimistic.handleTrackUpdated(oldId, newId);
+      return optimistic;
+    });
+    state = result;
+  }
 }

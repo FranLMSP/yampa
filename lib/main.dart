@@ -50,7 +50,6 @@ class MyHomePage extends ConsumerStatefulWidget {
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
   Timer? _timer;
-  int _timerTicks = 0;
 
   void _setTimer() {
     if (_timer != null) {
@@ -62,18 +61,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       final player = playerNotifier.getPlayerController();
       final tracks = ref.watch(tracksProvider);
 
-      // Check if track finished playing
       if (player != null && player.hasTrackFinishedPlaying()) {
         await playerNotifier.handleNextAutomatically(tracks);
       }
-
-      // Update playback statistics every 10 seconds (every 5th tick)
-      _timerTicks++;
-      if (_timerTicks >= 5) {
-        _timerTicks = 0;
-        if (player != null) {
-          await playerNotifier.updatePlaybackStatistics();
-        }
+      if (player != null) {
+        await playerNotifier.updatePlaybackStatistics();
       }
     });
   }

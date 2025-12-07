@@ -401,7 +401,7 @@ class PlayerController {
 
   Future<void> _trackPlayEvent(String trackId) async {
     try {
-      final statsRepo = await getStatisticsRepository();
+      final statsRepo = getStatisticsRepository();
 
       await statsRepo.incrementTrackPlayCount(trackId);
       await statsRepo.recordTrackPlayed(trackId);
@@ -413,7 +413,7 @@ class PlayerController {
 
   Future<void> _trackSkipEvent(String trackId) async {
     try {
-      final statsRepo = await getStatisticsRepository();
+      final statsRepo = getStatisticsRepository();
       await statsRepo.incrementTrackSkipCount(trackId);
       await statsRepo.incrementTotalSkips();
       await statsRepo.close();
@@ -424,7 +424,7 @@ class PlayerController {
 
   Future<void> _trackCompletionEvent(String trackId) async {
     try {
-      final statsRepo = await getStatisticsRepository();
+      final statsRepo = getStatisticsRepository();
       await statsRepo.incrementTrackCompletionCount(trackId);
       await statsRepo.close();
     } catch (e) {
@@ -442,13 +442,25 @@ class PlayerController {
     try {
       final now = DateTime.now();
       final playbackDuration = now.difference(lastPlayStartTime!);
-      final statsRepo = await getStatisticsRepository();
+      final statsRepo = getStatisticsRepository();
       await statsRepo.addPlaybackTime(playbackDuration);
       await statsRepo.addTrackPlaybackTime(currentTrackId!, playbackDuration);
       await statsRepo.close();
       lastPlayStartTime = now;
     } catch (e) {
       log('Error updating playback statistics', error: e);
+    }
+  }
+
+  Future<void> handleTrackUpdated(String oldId, String newId) async {
+    currentTrackId = newId;
+    final queueIdIndex = trackQueueIds.indexOf(oldId);
+    if (queueIdIndex != -1) {
+      trackQueueIds[queueIdIndex] = newId;
+    }
+    final shuffledIdIndex = shuffledTrackQueueIds.indexOf(oldId);
+    if (shuffledIdIndex != -1) {
+      shuffledTrackQueueIds[shuffledIdIndex] = newId;
     }
   }
 }
