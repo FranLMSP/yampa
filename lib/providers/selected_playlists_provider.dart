@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/playlist.dart';
 
-
-final selectedPlaylistsProvider = NotifierProvider<SelectedPlaylistNotifier, List<String>>(
-  () => SelectedPlaylistNotifier(),
-);
+final selectedPlaylistsProvider =
+    NotifierProvider<SelectedPlaylistNotifier, List<String>>(
+      () => SelectedPlaylistNotifier(),
+    );
 
 class SelectedPlaylistNotifier extends Notifier<List<String>> {
   @override
@@ -15,10 +15,7 @@ class SelectedPlaylistNotifier extends Notifier<List<String>> {
   }
 
   void selectPlaylist(Playlist playlist) {
-    state = [
-      ...state,
-      playlist.id,
-    ];
+    state = [...state, playlist.id];
   }
 
   void unselectPlaylist(Playlist playlist) {

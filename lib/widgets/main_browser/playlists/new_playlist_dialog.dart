@@ -2,13 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/playlist.dart';
 
-
 class NewPlaylistDialog extends ConsumerStatefulWidget {
-
-  const NewPlaylistDialog({
-    super.key,
-    required this.onSaved,
-  });
+  const NewPlaylistDialog({super.key, required this.onSaved});
 
   final Function onSaved;
 
@@ -52,14 +47,18 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
       ),
       actions: [
         TextButton(
-          style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
+          style: TextButton.styleFrom(
+            textStyle: Theme.of(context).textTheme.labelLarge,
+          ),
           child: const Text('Cancel'),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
         TextButton(
-          style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
+          style: TextButton.styleFrom(
+            textStyle: Theme.of(context).textTheme.labelLarge,
+          ),
           child: const Text('Create'),
           onPressed: () {
             setState(() {
@@ -71,7 +70,7 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
                     name: _titleController.text,
                     description: _descriptionController.text,
                     trackIds: [],
-                  )
+                  ),
                 );
                 Navigator.of(context).pop();
               }
@@ -89,4 +88,3 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
     super.dispose();
   }
 }
-

@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/core/player/enums.dart';
 
-
 final playlistsProvider = NotifierProvider<PlaylistNotifier, List<Playlist>>(
   () => PlaylistNotifier(),
 );
@@ -26,10 +25,7 @@ class PlaylistNotifier extends Notifier<List<Playlist>> {
   }
 
   void addPlaylist(Playlist playlist) {
-    state = [
-      ...state,
-      playlist,
-    ];
+    state = [...state, playlist];
   }
 
   void removePlaylist(Playlist playlist) {

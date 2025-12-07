@@ -29,7 +29,8 @@ class PlayerStatistics {
     return PlayerStatistics(
       totalMinutesPlayed: totalMinutesPlayed ?? this.totalMinutesPlayed,
       totalTracksPlayed: totalTracksPlayed ?? this.totalTracksPlayed,
-      totalUniqueTracksPlayed: totalUniqueTracksPlayed ?? this.totalUniqueTracksPlayed,
+      totalUniqueTracksPlayed:
+          totalUniqueTracksPlayed ?? this.totalUniqueTracksPlayed,
       uptime: uptime ?? this.uptime,
       timesStarted: timesStarted ?? this.timesStarted,
       lastPlayedAt: lastPlayedAt ?? this.lastPlayedAt,

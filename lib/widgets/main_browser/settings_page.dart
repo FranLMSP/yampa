@@ -18,10 +18,7 @@ class SettingsPage extends StatelessWidget {
         leading: Icon(icon, size: 32, color: Colors.blue),
         title: Text(
           title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.chevron_right),
@@ -38,10 +35,7 @@ class SettingsPage extends StatelessWidget {
         children: [
           const Text(
             'Settings',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           _buildSettingsOption(
@@ -81,10 +75,7 @@ class PlayerStatisticsPage extends ConsumerWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -108,9 +99,7 @@ class PlayerStatisticsPage extends ConsumerWidget {
     final playerStatsAsync = ref.watch(playerStatisticsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Player Statistics'),
-      ),
+      appBar: AppBar(title: const Text('Player Statistics')),
       body: playerStatsAsync.when(
         data: (stats) {
           return ListView(
@@ -118,7 +107,9 @@ class PlayerStatisticsPage extends ConsumerWidget {
             children: [
               _buildStatCard(
                 'Total Playback Time',
-                formatDurationLong(Duration(seconds: (stats.totalMinutesPlayed * 60).round())),
+                formatDurationLong(
+                  Duration(seconds: (stats.totalMinutesPlayed * 60).round()),
+                ),
                 Icons.access_time,
               ),
               _buildStatCard(
@@ -154,9 +145,7 @@ class PlayerStatisticsPage extends ConsumerWidget {
             ],
           );
         },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(
           child: Padding(
             padding: const EdgeInsets.all(16.0),

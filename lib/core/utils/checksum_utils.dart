@@ -6,7 +6,10 @@ import 'dart:convert';
 
 typedef HashFunction = Digest Function(List<int> input);
 
-Future<String> computeFileChecksum(String filePath, {HashFunction? hashFunction}) async {
+Future<String> computeFileChecksum(
+  String filePath, {
+  HashFunction? hashFunction,
+}) async {
   final hf = hashFunction ?? md5.convert;
   try {
     final file = File(filePath);
@@ -15,10 +18,7 @@ Future<String> computeFileChecksum(String filePath, {HashFunction? hashFunction}
     List<int> chunks = [];
 
     await for (var chunk in fileStream) {
-      chunks = [
-        ...chunks,
-        ...chunk,
-      ];
+      chunks = [...chunks, ...chunk];
     }
 
     final hash = hf(chunks);
@@ -29,7 +29,11 @@ Future<String> computeFileChecksum(String filePath, {HashFunction? hashFunction}
   }
 }
 
-Future<String> computeFastFileFingerprint(String filePath, {int headBytes = 4096, int tailBytes = 4096}) async {
+Future<String> computeFastFileFingerprint(
+  String filePath, {
+  int headBytes = 4096,
+  int tailBytes = 4096,
+}) async {
   // TODO: this function currently doesn't work. For some reason the whole app crashes when loading a certain amount of tracks.
   try {
     final file = File(filePath);
@@ -51,11 +55,7 @@ Future<String> computeFastFileFingerprint(String filePath, {int headBytes = 4096
     await raf.close();
 
     final meta = utf8.encode('$length:${stat.modified.millisecondsSinceEpoch}');
-    final combined = [
-      ...head,
-      ...tail,
-      ...meta,
-    ];
+    final combined = [...head, ...tail, ...meta];
     final hash = sha1.convert(combined);
     return hash.toString();
   } catch (e) {

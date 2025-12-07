@@ -3,9 +3,5 @@ class GenericPath {
   final String? folder;
   final String? filename;
 
-  GenericPath({
-    required this.id,
-    required this.folder,
-    required this.filename,
-  });
+  GenericPath({required this.id, required this.folder, required this.filename});
 }

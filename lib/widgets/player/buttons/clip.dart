@@ -15,4 +15,3 @@ class ClipButton extends ConsumerWidget {
     );
   }
 }
-

@@ -53,7 +53,7 @@ class JustAudioBackend implements PlayerBackend {
 
     final Map<String, Track> cachedTracksMap = {
       if (cachedTracks != null)
-        for (final track in cachedTracks) track.path: track
+        for (final track in cachedTracks) track.path: track,
     };
     final cachedTracksRepository = getCachedTracksRepository();
 
@@ -102,7 +102,9 @@ class JustAudioBackend implements PlayerBackend {
     return foundTracks.values.toList();
   }
 
-  Future<List<GenericPath>> _gatherEffectivePaths(List<GenericPath> paths) async {
+  Future<List<GenericPath>> _gatherEffectivePaths(
+    List<GenericPath> paths,
+  ) async {
     final List<GenericPath> filePaths = [];
     filePaths.addAll(paths.where((e) => e.filename != null));
 

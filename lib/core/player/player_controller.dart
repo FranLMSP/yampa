@@ -24,7 +24,7 @@ class PlayerController {
   TrackQueueDisplayMode trackQueueDisplayMode = TrackQueueDisplayMode.image;
   PlayerBackend? playerBackend;
   Duration lastTrackDuration = Duration.zero;
-  
+
   DateTime? sessionStartTime;
   DateTime? lastPlayStartTime;
 
@@ -35,7 +35,9 @@ class PlayerController {
     return PlayerController._clone(
       currentTrackId: lastState.currentTrackId,
       currentPlaylistId: lastState.currentPlaylistId,
-      currentTrackIndex: lastState.currentTrackIndex >= 0 ? lastState.currentTrackIndex : 0,
+      currentTrackIndex: lastState.currentTrackIndex >= 0
+          ? lastState.currentTrackIndex
+          : 0,
       speed: lastState.speed,
       trackQueueIds: lastState.trackQueueIds,
       shuffledTrackQueueIds: lastState.shuffledTrackQueueIds,
@@ -154,7 +156,8 @@ class PlayerController {
       currentTrackIndex--;
     } else {
       currentTrackIndex = 0;
-      if (shuffledTrackQueueIds.isNotEmpty && (loopMode == LoopMode.infinite || loopMode == LoopMode.startToEnd)) {
+      if (shuffledTrackQueueIds.isNotEmpty &&
+          (loopMode == LoopMode.infinite || loopMode == LoopMode.startToEnd)) {
         currentTrackIndex = shuffledTrackQueueIds.length - 1;
       }
     }
@@ -202,7 +205,9 @@ class PlayerController {
     await stop();
     await _trackPlayEvent(track.id);
     currentTrackId = track.id;
-    currentTrackIndex = shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
+    currentTrackIndex = shuffledTrackQueueIds.indexWhere(
+      (e) => e == currentTrackId,
+    );
     if (currentTrackIndex <= -1) {
       currentTrackIndex = 0;
     }
@@ -239,7 +244,7 @@ class PlayerController {
     if (playerBackend != null) {
       try {
         return await playerBackend!.getCurrentPosition();
-      } catch(e) {
+      } catch (e) {
         log("Couldn't get current track position", error: e);
       }
     }
@@ -250,7 +255,9 @@ class PlayerController {
     return lastTrackDuration;
   }
 
-  Future<void> handleTracksAddedToPlaylist(List<Map<String, String>> playlistTrackMapping) async {
+  Future<void> handleTracksAddedToPlaylist(
+    List<Map<String, String>> playlistTrackMapping,
+  ) async {
     for (final row in playlistTrackMapping) {
       final playlistId = row["playlist_id"] ?? "";
       if (playlistId != currentPlaylistId) {
@@ -273,13 +280,16 @@ class PlayerController {
     await reloadPlaylist(playlist, tracks);
   }
 
-  Future<void> reloadPlaylist(Playlist playlist, Map<String, Track> tracks) async {
+  Future<void> reloadPlaylist(
+    Playlist playlist,
+    Map<String, Track> tracks,
+  ) async {
     currentPlaylistId = playlist.id;
 
     // Get sorted track IDs based on playlist's sort mode
     final sortedTracks = sortTracks(
       playlist.trackIds.map((e) => tracks[e]).whereType<Track>().toList(),
-      playlist.sortMode
+      playlist.sortMode,
     );
     trackQueueIds = sortedTracks.map((e) => e.id).toList();
 
@@ -423,7 +433,9 @@ class PlayerController {
   }
 
   Future<void> updatePlaybackStatistics() async {
-    if (lastPlayStartTime == null || currentTrackId == null || state != PlayerState.playing) {
+    if (lastPlayStartTime == null ||
+        currentTrackId == null ||
+        state != PlayerState.playing) {
       return;
     }
 

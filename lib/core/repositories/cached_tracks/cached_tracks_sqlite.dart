@@ -45,41 +45,43 @@ class CachedTracksSqlite extends CachedTracksRepository {
   Future<List<Track>> getAll() async {
     final db = await _getdb();
     final results = await db.query(cachedTracksTableName);
-    return results.map((row) => Track(
-      id: row['id'] as String,
-      name: row['name'] as String,
-      artist: row['artist'] as String,
-      album: row['album'] as String,
-      genre: row['genre'] as String,
-      path: row['path'] as String,
-      trackNumber: row['trackNumber'] as int,
-      duration: Duration(milliseconds: row['duration'] as int),
-      imageBytes: row['imageBytes'] as dynamic,
-      lastModified: row['lastModified'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(row['lastModified'] as int)
-          : null,
-    )).toList();
+    return results
+        .map(
+          (row) => Track(
+            id: row['id'] as String,
+            name: row['name'] as String,
+            artist: row['artist'] as String,
+            album: row['album'] as String,
+            genre: row['genre'] as String,
+            path: row['path'] as String,
+            trackNumber: row['trackNumber'] as int,
+            duration: Duration(milliseconds: row['duration'] as int),
+            imageBytes: row['imageBytes'] as dynamic,
+            lastModified: row['lastModified'] != null
+                ? DateTime.fromMillisecondsSinceEpoch(
+                    row['lastModified'] as int,
+                  )
+                : null,
+          ),
+        )
+        .toList();
   }
 
   @override
   Future<void> addOrUpdate(Track track) async {
     final db = await _getdb();
-    await db.insert(
-      cachedTracksTableName,
-      {
-        'id': track.id,
-        'name': track.name,
-        'artist': track.artist,
-        'album': track.album,
-        'genre': track.genre,
-        'path': track.path,
-        'trackNumber': track.trackNumber,
-        'duration': track.duration.inMilliseconds,
-        'imageBytes': track.imageBytes,
-        'lastModified': track.lastModified?.millisecondsSinceEpoch,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.insert(cachedTracksTableName, {
+      'id': track.id,
+      'name': track.name,
+      'artist': track.artist,
+      'album': track.album,
+      'genre': track.genre,
+      'path': track.path,
+      'trackNumber': track.trackNumber,
+      'duration': track.duration.inMilliseconds,
+      'imageBytes': track.imageBytes,
+      'lastModified': track.lastModified?.millisecondsSinceEpoch,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   @override

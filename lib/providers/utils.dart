@@ -32,9 +32,9 @@ Future<void> doInitialLoad(
 ) async {
   if (initialLoadDone) return;
 
-    final statsRepo = await getStatisticsRepository();
-    await statsRepo.incrementTimesStarted();
-    await statsRepo.close();
+  final statsRepo = await getStatisticsRepository();
+  await statsRepo.incrementTimesStarted();
+  await statsRepo.close();
 
   final storedPathsRepository = getStoredPathsRepository();
   final storedPaths = await storedPathsRepository.getStoredPaths();
@@ -44,7 +44,12 @@ Future<void> doInitialLoad(
   final playlistsRepo = getPlaylistRepository();
   final playlists = await playlistsRepo.getPlaylists();
   if (playlists.indexWhere((e) => e.id == favoritePlaylistId) == -1) {
-    final favoritesPlaylist = Playlist(id: favoritePlaylistId, name: "Favorites", description: "", trackIds: []);
+    final favoritesPlaylist = Playlist(
+      id: favoritePlaylistId,
+      name: "Favorites",
+      description: "",
+      trackIds: [],
+    );
     playlists.insert(0, favoritesPlaylist);
     await playlistsRepo.addPlaylist(favoritesPlaylist);
   }
@@ -78,7 +83,12 @@ Future<void> doInitialLoad(
 
   initialLoadNotifier.setInitialLoadDone();
 
-  await _fetchAndSetTracks(storedPaths, tracksNotifier, loadedTracksCountNotifier, cachedTracks: cachedTracks);
+  await _fetchAndSetTracks(
+    storedPaths,
+    tracksNotifier,
+    loadedTracksCountNotifier,
+    cachedTracks: cachedTracks,
+  );
 }
 
 Future<void> _fetchAndSetTracks(
@@ -108,11 +118,19 @@ Future<void> handlePathsAdded(
   for (final path in paths) {
     final id = await storedPathsRepository.addPath(path);
     if (id.isEmpty) continue;
-    final newPath = GenericPath(id: id, folder: path.folder, filename: path.filename);
+    final newPath = GenericPath(
+      id: id,
+      folder: path.folder,
+      filename: path.filename,
+    );
     localPathsNotifier.addPaths([newPath]);
     actuallyAddedPaths.add(newPath);
   }
-  await _fetchAndSetTracks(actuallyAddedPaths, tracksNotifier, loadedTracksCountNotifier);
+  await _fetchAndSetTracks(
+    actuallyAddedPaths,
+    tracksNotifier,
+    loadedTracksCountNotifier,
+  );
   await storedPathsRepository.close();
 }
 
@@ -124,7 +142,7 @@ Future<void> handlePathsRemoved(
   // Try to remove from the provider only the tracks related to the removed paths
   final storedPathsRepository = getStoredPathsRepository();
   final cachedTracksRepository = getCachedTracksRepository();
-  
+
   localPathsNotifier.removePaths(removedPaths);
   final currentTracks = tracksNotifier.getTracks();
   Map<String, String> removedFolders = HashMap();
@@ -136,13 +154,13 @@ Future<void> handlePathsRemoved(
       removedFolders[path.folder!] = path.folder!;
     }
   }
-  
+
   // Collect tracks to remove
   final List<Track> tracksToRemove = [];
   final filteredTracks = [...currentTracks];
   filteredTracks.removeWhere((track) {
     bool shouldRemove = false;
-    
+
     // Check if track matches a removed file
     if (removedFiles[track.path] != null) {
       shouldRemove = true;
@@ -155,19 +173,19 @@ Future<void> handlePathsRemoved(
         }
       }
     }
-    
+
     if (shouldRemove) {
       tracksToRemove.add(track);
     }
-    
+
     return shouldRemove;
   });
-  
+
   // Remove tracks from cache
   for (final track in tracksToRemove) {
     await cachedTracksRepository.remove(track.path);
   }
-  
+
   tracksNotifier.setTracks(filteredTracks);
   final List<Future> removePathsFutures = [];
   for (final path in removedPaths) {
@@ -179,7 +197,10 @@ Future<void> handlePathsRemoved(
   await cachedTracksRepository.close();
 }
 
-Future<Playlist> handlePlaylistCreated(Playlist playlist, PlaylistNotifier playlistNotifier) async {
+Future<Playlist> handlePlaylistCreated(
+  Playlist playlist,
+  PlaylistNotifier playlistNotifier,
+) async {
   final playlistRepository = getPlaylistRepository();
   final id = await playlistRepository.addPlaylist(playlist);
   final newPlaylist = Playlist(
@@ -194,7 +215,10 @@ Future<Playlist> handlePlaylistCreated(Playlist playlist, PlaylistNotifier playl
   return newPlaylist;
 }
 
-Future<void> handlePlaylistEdited(Playlist playlist, PlaylistNotifier playlistNotifier) async {
+Future<void> handlePlaylistEdited(
+  Playlist playlist,
+  PlaylistNotifier playlistNotifier,
+) async {
   final playlistRepository = getPlaylistRepository();
   await playlistRepository.updatePlaylist(playlist);
   playlistNotifier.updatePlaylist(
@@ -204,12 +228,15 @@ Future<void> handlePlaylistEdited(Playlist playlist, PlaylistNotifier playlistNo
       description: playlist.description,
       imagePath: playlist.imagePath,
       trackIds: playlist.trackIds,
-    )
+    ),
   );
   await playlistRepository.close();
 }
 
-Future<void> handlePlaylistRemoved(Playlist playlist, PlaylistNotifier playlistNotifier) async {
+Future<void> handlePlaylistRemoved(
+  Playlist playlist,
+  PlaylistNotifier playlistNotifier,
+) async {
   final playlistRepository = getPlaylistRepository();
   await playlistRepository.removePlaylist(playlist);
   playlistNotifier.removePlaylist(playlist);
@@ -228,10 +255,7 @@ Future<void> handleTracksAddedToPlaylist(
   for (final playlist in playlists) {
     for (final trackId in trackIds) {
       playlistNotifier.addTrack(playlist, trackId);
-      mapping.add({
-        "playlist_id": playlist.id,
-        "track_id": trackId,
-      });
+      mapping.add({"playlist_id": playlist.id, "track_id": trackId});
     }
   }
 
@@ -252,7 +276,9 @@ Future<void> handleMultipleTrackRemovedFromPlaylist(
   await playlistRepository.close();
 }
 
-Future<void> handlePersistPlayerControllerState(PlayerController playerController) async {
+Future<void> handlePersistPlayerControllerState(
+  PlayerController playerController,
+) async {
   final playerControllerStateRepository = getPlayerControllerStateRepository();
   await playerControllerStateRepository.savePlayerControllerState(
     LastPlayerControllerState(
@@ -266,16 +292,21 @@ Future<void> handlePersistPlayerControllerState(PlayerController playerControlle
       loopMode: playerController.loopMode,
       shuffleMode: playerController.shuffleMode,
       trackQueueDisplayMode: playerController.trackQueueDisplayMode,
-    )
+    ),
   );
   await playerControllerStateRepository.close();
 }
 
-
-Future<void> loadPlayerControllerState(PlayerControllerNotifier playerControllerNotifier) async {
+Future<void> loadPlayerControllerState(
+  PlayerControllerNotifier playerControllerNotifier,
+) async {
   final playerControllerStateRepository = getPlayerControllerStateRepository();
-  final lastPlayerControllerState = await playerControllerStateRepository.getPlayerControllerState();
+  final lastPlayerControllerState = await playerControllerStateRepository
+      .getPlayerControllerState();
   // TODO: set the current track after they are all loaded
-  await playerControllerNotifier.setPlayerController(await PlayerController.fromLastState(lastPlayerControllerState), {});
+  await playerControllerNotifier.setPlayerController(
+    await PlayerController.fromLastState(lastPlayerControllerState),
+    {},
+  );
   await playerControllerStateRepository.close();
 }

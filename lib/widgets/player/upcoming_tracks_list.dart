@@ -20,7 +20,9 @@ class UpcomingTracksList extends ConsumerWidget {
     final playerController = playerControllerState.value;
     final playlists = ref.watch(playlistsProvider);
     final tracks = ref.watch(tracksProvider);
-    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
 
     if (playerController == null) {
       return const Center(child: CircularProgressIndicator());
@@ -73,7 +75,12 @@ class UpcomingTracksList extends ConsumerWidget {
                 key: Key(track.id),
                 track: track,
                 onTap: (track) async {
-                  playTrack(track, tracks, playerController, playerControllerNotifier);
+                  playTrack(
+                    track,
+                    tracks,
+                    playerController,
+                    playerControllerNotifier,
+                  );
                 },
               );
             },

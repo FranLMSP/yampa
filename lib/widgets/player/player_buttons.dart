@@ -13,10 +13,7 @@ import 'package:yampa/widgets/player/buttons/shuffle.dart';
 import 'package:yampa/widgets/player/buttons/speed.dart';
 
 class PlayerButtons extends StatelessWidget {
-
-  const PlayerButtons({
-    super.key,
-  });
+  const PlayerButtons({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,4 +46,3 @@ class PlayerButtons extends StatelessWidget {
     );
   }
 }
-

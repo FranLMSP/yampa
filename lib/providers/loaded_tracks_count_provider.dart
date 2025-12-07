@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/utils/format_utils.dart' as format_utils;
 
-
-final loadedTracksCountProvider = NotifierProvider<LoadedTracksCountProviderNotifier, (int, int)>(
-  () => LoadedTracksCountProviderNotifier(),
-);
+final loadedTracksCountProvider =
+    NotifierProvider<LoadedTracksCountProviderNotifier, (int, int)>(
+      () => LoadedTracksCountProviderNotifier(),
+    );
 
 class LoadedTracksCountProviderNotifier extends Notifier<(int, int)> {
   @override

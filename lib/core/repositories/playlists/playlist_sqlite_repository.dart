@@ -7,14 +7,12 @@ import 'package:yampa/core/player/enums.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ulid/ulid.dart';
 
-
 const String playlistsTableName = 'playlists';
 const String playlistsTracksRelationsTableName = 'playlists_tracks_relation';
 
 Future<void> _initializeDatabase(Database db) async {
   final futures = [
-    db.execute(
-      '''
+    db.execute('''
         CREATE TABLE IF NOT EXISTS $playlistsTableName (
           id TEXT PRIMARY KEY,
           name TEXT NULL,
@@ -22,17 +20,14 @@ Future<void> _initializeDatabase(Database db) async {
           image_path TEXT NULL,
           sort_mode INTEGER NULL
         )
-      '''
-    ),
-    db.execute(
-      '''
+      '''),
+    db.execute('''
         CREATE TABLE IF NOT EXISTS $playlistsTracksRelationsTableName (
           id TEXT PRIMARY KEY,
           playlist_id TEXT NULL,
           track_id TEXT NULL
         )
-      '''
-    ),
+      '''),
   ];
   await Future.wait(futures);
 }
@@ -59,7 +54,9 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
   Future<List<Playlist>> getPlaylists() async {
     final db = await _getdb();
     final playlists = await db.rawQuery('SELECT * FROM $playlistsTableName');
-    final playlistTracks = await db.rawQuery('SELECT * FROM $playlistsTracksRelationsTableName');
+    final playlistTracks = await db.rawQuery(
+      'SELECT * FROM $playlistsTracksRelationsTableName',
+    );
     final Map<String, List<String>?> playlistTracksMap = HashMap();
     for (final row in playlistTracks) {
       if (playlistTracksMap[row["playlist_id"]] == null) {
@@ -80,9 +77,9 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
           imagePath: playlistData["image_path"]?.toString(),
           trackIds: trackIds,
           sortMode: playlistData["sort_mode"] != null
-            ? SortMode.values[int.parse(playlistData["sort_mode"].toString())]
-            : SortMode.titleAtoZ,
-        )
+              ? SortMode.values[int.parse(playlistData["sort_mode"].toString())]
+              : SortMode.titleAtoZ,
+        ),
       );
     }
 
@@ -93,18 +90,16 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
   Future<String> addPlaylist(Playlist playlist) async {
     final db = await _getdb();
 
-    final id = playlist.id == favoritePlaylistId ? favoritePlaylistId : Ulid().toString();
-    await db.insert(
-      playlistsTableName,
-      {
-        'id': id,
-        'name': playlist.name,
-        'description': playlist.description,
-        'image_path': playlist.imagePath,
-        'sort_mode': playlist.sortMode.index,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    final id = playlist.id == favoritePlaylistId
+        ? favoritePlaylistId
+        : Ulid().toString();
+    await db.insert(playlistsTableName, {
+      'id': id,
+      'name': playlist.name,
+      'description': playlist.description,
+      'image_path': playlist.imagePath,
+      'sort_mode': playlist.sortMode.index,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
     return id;
   }
 
@@ -131,17 +126,16 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
     final id = Ulid().toString();
     await db.insert(
       playlistsTracksRelationsTableName,
-      {
-        'id': id,
-        'playlist_id': playlist.id,
-        'track_id': trackId,
-      },
+      {'id': id, 'playlist_id': playlist.id, 'track_id': trackId},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
   @override
-  Future<void> removeTrackFromPlaylist(Playlist playlist, String trackId) async {
+  Future<void> removeTrackFromPlaylist(
+    Playlist playlist,
+    String trackId,
+  ) async {
     final db = await _getdb();
     await db.delete(
       playlistsTracksRelationsTableName,
@@ -151,15 +145,16 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
   }
 
   @override
-  Future<void> removeMultipleTracksFromPlaylist(Playlist playlist, List<String> trackIds) async {
+  Future<void> removeMultipleTracksFromPlaylist(
+    Playlist playlist,
+    List<String> trackIds,
+  ) async {
     final db = await _getdb();
     await db.delete(
       playlistsTracksRelationsTableName,
-      where: 'playlist_id = ? and track_id in (${List.filled(trackIds.length, '?').join(',')})',
-      whereArgs: [
-        playlist.id,
-        ...trackIds,
-      ],
+      where:
+          'playlist_id = ? and track_id in (${List.filled(trackIds.length, '?').join(',')})',
+      whereArgs: [playlist.id, ...trackIds],
     );
   }
 
@@ -167,11 +162,7 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
   Future<void> removePlaylist(Playlist playlist) async {
     final db = await _getdb();
     final futures = [
-      db.delete(
-        playlistsTableName,
-        where: 'id = ?',
-        whereArgs: [playlist.id],
-      ),
+      db.delete(playlistsTableName, where: 'id = ?', whereArgs: [playlist.id]),
       db.delete(
         playlistsTracksRelationsTableName,
         where: 'playlist_id = ?',
@@ -190,7 +181,9 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
   }
 
   @override
-  Future<void> linkTracksWithPlaylists(List<Map<String, String>> playlistAndTrackMapping) async {
+  Future<void> linkTracksWithPlaylists(
+    List<Map<String, String>> playlistAndTrackMapping,
+  ) async {
     final db = await _getdb();
 
     final batch = db.batch();

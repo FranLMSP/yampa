@@ -7,11 +7,26 @@ class SpeedButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final speed = ref.watch(playerControllerProvider.select((p) => p.value?.speed ?? 1.0));
-    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
-    final formattedSpeed = speed.toStringAsFixed(2).replaceAll(RegExp(r'([.]*0+)$'), '');
+    final speed = ref.watch(
+      playerControllerProvider.select((p) => p.value?.speed ?? 1.0),
+    );
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
+    final formattedSpeed = speed
+        .toStringAsFixed(2)
+        .replaceAll(RegExp(r'([.]*0+)$'), '');
 
-    final List<double> speedValues = [0.25, 0.50, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00];
+    final List<double> speedValues = [
+      0.25,
+      0.50,
+      0.75,
+      1.00,
+      1.25,
+      1.50,
+      1.75,
+      2.00,
+    ];
 
     return PopupMenuButton<double>(
       tooltip: "Playback speed",

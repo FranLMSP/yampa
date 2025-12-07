@@ -5,5 +5,7 @@ String stringifyTrackProperties(Track track) {
 }
 
 bool checkSearchMatch(String searchText, String targetText) {
-  return targetText.trim().toLowerCase().contains(searchText.trim().toLowerCase());
+  return targetText.trim().toLowerCase().contains(
+    searchText.trim().toLowerCase(),
+  );
 }

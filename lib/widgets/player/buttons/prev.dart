@@ -9,7 +9,9 @@ class PrevButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
-    final playerNotifierController = ref.watch(playerControllerProvider.notifier);
+    final playerNotifierController = ref.watch(
+      playerControllerProvider.notifier,
+    );
     return IconButton(
       onPressed: () async {
         await playerNotifierController.prev(tracks);

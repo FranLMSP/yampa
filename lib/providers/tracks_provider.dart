@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/track.dart';
 
-
 final tracksProvider = NotifierProvider<TracksNotifier, Map<String, Track>>(
   () => TracksNotifier(),
 );

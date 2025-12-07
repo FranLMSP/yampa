@@ -23,18 +23,22 @@ void addToPlaylistsModal(
         scrollable: true,
         title: const Text('Playlists'),
         content: Column(
-          children: playlists.map(
-            (playlist) => PlaylistItemList(
-              playlist: playlist,
-              onTap: (playlist) {
-                if (selectedPlaylistsNotifier.getPlaylistIds().contains(playlist.id)) {
-                  selectedPlaylistsNotifier.unselectPlaylist(playlist);
-                } else {
-                  selectedPlaylistsNotifier.selectPlaylist(playlist);
-                }
-              },
-            )
-          ).toList(),
+          children: playlists
+              .map(
+                (playlist) => PlaylistItemList(
+                  playlist: playlist,
+                  onTap: (playlist) {
+                    if (selectedPlaylistsNotifier.getPlaylistIds().contains(
+                      playlist.id,
+                    )) {
+                      selectedPlaylistsNotifier.unselectPlaylist(playlist);
+                    } else {
+                      selectedPlaylistsNotifier.selectPlaylist(playlist);
+                    }
+                  },
+                ),
+              )
+              .toList(),
         ),
         actions: [
           TextButton(
@@ -45,13 +49,19 @@ void addToPlaylistsModal(
               }
               Navigator.of(context).pop();
             },
-            child: const Text('Cancel')
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
               await handleTracksAddedToPlaylist(
                 selectedTracksNotifier.getTrackIds(),
-                playlists.where((e) => selectedPlaylistsNotifier.getPlaylistIds().contains(e.id)).toList(),
+                playlists
+                    .where(
+                      (e) => selectedPlaylistsNotifier
+                          .getPlaylistIds()
+                          .contains(e.id),
+                    )
+                    .toList(),
                 playlistNotifier,
                 playerNotifier,
               );
@@ -61,7 +71,7 @@ void addToPlaylistsModal(
                 Navigator.of(context).pop();
               }
             },
-            child: const Text('Add')
+            child: const Text('Add'),
           ),
         ],
       );

@@ -12,13 +12,15 @@ class PlaylistList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListView(
-      children: playlists.map(
-        (playlist) => PlaylistItemList(
-          key: Key(playlist.id),
-          playlist: playlist,
-          onTap: onTap,
-        )
-      ).toList()
+      children: playlists
+          .map(
+            (playlist) => PlaylistItemList(
+              key: Key(playlist.id),
+              playlist: playlist,
+              onTap: onTap,
+            ),
+          )
+          .toList(),
     );
   }
 }

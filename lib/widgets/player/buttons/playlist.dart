@@ -13,10 +13,16 @@ class PlaylistButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playlistsNotifier = ref.read(playlistsProvider.notifier);
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
-    final selectedPlaylistsNotifier = ref.read(selectedPlaylistsProvider.notifier);
+    final currentTrackId = ref.watch(
+      playerControllerProvider.select((p) => p.value?.currentTrackId),
+    );
+    final selectedPlaylistsNotifier = ref.read(
+      selectedPlaylistsProvider.notifier,
+    );
     final selectedTracksNotifier = ref.read(selectedTracksProvider.notifier);
-    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
     final tracks = ref.watch(tracksProvider);
     final playlists = ref.watch(playlistsProvider);
     return IconButton(
@@ -32,7 +38,15 @@ class PlaylistButton extends ConsumerWidget {
         }
         selectedTracksNotifier.clear();
         selectedTracksNotifier.selectTrack(track);
-        addToPlaylistsModal(context, selectedTracksNotifier.getTrackIds(), playlists, playlistsNotifier, selectedPlaylistsNotifier, selectedTracksNotifier, playerControllerNotifier);
+        addToPlaylistsModal(
+          context,
+          selectedTracksNotifier.getTrackIds(),
+          playlists,
+          playlistsNotifier,
+          selectedPlaylistsNotifier,
+          selectedTracksNotifier,
+          playerControllerNotifier,
+        );
       },
     );
   }

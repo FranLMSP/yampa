@@ -31,8 +31,8 @@ class TrackItem extends ConsumerWidget {
 
   Widget _buildTrackPlaceholder(String? currentTrackId) {
     final icon = track.id == currentTrackId
-      ? Icons.play_arrow
-      : Icons.music_note;
+        ? Icons.play_arrow
+        : Icons.music_note;
     return Container(
       width: 50,
       height: 50,
@@ -45,8 +45,8 @@ class TrackItem extends ConsumerWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
       child: track.imageBytes != null
-        ? _buildTrackImage()
-        : _buildTrackPlaceholder(currentTrackId),
+          ? _buildTrackImage()
+          : _buildTrackPlaceholder(currentTrackId),
     );
   }
 
@@ -56,7 +56,9 @@ class TrackItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
+    final currentTrackId = ref.watch(
+      playerControllerProvider.select((p) => p.value?.currentTrackId),
+    );
     return InkWell(
       onTap: () {
         if (onTap != null) {
@@ -69,7 +71,9 @@ class TrackItem extends ConsumerWidget {
         }
       },
       child: Card(
-        color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
+        color: isSelected
+            ? Theme.of(context).colorScheme.primaryContainer
+            : null,
         child: ListTile(
           leading: _buildTrackIcon(currentTrackId),
           title: Text(track.displayName()),

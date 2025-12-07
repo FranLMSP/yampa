@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/core/player/player_controller.dart';
@@ -6,10 +5,10 @@ import 'package:yampa/core/player_backends/interface.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 
-
-final playerControllerProvider = AsyncNotifierProvider<PlayerControllerNotifier, PlayerController>(
-  PlayerControllerNotifier.new,
-);
+final playerControllerProvider =
+    AsyncNotifierProvider<PlayerControllerNotifier, PlayerController>(
+      PlayerControllerNotifier.new,
+    );
 
 class PlayerControllerNotifier extends AsyncNotifier<PlayerController> {
   @override
@@ -132,7 +131,9 @@ class PlayerControllerNotifier extends AsyncNotifier<PlayerController> {
     state = result;
   }
 
-  Future<void> handleTracksAddedToPlaylist(List<Map<String, String>> playlistTrackMapping) async {
+  Future<void> handleTracksAddedToPlaylist(
+    List<Map<String, String>> playlistTrackMapping,
+  ) async {
     final currentState = state.value;
     if (currentState == null) return;
 
@@ -186,7 +187,10 @@ class PlayerControllerNotifier extends AsyncNotifier<PlayerController> {
     state = AsyncData(optimistic);
   }
 
-  Future<void> setPlayerController(PlayerController playerController, Map<String, Track> tracks) async {
+  Future<void> setPlayerController(
+    PlayerController playerController,
+    Map<String, Track> tracks,
+  ) async {
     final result = await AsyncValue.guard(() async {
       await playerController.setSpeed(playerController.speed);
       final currentTrack = tracks[playerController.currentTrackId];
@@ -207,7 +211,10 @@ class PlayerControllerNotifier extends AsyncNotifier<PlayerController> {
     state = AsyncData(optimistic);
   }
 
-  Future<void> reloadPlaylist(Playlist playlist, Map<String, Track> tracks) async {
+  Future<void> reloadPlaylist(
+    Playlist playlist,
+    Map<String, Track> tracks,
+  ) async {
     final currentState = state.value;
     if (currentState == null) return;
 

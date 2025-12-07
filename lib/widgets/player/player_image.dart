@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:yampa/models/track.dart';
 
 class PlayerImage extends StatelessWidget {
-
   const PlayerImage({
     super.key,
     this.track,
@@ -39,8 +38,8 @@ class PlayerImage extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
       child: track?.imageBytes != null
-        ? _buildImage(track!)
-        : _buildImagePlaceholder(),
+          ? _buildImage(track!)
+          : _buildImagePlaceholder(),
     );
   }
 }

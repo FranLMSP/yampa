@@ -3,21 +3,28 @@ import 'package:yampa/models/playlist.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 
 class PlaylistItemBig extends StatelessWidget {
-  const PlaylistItemBig({super.key, required this.playlist, this.onTap, this.onSecondaryTap, this.onLongPress});
+  const PlaylistItemBig({
+    super.key,
+    required this.playlist,
+    this.onTap,
+    this.onSecondaryTap,
+    this.onLongPress,
+  });
 
   final Playlist playlist;
   final Function(Playlist playlist)? onTap;
   final Function(Playlist playlist, TapDownDetails details)? onSecondaryTap;
   final Function(Playlist playlist)? onLongPress;
 
-@override
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 50,
       height: 50,
       child: InkWell(
         onTap: () => onTap != null ? onTap!(playlist) : () {},
-        onSecondaryTapDown: (TapDownDetails details) => onSecondaryTap != null ? onSecondaryTap!(playlist, details) : () {},
+        onSecondaryTapDown: (TapDownDetails details) =>
+            onSecondaryTap != null ? onSecondaryTap!(playlist, details) : () {},
         onLongPress: () => onLongPress != null ? onLongPress!(playlist) : () {},
         child: Card(
           shape: RoundedRectangleBorder(
@@ -48,4 +55,3 @@ class PlaylistItemBig extends StatelessWidget {
     );
   }
 }
-

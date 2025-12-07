@@ -27,13 +27,16 @@ class _PlaylistsState extends ConsumerState<Playlists> {
           builder: (BuildContext context) {
             return NewPlaylistDialog(
               onSaved: (newPlaylist) async {
-                final createdPlaylist = await handlePlaylistCreated(newPlaylist, playlistNotifier);
+                final createdPlaylist = await handlePlaylistCreated(
+                  newPlaylist,
+                  playlistNotifier,
+                );
                 setState(() {
                   _selectedPlaylist = createdPlaylist;
                 });
               },
             );
-          }
+          },
         );
       },
     );
@@ -61,7 +64,11 @@ class _PlaylistsState extends ConsumerState<Playlists> {
                   child: const Text('Yes'),
                   onPressed: () {
                     setState(() {
-                      handleMultipleTrackRemovedFromPlaylist(_selectedPlaylist!, _selectedTrackIds, playlistNotifier);
+                      handleMultipleTrackRemovedFromPlaylist(
+                        _selectedPlaylist!,
+                        _selectedTrackIds,
+                        playlistNotifier,
+                      );
                       _selectedTrackIds = [];
                       // TODO: show a snackbar with an "undo" button
                       Navigator.of(context).pop();
@@ -70,19 +77,24 @@ class _PlaylistsState extends ConsumerState<Playlists> {
                 ),
               ],
             );
-          }
+          },
         );
       },
     );
   }
 
-  Widget? _buildFloatingActionButton(BuildContext context, PlaylistNotifier playlistNotifier) {
+  Widget? _buildFloatingActionButton(
+    BuildContext context,
+    PlaylistNotifier playlistNotifier,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if (_selectedTrackIds.isEmpty && _selectedPlaylist == null) _buildAddNewTrackFloatingButton(playlistNotifier),
-        if (_selectedTrackIds.isNotEmpty) _buildRemoveSelectedTracksButton(playlistNotifier),
+        if (_selectedTrackIds.isEmpty && _selectedPlaylist == null)
+          _buildAddNewTrackFloatingButton(playlistNotifier),
+        if (_selectedTrackIds.isNotEmpty)
+          _buildRemoveSelectedTracksButton(playlistNotifier),
       ],
     );
   }
@@ -94,7 +106,12 @@ class _PlaylistsState extends ConsumerState<Playlists> {
     });
   }
 
-  Future<void> _handlePlaylistOptions(BuildContext context, Playlist playlist, PlaylistNotifier playlistsNotifier, TapDownDetails details) async {
+  Future<void> _handlePlaylistOptions(
+    BuildContext context,
+    Playlist playlist,
+    PlaylistNotifier playlistsNotifier,
+    TapDownDetails details,
+  ) async {
     final selected = await showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(
@@ -152,7 +169,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No')
+              child: const Text('No'),
             ),
             TextButton(
               onPressed: () {
@@ -160,11 +177,11 @@ class _PlaylistsState extends ConsumerState<Playlists> {
                 Navigator.of(context).pop();
                 // TODO: show snackbar with "undo" button
               },
-              child: const Text('Yes')
+              child: const Text('Yes'),
             ),
           ],
         );
-      }
+      },
     );
   }
 
@@ -173,35 +190,43 @@ class _PlaylistsState extends ConsumerState<Playlists> {
     final playlistNotifier = ref.read(playlistsProvider.notifier);
     return Scaffold(
       body: _selectedPlaylist != null
-        ? PlaylistViewSmall(
-            playlist: _selectedPlaylist!,
-            onEdit: (Playlist editedPlaylist) {
-              handlePlaylistEdited(editedPlaylist, playlistNotifier);
-            },
-            onGoBack: () {
-              setState(() {
-                _selectedPlaylist = null;
-                _selectedTrackIds = [];
-              });
-            },
-            setSelectedTrackIds: (List<String> selectedTrackIds) {
-              setState(() {
-                _selectedTrackIds = selectedTrackIds;
-              });
-            },
-          )
-        : PlaylistListBig(
-            onTap: (Playlist playlist) {
-              _handlePlaylistSelected(playlist);
-            },
-            onLongPress: (Playlist playlist) {
-              // TODO: handle multi select
-            },
-            onSecondaryTap: (Playlist playlist, TapDownDetails details) {
-              _handlePlaylistOptions(context, playlist, playlistNotifier, details);
-            },
-          ),
-      floatingActionButton: _buildFloatingActionButton(context, playlistNotifier),
+          ? PlaylistViewSmall(
+              playlist: _selectedPlaylist!,
+              onEdit: (Playlist editedPlaylist) {
+                handlePlaylistEdited(editedPlaylist, playlistNotifier);
+              },
+              onGoBack: () {
+                setState(() {
+                  _selectedPlaylist = null;
+                  _selectedTrackIds = [];
+                });
+              },
+              setSelectedTrackIds: (List<String> selectedTrackIds) {
+                setState(() {
+                  _selectedTrackIds = selectedTrackIds;
+                });
+              },
+            )
+          : PlaylistListBig(
+              onTap: (Playlist playlist) {
+                _handlePlaylistSelected(playlist);
+              },
+              onLongPress: (Playlist playlist) {
+                // TODO: handle multi select
+              },
+              onSecondaryTap: (Playlist playlist, TapDownDetails details) {
+                _handlePlaylistOptions(
+                  context,
+                  playlist,
+                  playlistNotifier,
+                  details,
+                );
+              },
+            ),
+      floatingActionButton: _buildFloatingActionButton(
+        context,
+        playlistNotifier,
+      ),
     );
   }
 }

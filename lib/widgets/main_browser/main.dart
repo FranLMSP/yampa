@@ -9,11 +9,7 @@ import 'package:yampa/widgets/player/mini_player.dart';
 import 'package:yampa/widgets/utils.dart';
 
 class MainBrowser extends ConsumerStatefulWidget {
-
-  const MainBrowser({
-    super.key,
-    required this.viewMode,
-  });
+  const MainBrowser({super.key, required this.viewMode});
 
   final ViewMode viewMode;
 
@@ -21,7 +17,8 @@ class MainBrowser extends ConsumerStatefulWidget {
   ConsumerState<MainBrowser> createState() => _MainBrowserState();
 }
 
-class _MainBrowserState extends ConsumerState<MainBrowser> with SingleTickerProviderStateMixin {
+class _MainBrowserState extends ConsumerState<MainBrowser>
+    with SingleTickerProviderStateMixin {
   bool _showMiniPlayer = false;
   late TabController _tabController;
 
@@ -36,9 +33,15 @@ class _MainBrowserState extends ConsumerState<MainBrowser> with SingleTickerProv
     super.didUpdateWidget(oldWidget);
     final newLength = _getTabs().length;
     if (_tabController.length != newLength) {
-      final currentIndex = _tabController.index < newLength ? _tabController.index : 0;
+      final currentIndex = _tabController.index < newLength
+          ? _tabController.index
+          : 0;
       _tabController.dispose();
-      _tabController = TabController(length: newLength, vsync: this, initialIndex: currentIndex);
+      _tabController = TabController(
+        length: newLength,
+        vsync: this,
+        initialIndex: currentIndex,
+      );
     }
   }
 
@@ -87,12 +90,15 @@ class _MainBrowserState extends ConsumerState<MainBrowser> with SingleTickerProv
         controller: _tabController,
         tabs: tabs,
         onTap: (index) {
-          if (index != 0 && widget.viewMode == ViewMode.portrait && _showMiniPlayer == false) {
+          if (index != 0 &&
+              widget.viewMode == ViewMode.portrait &&
+              _showMiniPlayer == false) {
             setState(() {
               _showMiniPlayer = true;
             });
           }
-          if ((index == 0 || widget.viewMode != ViewMode.portrait) && _showMiniPlayer == true) {
+          if ((index == 0 || widget.viewMode != ViewMode.portrait) &&
+              _showMiniPlayer == true) {
             setState(() {
               _showMiniPlayer = false;
             });
@@ -102,7 +108,7 @@ class _MainBrowserState extends ConsumerState<MainBrowser> with SingleTickerProv
       body: Column(
         children: [
           Expanded(
-            child: TabBarView(controller: _tabController, children: elements)
+            child: TabBarView(controller: _tabController, children: elements),
           ),
           if (_showMiniPlayer)
             MiniPlayer(
@@ -113,8 +119,8 @@ class _MainBrowserState extends ConsumerState<MainBrowser> with SingleTickerProv
                     _showMiniPlayer = false;
                   });
                 }
-              }
-            )
+              },
+            ),
         ],
       ),
     );

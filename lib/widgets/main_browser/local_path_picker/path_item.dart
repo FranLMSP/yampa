@@ -26,42 +26,62 @@ class PathItem extends ConsumerStatefulWidget {
 }
 
 class _PathItemState extends ConsumerState<PathItem> {
-
-  Widget _buildDeleteButton(BuildContext context, LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) {
+  Widget _buildDeleteButton(
+    BuildContext context,
+    LocalPathsNotifier localPathsNotifier,
+    TracksNotifier tracksNotifier,
+  ) {
     return IconButton(
       onPressed: () async {
         showDialog(
-        context: context,
-        builder: (BuildContext ctx) {
-          return AlertDialog(
-            title: const Text('Remove this path?'),
-            content: Text(widget.path.filename != null ? widget.path.filename! : widget.path.folder!),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('No')
+          context: context,
+          builder: (BuildContext ctx) {
+            return AlertDialog(
+              title: const Text('Remove this path?'),
+              content: Text(
+                widget.path.filename != null
+                    ? widget.path.filename!
+                    : widget.path.folder!,
               ),
-              TextButton(
-                onPressed: () {
-                  handlePathsRemoved([widget.path], localPathsNotifier, tracksNotifier);
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Yes')
-              ),
-            ],
-          );
-        });
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('No'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    handlePathsRemoved(
+                      [widget.path],
+                      localPathsNotifier,
+                      tracksNotifier,
+                    );
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Yes'),
+                ),
+              ],
+            );
+          },
+        );
       },
       icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
     );
   }
 
-  Widget _buildCard(BuildContext context, IconData icon, String name, LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) {
+  Widget _buildCard(
+    BuildContext context,
+    IconData icon,
+    String name,
+    LocalPathsNotifier localPathsNotifier,
+    TracksNotifier tracksNotifier,
+  ) {
     final theme = Theme.of(context);
     final int selectionAlpha = (0.12 * 255).round();
-    final bg = widget.isSelected ? theme.colorScheme.primary.withAlpha(selectionAlpha) : null;
+    final bg = widget.isSelected
+        ? theme.colorScheme.primary.withAlpha(selectionAlpha)
+        : null;
     final leading = widget.isSelected
         ? Icon(Icons.check_circle, color: theme.colorScheme.primary)
         : Icon(icon);
@@ -78,19 +98,40 @@ class _PathItemState extends ConsumerState<PathItem> {
     );
   }
 
-  Widget _buildFolderCard(BuildContext context, LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) {
-    return _buildCard(context, Icons.folder, widget.path.folder!, localPathsNotifier, tracksNotifier);
+  Widget _buildFolderCard(
+    BuildContext context,
+    LocalPathsNotifier localPathsNotifier,
+    TracksNotifier tracksNotifier,
+  ) {
+    return _buildCard(
+      context,
+      Icons.folder,
+      widget.path.folder!,
+      localPathsNotifier,
+      tracksNotifier,
+    );
   }
 
-  Widget _buildFileCard(BuildContext context, LocalPathsNotifier localPathsNotifier, TracksNotifier tracksNotifier) {
-    return _buildCard(context, Icons.file_present, widget.path.filename!, localPathsNotifier, tracksNotifier);
+  Widget _buildFileCard(
+    BuildContext context,
+    LocalPathsNotifier localPathsNotifier,
+    TracksNotifier tracksNotifier,
+  ) {
+    return _buildCard(
+      context,
+      Icons.file_present,
+      widget.path.filename!,
+      localPathsNotifier,
+      tracksNotifier,
+    );
   }
-@override
+
+  @override
   Widget build(BuildContext context) {
     final localPathsNotifier = ref.read(localPathsProvider.notifier);
     final tracksNotifier = ref.read(tracksProvider.notifier);
-    return widget.path.filename != null 
-      ? _buildFileCard(context, localPathsNotifier, tracksNotifier)
-      : _buildFolderCard(context, localPathsNotifier, tracksNotifier);
+    return widget.path.filename != null
+        ? _buildFileCard(context, localPathsNotifier, tracksNotifier)
+        : _buildFolderCard(context, localPathsNotifier, tracksNotifier);
   }
 }

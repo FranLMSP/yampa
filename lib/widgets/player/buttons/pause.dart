@@ -7,7 +7,9 @@ class PauseButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
     return IconButton(
       onPressed: () async {
         await playerControllerNotifier.pause();

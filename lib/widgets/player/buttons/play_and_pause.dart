@@ -6,17 +6,14 @@ import 'package:yampa/widgets/player/buttons/pause.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 
 class PlayAndPauseButton extends ConsumerWidget {
-
-  const PlayAndPauseButton({
-    super.key,
-  });
+  const PlayAndPauseButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerState = ref.watch(playerControllerProvider.select((p) => p.value?.state));
+    final playerState = ref.watch(
+      playerControllerProvider.select((p) => p.value?.state),
+    );
 
-    return playerState == PlayerState.playing
-      ? PauseButton()
-      : PlayButton();
+    return playerState == PlayerState.playing ? PauseButton() : PlayButton();
   }
 }

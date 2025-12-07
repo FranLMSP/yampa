@@ -7,7 +7,9 @@ class PlayButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerControllerNotifier = ref.watch(playerControllerProvider.notifier);
+    final playerControllerNotifier = ref.watch(
+      playerControllerProvider.notifier,
+    );
     return IconButton(
       onPressed: () async {
         await playerControllerNotifier.play();
