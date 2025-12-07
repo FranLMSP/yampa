@@ -1,8 +1,10 @@
 import 'dart:developer';
 import 'dart:io' as io;
+import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:ulid/ulid.dart';
+import 'package:image/image.dart' as img;
 
 const String kUserImagesFolder = "user_images";
 
@@ -151,4 +153,12 @@ Future<void> deleteFile(String path) async {
   } catch (e) {
     log("Couldn't delete file", error: e);
   }
+}
+
+Future<Uint8List> convertToJpeg(Uint8List bytes) async {
+  final decoded = img.decodeImage(bytes);
+  if (decoded == null) {
+    throw Exception("Failed to decode image");
+  }
+  return Uint8List.fromList(img.encodeJpg(decoded, quality: 90));
 }

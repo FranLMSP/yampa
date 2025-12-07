@@ -204,19 +204,24 @@ class JustAudioBackend implements PlayerBackend {
   Future<Duration> setTrack(Track track) async {
     _ensurePlayerInitialized();
     // TODO: maybe detect here if the path is an URL or not, and call setUrl if that's the case
-    final duration = await _player!.setAudioSource(
-      AudioSource.uri(
+    final artUri = track.imageBytes != null
+      ? bytesToDataUri(track.imageBytes!)
+      : null;
+    Duration? duration;
+    try {
+      final audioSource = AudioSource.uri(
         Uri.file(track.path),
         tag: MediaItem(
           id: track.id,
-          title: track.name,
+          title: track.displayName(),
           artist: track.artist,
-          artUri: track.imageBytes != null
-              ? bytesToDataUri(track.imageBytes!)
-              : null,
+          artUri: artUri,
         ),
-      ),
-    );
+      );
+      duration = await _player!.setAudioSource(audioSource);
+    } catch (e) {
+      log("Unable to set audio source", error: e);
+    }
     _currentTrackDuration = duration;
     return duration ?? Duration.zero;
   }
@@ -285,19 +290,26 @@ class JustAudioBackend implements PlayerBackend {
   @override
   Future<Track> updateTrackMetadata(Track track) async {
     final file = File(track.path);
+
+    Picture? picture;
+    if (track.imageBytes != null) {
+      final jpegImageBytes = await convertToJpeg(track.imageBytes!);
+      picture = Picture(
+        jpegImageBytes,
+        "image/jpeg",
+        PictureType.coverFront,
+      );
+    }
     updateMetadata(file, (metadata) {
       metadata.setTitle(track.name);
       metadata.setArtist(track.artist);
       metadata.setAlbum(track.album);
       metadata.setTrackNumber(track.trackNumber);
       metadata.setGenres(track.genre.split(", "));
-      metadata.setPictures([
-        Picture(
-          Uint8List.fromList(track.imageBytes ?? []),
-          "image/png",
-          PictureType.coverFront,
-        ),
-      ]);
+      metadata.setPictures([]);
+      if (picture != null) {
+        metadata.setPictures([picture]);
+      }
     });
     final updatedTrack = await _getTrackMetadataFromGenericPath(track.path);
     return updatedTrack!;

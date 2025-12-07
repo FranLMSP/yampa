@@ -126,20 +126,17 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
       album: _albumCtrl.text.trim(),
       genre: _genreCtrl.text.trim(),
       path: widget.track.path,
-      trackNumber:
-          int.tryParse(_trackNumCtrl.text.trim()) ?? widget.track.trackNumber,
+      trackNumber: int.tryParse(_trackNumCtrl.text.trim()) ?? widget.track.trackNumber,
       duration: widget.track.duration,
       imageBytes: _imageBytes,
       lastModified: DateTime.now(),
     );
 
-    final allTracks = ref.watch(tracksProvider);
-    final allPlaylists = ref.watch(playlistsProvider);
+    final allTracks = ref.read(tracksProvider);
+    final allPlaylists = ref.read(playlistsProvider);
     final tracksNotifier = ref.read(tracksProvider.notifier);
     final playlistNotifier = ref.read(playlistsProvider.notifier);
-    final playerControllerNotifier = ref.read(
-      playerControllerProvider.notifier,
-    );
+    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
 
     await handleTrackMetadataEdited(
       updatedTrack,
@@ -150,7 +147,13 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
       playerControllerNotifier,
     );
 
-    setState(() => _isEditing = false);
+    if (mounted) {
+      Navigator.of(context).pop();
+      showDialog(
+        context: context,
+        builder: (_) => TrackInfoDialog(track: updatedTrack),
+      );
+    }
   }
 
   @override
@@ -201,9 +204,18 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                 ),
               ),
             ),
-
             const SizedBox(height: 24),
-
+            if (_isEditing && _imageBytes != null)
+              Center(
+                child: TextButton(
+                  onPressed: () => setState(() => _imageBytes = null),
+                  child: const Text(
+                    "Remove Image",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 24),
             Text(
               "Metadata",
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

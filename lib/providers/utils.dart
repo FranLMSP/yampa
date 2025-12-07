@@ -334,8 +334,9 @@ Future<void> handleTrackMetadataEdited(
         break;
       }
     }
-    if (didPlaylistChange)
+    if (didPlaylistChange) {
       await handlePlaylistEdited(playlist, playlistNotifier);
+    }
   }
   tracksNotifier.removeTracks([existingId]);
   tracksNotifier.addTracks([updatedTrack]);
