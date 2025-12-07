@@ -96,13 +96,13 @@ class PlayerControllerNotifier extends AsyncNotifier<PlayerController> {
     state = AsyncData(optimistic);
   }
 
-  Future<void> setTrackPlayer(PlayerBackend trackPlayer) async {
+  Future<void> setPlayerBackend(PlayerBackend trackPlayer) async {
     final currentState = state.value;
     if (currentState == null) return;
 
     final result = await AsyncValue.guard(() async {
       final optimistic = currentState.clone();
-      await optimistic.setTrackPlayer(trackPlayer);
+      await optimistic.setPlayerBackend(trackPlayer);
       return optimistic;
     });
     state = result;

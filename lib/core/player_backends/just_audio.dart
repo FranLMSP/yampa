@@ -213,7 +213,9 @@ class JustAudioBackend implements PlayerBackend {
   Future<void> play() async {
     _ensurePlayerInitialized();
     if (!_player!.playing) {
-      await _player!.play();
+      // Do not await play() because just_audio's play() future completes when playback completes (song ends).
+      // We want to return immediately to update the UI.
+      _player!.play();
     }
   }
 

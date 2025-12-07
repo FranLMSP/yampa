@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/repositories/player_controller_state/factory.dart';
 import 'package:yampa/core/repositories/playlists/factory.dart';
+import 'package:yampa/core/repositories/statistics/factory.dart';
 import 'package:yampa/core/repositories/stored_paths/factory.dart';
 import 'package:yampa/core/repositories/cached_tracks/factory.dart';
 import 'package:yampa/core/player_backends/factory.dart';
@@ -30,6 +31,10 @@ Future<void> doInitialLoad(
   LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
 ) async {
   if (initialLoadDone) return;
+
+    final statsRepo = await getStatisticsRepository();
+    await statsRepo.incrementTimesStarted();
+    await statsRepo.close();
 
   final storedPathsRepository = getStoredPathsRepository();
   final storedPaths = await storedPathsRepository.getStoredPaths();

@@ -128,13 +128,16 @@ class StatisticsSqlite extends StatisticsRepository {
   Future<void> addPlaybackTime(Duration duration) async {
     final db = await _getdb();
     final minutes = duration.inSeconds / 60.0;
-    await db.rawUpdate('''
-      UPDATE $playerStatisticsTableName
-      SET totalMinutesPlayed = totalMinutesPlayed + ?,
-          uptime = uptime + ?,
-          lastPlayedAt = ?
-      WHERE id = 1
-    ''', [minutes, duration.inMilliseconds, DateTime.now().millisecondsSinceEpoch]);
+    await db.rawUpdate(
+      '''
+        UPDATE $playerStatisticsTableName
+        SET totalMinutesPlayed = totalMinutesPlayed + ?,
+            uptime = uptime + ?,
+            lastPlayedAt = ?
+        WHERE id = 1
+      ''',
+      [minutes, duration.inMilliseconds, DateTime.now().millisecondsSinceEpoch]
+    );
   }
 
   @override
