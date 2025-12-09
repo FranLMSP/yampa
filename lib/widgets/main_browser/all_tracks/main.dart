@@ -313,6 +313,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         SortButton(
           currentSortMode: sortMode,
           onSortModeChanged: (SortMode item) {
+            ref.invalidate(allTrackStatisticsProvider);
             ref.read(allTracksSortModeProvider.notifier).setSortMode(item);
           },
         ),

@@ -253,6 +253,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 SortButton(
                   currentSortMode: selectedPlaylist.sortMode,
                   onSortModeChanged: (SortMode mode) {
+                    ref.invalidate(allTrackStatisticsProvider);
                     playlistNotifier.setSortMode(selectedPlaylist, mode);
 
                     final editedPlaylist = Playlist(
