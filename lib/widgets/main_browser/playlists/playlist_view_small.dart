@@ -11,6 +11,7 @@ import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
+import 'package:yampa/providers/statistics_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/common/image_cropper_screen.dart';
@@ -231,6 +232,9 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
         playlists.where((e) => e.id == widget.playlist.id).firstOrNull ??
         widget.playlist;
     final isInSelectMode = _selectedTrackIds.isNotEmpty;
+    final allTrackStatisticsAsync = ref.watch(
+      allTrackStatisticsProvider,
+    );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -340,6 +344,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                       .whereType<Track>()
                       .toList(),
                   selectedPlaylist.sortMode,
+                  allTrackStatisticsAsync.value ?? {},
                 ).map((track) {
                   final isSelected = _selectedTrackIds.contains(track.id);
                   return TrackItem(

@@ -7,6 +7,7 @@ import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/core/player/enums.dart';
+import 'package:yampa/models/track_statistics.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/core/utils/sort_utils.dart';
 
@@ -286,10 +287,12 @@ class PlayerController {
   ) async {
     currentPlaylistId = playlist.id;
 
+    final allTrackStatistics = await _getAllTrackStatistics();
     // Get sorted track IDs based on playlist's sort mode
     final sortedTracks = sortTracks(
       playlist.trackIds.map((e) => tracks[e]).whereType<Track>().toList(),
       playlist.sortMode,
+      allTrackStatistics,
     );
     trackQueueIds = sortedTracks.map((e) => e.id).toList();
 
@@ -397,6 +400,19 @@ class PlayerController {
   Future<void> setTrackQueueDisplayMode(TrackQueueDisplayMode mode) async {
     trackQueueDisplayMode = mode;
     await handlePersistPlayerControllerState(this);
+  }
+
+  Future<Map<String, TrackStatistics>> _getAllTrackStatistics() async {
+    try {
+      final statsRepo = getStatisticsRepository();
+
+      final result = await statsRepo.getAllTrackStatistics();
+      await statsRepo.close();
+      return result;
+    } catch (e) {
+      log('Error getting track statistics', error: e);
+    }
+    return {};
   }
 
   Future<void> _trackPlayEvent(String trackId) async {

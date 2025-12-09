@@ -30,11 +30,12 @@ enum SortMode {
   genreZtoA,
 
   // Play count
-  // mostPlayed, // TODO: implement after track statistics
-  // leastPlayed, // TODO: implement after track statistics
+  mostPlayed,
+  leastPlayed,
 
   // Recently played
-  // recentlyPlayed, // TODO: implement after track statistics
+  recentlyPlayed,
+  leastRecentlyPlayed,
 
   // Duration
   durationShortToLong,

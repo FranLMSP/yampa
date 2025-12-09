@@ -27,6 +27,22 @@ class SortButton extends StatelessWidget {
           child: Text('Title (Z-A)'),
         ),
         const PopupMenuItem<SortMode>(
+          value: SortMode.mostPlayed,
+          child: Text('Most played to least played'),
+        ),
+        const PopupMenuItem<SortMode>(
+          value: SortMode.leastPlayed,
+          child: Text('Least played to most played'),
+        ),
+        const PopupMenuItem<SortMode>(
+          value: SortMode.recentlyPlayed,
+          child: Text('Recently played (most recent first)'),
+        ),
+        const PopupMenuItem<SortMode>(
+          value: SortMode.leastRecentlyPlayed,
+          child: Text('Recently played (least recent first)'),
+        ),
+        const PopupMenuItem<SortMode>(
           value: SortMode.artistAtoZ,
           child: Text('Artist (A-Z)'),
         ),
