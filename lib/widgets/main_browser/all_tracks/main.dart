@@ -355,10 +355,12 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
               .toList()
         : tracks.values.toList();
 
-    final allTrackStatisticsAsync = ref.watch(
-      allTrackStatisticsProvider,
+    final allTrackStatisticsAsync = ref.watch(allTrackStatisticsProvider);
+    final sortedTracks = sortTracks(
+      filteredTracks,
+      sortMode,
+      allTrackStatisticsAsync.value ?? {},
     );
-    final sortedTracks = sortTracks(filteredTracks, sortMode, allTrackStatisticsAsync.value ?? {});
 
     if (tracks.isEmpty) {
       return Center(

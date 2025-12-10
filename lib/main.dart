@@ -16,8 +16,15 @@ import 'package:yampa/widgets/main_browser/main.dart';
 import 'package:yampa/widgets/main_page_loader.dart';
 import 'package:yampa/widgets/player/big_player.dart';
 import 'package:yampa/widgets/utils.dart';
+import 'package:window_size/window_size.dart' as window_size;
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    window_size.setWindowMinSize(const Size(400, 750));
+  }
+
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
