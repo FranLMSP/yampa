@@ -21,7 +21,8 @@ import 'package:window_size/window_size.dart' as window_size;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+  if (isPlatformDesktop()) {
+    // TODO: remember last window size
     window_size.setWindowMinSize(const Size(400, 750));
   }
 
@@ -134,12 +135,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         }
       },
     );
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
   }
 
   @override
