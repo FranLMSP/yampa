@@ -1,7 +1,8 @@
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/models/track_statistics.dart';
 
-List<Track> sortTracks(List<Track> tracks, SortMode sortMode) {
+List<Track> sortTracks(List<Track> tracks, SortMode sortMode, Map<String, TrackStatistics> allTrackStatistics) {
   switch (sortMode) {
     case SortMode.titleAtoZ:
       return tracks..sort(
@@ -14,6 +15,46 @@ List<Track> sortTracks(List<Track> tracks, SortMode sortMode) {
         (a, b) => b.displayName().toLowerCase().compareTo(
           a.displayName().toLowerCase(),
         ),
+      );
+    case SortMode.mostPlayed:
+      return tracks..sort(
+        (a, b) {
+          final statsA = allTrackStatistics[a.id];
+          final statsB = allTrackStatistics[b.id];
+          final timesPlayedA = statsA != null ? statsA.timesPlayed : 0;
+          final timesPlayedB = statsB != null ? statsB.timesPlayed : 0;
+          return timesPlayedB.compareTo(timesPlayedA);
+        },
+      );
+    case SortMode.leastPlayed:
+      return tracks..sort(
+        (a, b) {
+          final statsA = allTrackStatistics[a.id];
+          final statsB = allTrackStatistics[b.id];
+          final timesPlayedA = statsA?.timesPlayed ?? 0;
+          final timesPlayedB = statsB?.timesPlayed ?? 0;
+          return timesPlayedA.compareTo(timesPlayedB);
+        },
+      );
+    case SortMode.recentlyPlayed:
+      return tracks..sort(
+        (a, b) {
+          final statsA = allTrackStatistics[a.id];
+          final statsB = allTrackStatistics[b.id];
+          final lastPlayedAtA = statsA?.lastPlayedAt ?? DateTime.utc(0);
+          final lastPlayedAtB = statsB?.lastPlayedAt ?? DateTime.utc(0);
+          return lastPlayedAtB.compareTo(lastPlayedAtA);
+        },
+      );
+    case SortMode.leastRecentlyPlayed:
+      return tracks..sort(
+        (a, b) {
+          final statsA = allTrackStatistics[a.id];
+          final statsB = allTrackStatistics[b.id];
+          final lastPlayedAtA = statsA?.lastPlayedAt ?? DateTime.utc(0);
+          final lastPlayedAtB = statsB?.lastPlayedAt ?? DateTime.utc(0);
+          return lastPlayedAtA.compareTo(lastPlayedAtB);
+        },
       );
     case SortMode.artistAtoZ:
       return tracks..sort(

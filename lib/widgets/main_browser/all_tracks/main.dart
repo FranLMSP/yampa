@@ -10,6 +10,7 @@ import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/providers/selected_tracks_provider.dart';
+import 'package:yampa/providers/statistics_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
@@ -312,6 +313,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         SortButton(
           currentSortMode: sortMode,
           onSortModeChanged: (SortMode item) {
+            ref.invalidate(allTrackStatisticsProvider);
             ref.read(allTracksSortModeProvider.notifier).setSortMode(item);
           },
         ),
@@ -353,7 +355,10 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
               .toList()
         : tracks.values.toList();
 
-    final sortedTracks = sortTracks(filteredTracks, sortMode);
+    final allTrackStatisticsAsync = ref.watch(
+      allTrackStatisticsProvider,
+    );
+    final sortedTracks = sortTracks(filteredTracks, sortMode, allTrackStatisticsAsync.value ?? {});
 
     if (tracks.isEmpty) {
       return Center(

@@ -45,6 +45,8 @@ final trackStatisticsProvider = FutureProvider.family<TrackStatistics, String>((
 final allTrackStatisticsProvider = FutureProvider<Map<String, TrackStatistics>>(
   (ref) async {
     final repo = await ref.watch(statisticsRepositoryProvider.future);
-    return await repo.getAllTrackStatistics();
+    final result = await repo.getAllTrackStatistics();
+    repo.close();
+    return result;
   },
 );
