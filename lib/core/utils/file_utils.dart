@@ -162,3 +162,66 @@ Future<Uint8List> convertToJpeg(Uint8List bytes) async {
   }
   return Uint8List.fromList(img.encodeJpg(decoded, quality: 90));
 }
+
+Uint8List? extractMp3Image(Uint8List mp3Data) {
+  // MP3 must start with ID3 tag to contain APIC image
+  if (mp3Data.length < 10 ||
+      mp3Data[0] != 0x49 || // 'I'
+      mp3Data[1] != 0x44 || // 'D'
+      mp3Data[2] != 0x33    // '3'
+  ) {
+    return null;
+  }
+
+  // Tag header size is synchsafe
+  int tagSize = (mp3Data[6] << 21) |
+                (mp3Data[7] << 14) |
+                (mp3Data[8] << 7)  |
+                 mp3Data[9];
+
+  int offset = 10;
+  int end = offset + tagSize;
+
+  while (offset + 10 < end) {
+    // Read frame header
+    String frameId = String.fromCharCodes(mp3Data.sublist(offset, offset + 4));
+    int frameSize = (mp3Data[offset + 4] << 24) |
+                    (mp3Data[offset + 5] << 16) |
+                    (mp3Data[offset + 6] << 8)  |
+                     mp3Data[offset + 7];
+
+    // Stop if invalid
+    if (frameSize <= 0 || offset + 10 + frameSize > mp3Data.length) break;
+
+    // Look for APIC frame
+    if (frameId == "APIC") {
+      int pos = offset + 10;
+
+      // Text encoding byte
+      pos += 1;
+
+      // MIME type until null byte
+      int mimeEnd = mp3Data.indexOf(0, pos);
+      if (mimeEnd == -1) return null;
+      pos = mimeEnd + 1;
+
+      // Skip picture type
+      pos += 1;
+
+      // Description (null-terminated)
+      int descEnd = mp3Data.indexOf(0, pos);
+      if (descEnd == -1) return null;
+      pos = descEnd + 1;
+
+      // Remaining bytes = image
+      return Uint8List.fromList(
+        mp3Data.sublist(pos, offset + 10 + frameSize),
+      );
+    }
+
+    // Move to next frame
+    offset += 10 + frameSize;
+  }
+
+  return null;
+}

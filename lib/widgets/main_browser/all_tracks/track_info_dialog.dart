@@ -23,7 +23,7 @@ class TrackInfoDialog extends ConsumerStatefulWidget {
 class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
   bool _isEditing = false;
 
-  late TextEditingController _nameCtrl;
+  late TextEditingController _titleCtrl;
   late TextEditingController _artistCtrl;
   late TextEditingController _albumCtrl;
   late TextEditingController _genreCtrl;
@@ -34,7 +34,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
   @override
   void initState() {
     super.initState();
-    _nameCtrl = TextEditingController(text: widget.track.name);
+    _titleCtrl = TextEditingController(text: widget.track.title);
     _artistCtrl = TextEditingController(text: widget.track.artist);
     _albumCtrl = TextEditingController(text: widget.track.album);
     _genreCtrl = TextEditingController(text: widget.track.genre);
@@ -46,7 +46,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
+    _titleCtrl.dispose();
     _artistCtrl.dispose();
     _albumCtrl.dispose();
     _genreCtrl.dispose();
@@ -122,7 +122,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
   Future<void> _handleSave() async {
     final updatedTrack = Track(
       id: widget.track.id,
-      name: _nameCtrl.text.trim(),
+      title: _titleCtrl.text.trim(),
       artist: _artistCtrl.text.trim(),
       album: _albumCtrl.text.trim(),
       genre: _genreCtrl.text.trim(),
@@ -170,7 +170,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(widget.track.displayName()),
+          Text(widget.track.displayTitle()),
           // TODO: metadata editing doesn't currently work on Android (permission issue)
           if (!Platform.isAndroid && !Platform.isIOS)
             IconButton(
@@ -229,7 +229,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
             const SizedBox(height: 8),
 
             if (_isEditing) ...[
-              _buildEditableRow('Name', _nameCtrl),
+              _buildEditableRow('Title', _titleCtrl),
               _buildEditableRow('Artist', _artistCtrl),
               _buildEditableRow('Album', _albumCtrl),
               _buildEditableRow('Genre', _genreCtrl),
@@ -239,7 +239,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                 keyboardType: TextInputType.number,
               ),
             ] else ...[
-              _buildInfoRow('Name', widget.track.name),
+              _buildInfoRow('Title', widget.track.title),
               _buildInfoRow('Artist', widget.track.artist),
               _buildInfoRow('Album', widget.track.album),
               _buildInfoRow('Genre', widget.track.genre),

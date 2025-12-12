@@ -76,7 +76,7 @@ class TrackItem extends ConsumerWidget {
             : null,
         child: ListTile(
           leading: _buildTrackIcon(currentTrackId),
-          title: Text(track.displayName()),
+          title: Text(track.displayTitle()),
           subtitle: Row(
             children: [
               Text(track.artist),

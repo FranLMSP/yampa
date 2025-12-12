@@ -33,7 +33,7 @@ class BigPlayer extends ConsumerWidget {
           const Expanded(child: UpcomingTracksList()),
         const SizedBox(height: 20),
         Text(
-          track != null ? track.displayName() : "",
+          track != null ? track.displayTitle() : "",
           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
