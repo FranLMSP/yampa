@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:yampa/core/repositories/user_settings_data/factory.dart';
+import 'package:yampa/models/user_settings.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
@@ -16,14 +18,28 @@ import 'package:yampa/widgets/main_browser/main.dart';
 import 'package:yampa/widgets/main_page_loader.dart';
 import 'package:yampa/widgets/player/big_player.dart';
 import 'package:yampa/widgets/utils.dart';
-import 'package:window_size/window_size.dart' as window_size;
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (isPlatformDesktop()) {
-    // TODO: remember last window size
-    window_size.setWindowMinSize(const Size(400, 750));
+    await windowManager.ensureInitialized();
+    final userSettingsRepo = getUserSettingsDataRepository();
+    final lastWindowSize = await userSettingsRepo.getLastWindowSize();
+    await userSettingsRepo.close();
+    Size? windowSize;
+    if (lastWindowSize != null) {
+      windowSize = Size(lastWindowSize.width, lastWindowSize.height);
+    }
+    WindowOptions windowOptions = WindowOptions(
+      minimumSize: Size(400, 750),
+      size: windowSize,
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
   }
 
   await JustAudioBackground.init(
@@ -56,8 +72,48 @@ class MyHomePage extends ConsumerStatefulWidget {
   ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends ConsumerState<MyHomePage> {
+class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
   Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (isPlatformDesktop()) {
+      windowManager.addListener(this);
+      _initWindow();
+    }
+  }
+
+  @override
+  void dispose() {
+    if (isPlatformDesktop()) {
+      windowManager.removeListener(this);
+    }
+    super.dispose();
+  }
+
+
+  void _initWindow() async {
+    await windowManager.setPreventClose(true);
+    setState(() {});
+  }
+
+  @override
+  void onWindowClose() async {
+    if (isPlatformDesktop()) {
+      final isPreventClose = await windowManager.isPreventClose();
+      if (isPreventClose) {
+        await windowManager.ensureInitialized();
+        final userSettingsRepo = getUserSettingsDataRepository();
+        final size = await windowManager.getSize();
+        await userSettingsRepo.saveLastWindowSize(
+          WindowSize(width: size.width, height: size.height),
+        );
+        await userSettingsRepo.close();
+        await windowManager.destroy();
+      }
+    }
+  }
 
   void _setTimer() {
     if (_timer != null) {

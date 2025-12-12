@@ -8,26 +8,26 @@ const defaultSortModeKey = "defaultSortMode";
 const lastWindowWidthKey = "lastWindowWidth";
 const lastWindowHeightKey = "lastWindowHeight";
 
+SharedPreferencesAsync _getPrefs() {
+  // change preferences here if necessary
+  return SharedPreferencesAsync();
+}
+
 class UserSettingsDataSharedPreferences extends UserSettingsData {
   @override
   Future<UserSettings> getUserSettings() async {
-    final prefs = SharedPreferencesAsync();
+    final prefs = _getPrefs();
 
     final defaultSortModeIndex = await prefs.getInt(defaultSortModeKey) ?? 0;
-    final lastWindowWidth = await prefs.getDouble(lastWindowWidthKey);
-    final lastWindowHeight = await prefs.getDouble(lastWindowHeightKey);
     return UserSettings(
       defaultSortMode: SortMode.values[defaultSortModeIndex], 
-      lastWindowSize: lastWindowWidth != null && lastWindowHeight != null ? WindowSize(
-        width: lastWindowWidth,
-        height: lastWindowHeight,
-      ) : null,
+      lastWindowSize: await getLastWindowSize(),
     );
   }
 
   @override
   Future<void> saveUserSettings(UserSettings userSettings) async {
-    final prefs = SharedPreferencesAsync();
+    final prefs = _getPrefs();
 
     await prefs.setInt(defaultSortModeKey, userSettings.defaultSortMode.index);
     if (userSettings.lastWindowSize != null) {
@@ -37,13 +37,27 @@ class UserSettingsDataSharedPreferences extends UserSettingsData {
 
   @override
   Future<void> saveLastWindowSize(WindowSize lastWindowSize) async {
-    final prefs = SharedPreferencesAsync();
+    final prefs = _getPrefs();
 
     await prefs.setDouble(lastWindowWidthKey, lastWindowSize.width);
     await prefs.setDouble(lastWindowHeightKey, lastWindowSize.height);
   }
 
   @override
+  Future<WindowSize?> getLastWindowSize() async {
+    final prefs = _getPrefs();
+
+    final lastWindowWidth = await prefs.getDouble(lastWindowWidthKey);
+    final lastWindowHeight = await prefs.getDouble(lastWindowHeightKey);
+    if (lastWindowWidth != null && lastWindowHeight != null) {
+      return WindowSize(
+        width: lastWindowWidth,
+        height: lastWindowHeight,
+      );
+    }
+    return null;
+  }
+
+  @override
   Future<void> close() async {}
 }
-

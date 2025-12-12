@@ -4,6 +4,7 @@ abstract class UserSettingsData {
   Future<UserSettings> getUserSettings();
   Future<void> saveUserSettings(UserSettings userSettings);
   Future<void> saveLastWindowSize(WindowSize windowSize);
+  Future<WindowSize?> getLastWindowSize();
   Future<void> close();
 }
 
