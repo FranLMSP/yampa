@@ -232,9 +232,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
         playlists.where((e) => e.id == widget.playlist.id).firstOrNull ??
         widget.playlist;
     final isInSelectMode = _selectedTrackIds.isNotEmpty;
-    final allTrackStatisticsAsync = ref.watch(
-      allTrackStatisticsProvider,
-    );
+    final allTrackStatisticsAsync = ref.watch(allTrackStatisticsProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),

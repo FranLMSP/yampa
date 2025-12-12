@@ -205,8 +205,8 @@ class JustAudioBackend implements PlayerBackend {
     _ensurePlayerInitialized();
     // TODO: maybe detect here if the path is an URL or not, and call setUrl if that's the case
     final artUri = track.imageBytes != null
-      ? bytesToDataUri(track.imageBytes!)
-      : null;
+        ? bytesToDataUri(track.imageBytes!)
+        : null;
     Duration? duration;
     try {
       final audioSource = AudioSource.uri(
@@ -289,8 +289,10 @@ class JustAudioBackend implements PlayerBackend {
 
   @override
   Future<Track> updateTrackMetadata(Track track) async {
-    final hasStorageAccess = Platform.isAndroid || Platform.isIOS ? await Permission.storage.isGranted : true;
-    if(!hasStorageAccess){
+    final hasStorageAccess = Platform.isAndroid || Platform.isIOS
+        ? await Permission.storage.isGranted
+        : true;
+    if (!hasStorageAccess) {
       await Permission.storage.request();
     }
 
@@ -298,11 +300,7 @@ class JustAudioBackend implements PlayerBackend {
     Picture? picture;
     if (track.imageBytes != null) {
       final jpegImageBytes = await convertToJpeg(track.imageBytes!);
-      picture = Picture(
-        jpegImageBytes,
-        "image/jpeg",
-        PictureType.coverFront,
-      );
+      picture = Picture(jpegImageBytes, "image/jpeg", PictureType.coverFront);
     }
     updateMetadata(file, (metadata) {
       metadata.setTitle(track.name);

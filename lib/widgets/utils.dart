@@ -18,3 +18,7 @@ Future<void> showButtonActionMessage(String message) async {
     await Fluttertoast.showToast(msg: message);
   }
 }
+
+bool isPlatformDesktop() {
+  return Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+}

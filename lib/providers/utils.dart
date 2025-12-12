@@ -8,12 +8,14 @@ import 'package:yampa/core/repositories/statistics/factory.dart';
 import 'package:yampa/core/repositories/stored_paths/factory.dart';
 import 'package:yampa/core/repositories/cached_tracks/factory.dart';
 import 'package:yampa/core/player_backends/factory.dart';
+import 'package:yampa/core/repositories/user_settings_data/factory.dart';
 import 'package:yampa/core/utils/file_utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/player_controller_state.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/models/user_settings.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
@@ -342,4 +344,10 @@ Future<void> handleTrackMetadataEdited(
   tracksNotifier.addTracks([updatedTrack]);
 
   playerControllerNotifier.handleTrackUpdated(existingId, updatedTrack.id);
+}
+
+Future<void> handleAppWindowSizeChanged(WindowSize windowSize) async {
+  final repo = getUserSettingsDataRepository();
+  await repo.saveLastWindowSize(windowSize);
+  await repo.close();
 }

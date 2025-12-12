@@ -127,7 +127,8 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
       album: _albumCtrl.text.trim(),
       genre: _genreCtrl.text.trim(),
       path: widget.track.path,
-      trackNumber: int.tryParse(_trackNumCtrl.text.trim()) ?? widget.track.trackNumber,
+      trackNumber:
+          int.tryParse(_trackNumCtrl.text.trim()) ?? widget.track.trackNumber,
       duration: widget.track.duration,
       imageBytes: _imageBytes,
       lastModified: DateTime.now(),
@@ -137,7 +138,9 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
     final allPlaylists = ref.read(playlistsProvider);
     final tracksNotifier = ref.read(tracksProvider.notifier);
     final playlistNotifier = ref.read(playlistsProvider.notifier);
-    final playerControllerNotifier = ref.read(playerControllerProvider.notifier);
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
 
     await handleTrackMetadataEdited(
       updatedTrack,
