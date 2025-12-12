@@ -10,14 +10,14 @@ List<Track> sortTracks(
   switch (sortMode) {
     case SortMode.titleAtoZ:
       return tracks..sort(
-        (a, b) => a.displayName().toLowerCase().compareTo(
-          b.displayName().toLowerCase(),
+        (a, b) => a.displayTitle().toLowerCase().compareTo(
+          b.displayTitle().toLowerCase(),
         ),
       );
     case SortMode.titleZtoA:
       return tracks..sort(
-        (a, b) => b.displayName().toLowerCase().compareTo(
-          a.displayName().toLowerCase(),
+        (a, b) => b.displayTitle().toLowerCase().compareTo(
+          a.displayTitle().toLowerCase(),
         ),
       );
     case SortMode.mostPlayed:

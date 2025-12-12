@@ -1,7 +1,7 @@
 import 'package:yampa/models/track.dart';
 
 String stringifyTrackProperties(Track track) {
-  return "${track.displayName()}${track.album}${track.artist}${track.genre}";
+  return "${track.displayTitle()}${track.album}${track.artist}${track.genre}";
 }
 
 bool checkSearchMatch(String searchText, String targetText) {

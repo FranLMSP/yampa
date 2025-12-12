@@ -46,7 +46,7 @@ class MiniPlayer extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        track.displayName(),
+                        track.displayTitle(),
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(track.album),

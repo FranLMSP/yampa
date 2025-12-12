@@ -9,7 +9,7 @@ Future<void> _initializeDatabase(Database db) async {
   await db.execute('''
     CREATE TABLE IF NOT EXISTS $cachedTracksTableName (
       id TEXT PRIMARY KEY,
-      name TEXT,
+      title TEXT,
       artist TEXT,
       album TEXT,
       genre TEXT,
@@ -49,7 +49,7 @@ class CachedTracksSqlite extends CachedTracksRepository {
         .map(
           (row) => Track(
             id: row['id'] as String,
-            name: row['name'] as String,
+            title: row['title'] as String,
             artist: row['artist'] as String,
             album: row['album'] as String,
             genre: row['genre'] as String,
@@ -72,7 +72,7 @@ class CachedTracksSqlite extends CachedTracksRepository {
     final db = await _getdb();
     await db.insert(cachedTracksTableName, {
       'id': track.id,
-      'name': track.name,
+      'title': track.title,
       'artist': track.artist,
       'album': track.album,
       'genre': track.genre,

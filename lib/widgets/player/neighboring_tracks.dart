@@ -85,14 +85,14 @@ class NeighboringTracks extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      track.displayName(),
+                      track.displayTitle(),
                       style: const TextStyle(fontWeight: FontWeight.w500),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.right,
                     ),
                     Text(
-                      track.artist.isNotEmpty ? track.artist : "Unknown Artist",
+                      track.artist.isNotEmpty ? track.artist : "",
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -111,13 +111,13 @@ class NeighboringTracks extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      track.displayName(),
+                      track.displayTitle(),
                       style: const TextStyle(fontWeight: FontWeight.w500),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      track.artist.isNotEmpty ? track.artist : "Unknown Artist",
+                      track.artist.isNotEmpty ? track.artist : "",
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

@@ -4,7 +4,7 @@ import 'package:yampa/core/utils/file_utils.dart';
 
 class Track {
   final String id;
-  final String name;
+  final String title;
   final String artist;
   final String album;
   final String genre;
@@ -16,7 +16,7 @@ class Track {
 
   Track({
     required this.id,
-    required this.name,
+    required this.title,
     required this.artist,
     required this.album,
     required this.genre,
@@ -27,6 +27,6 @@ class Track {
     this.lastModified,
   });
 
-  String displayName() =>
-      name.isNotEmpty ? name : extractFilenameFromFullPath(path);
+  String displayTitle() =>
+      title.isNotEmpty ? title : extractFilenameFromFullPath(path);
 }

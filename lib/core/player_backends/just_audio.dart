@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:audio_metadata_reader/audio_metadata_reader.dart';
+import 'package:audiotags/audiotags.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
@@ -178,20 +179,18 @@ class JustAudioBackend implements PlayerBackend {
   Future<Track?> _getTrackMetadataFromGenericPath(String path) async {
     try {
       final file = File(path);
-      final metadata = readMetadata(file);
+      Tag? tag = await AudioTags.read(path);
       final lastModified = await file.lastModified();
       return Track(
         id: await generateTrackId(path),
-        name: metadata.title ?? "",
-        artist: metadata.artist ?? "",
-        album: metadata.album ?? "",
-        genre: metadata.genres.isNotEmpty ? metadata.genres.join(", ") : "",
-        trackNumber: metadata.trackNumber ?? 0,
+        title: tag?.title ?? "",
+        artist: tag?.trackArtist ?? "",
+        album: tag?.album ?? "",
+        genre: tag?.genre ?? "",
+        trackNumber: tag?.trackNumber ?? 0,
         path: path,
-        duration: metadata.duration ?? Duration.zero,
-        imageBytes: metadata.pictures.isNotEmpty
-            ? metadata.pictures.first.bytes
-            : null,
+        duration: tag?.duration != null ? Duration(seconds: tag!.duration!) : Duration.zero,
+        imageBytes: tag != null && tag.pictures.isNotEmpty ? tag.pictures.first.bytes : null,
         lastModified: lastModified,
       );
     } catch (e) {
@@ -213,7 +212,7 @@ class JustAudioBackend implements PlayerBackend {
         Uri.file(track.path),
         tag: MediaItem(
           id: track.id,
-          title: track.displayName(),
+          title: track.displayTitle(),
           artist: track.artist,
           artUri: artUri,
         ),
@@ -295,24 +294,30 @@ class JustAudioBackend implements PlayerBackend {
     if (!hasStorageAccess) {
       await Permission.storage.request();
     }
+    Tag? existingTag = await AudioTags.read(track.path);
 
-    final file = File(track.path);
-    Picture? picture;
-    if (track.imageBytes != null) {
-      final jpegImageBytes = await convertToJpeg(track.imageBytes!);
-      picture = Picture(jpegImageBytes, "image/jpeg", PictureType.coverFront);
-    }
-    updateMetadata(file, (metadata) {
-      metadata.setTitle(track.name);
-      metadata.setArtist(track.artist);
-      metadata.setAlbum(track.album);
-      metadata.setTrackNumber(track.trackNumber);
-      metadata.setGenres(track.genre.split(", "));
-      metadata.setPictures([]);
-      if (picture != null) {
-        metadata.setPictures([picture]);
-      }
-    });
+    Tag tag = Tag(
+        title: track.title,
+        trackArtist: track.artist,
+        album: track.album,
+        albumArtist: track.artist,
+        genre: track.genre,
+        year: existingTag?.year,
+        trackNumber: track.trackNumber,
+        trackTotal: existingTag?.trackTotal,
+        discNumber: existingTag?.discNumber,
+        discTotal: existingTag?.discTotal,
+        pictures: track.imageBytes != null ? [
+            Picture(
+                bytes: Uint8List.fromList(track.imageBytes!),
+                mimeType: null,
+                pictureType: PictureType.other
+            )
+        ] : []
+    );
+
+    await AudioTags.write(track.path, tag);
+
     final updatedTrack = await _getTrackMetadataFromGenericPath(track.path);
     return updatedTrack!;
   }
