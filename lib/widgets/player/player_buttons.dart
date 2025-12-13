@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yampa/widgets/player/buttons/backward_seconds.dart';
-import 'package:yampa/widgets/player/buttons/clip.dart';
+// import 'package:yampa/widgets/player/buttons/clip.dart';
 import 'package:yampa/widgets/player/buttons/favorite.dart';
 import 'package:yampa/widgets/player/buttons/forward_seconds.dart';
 import 'package:yampa/widgets/player/buttons/info.dart';
@@ -36,7 +36,7 @@ class PlayerButtons extends StatelessWidget {
           children: const [
             PlayerDisplayModeButton(),
             FavoriteButton(),
-            ClipButton(),
+            // ClipButton(),
             LoopButton(),
             ShuffleButton(),
             SpeedButton(),
