@@ -319,7 +319,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
               onPressed: () async {
                 if (selectedPlaylist.trackIds.isNotEmpty &&
                     playerController != null) {
-                  playerController.setPlaylist(selectedPlaylist, tracks);
+                  await playerController.setPlaylist(selectedPlaylist, tracks);
                   final firstTrack = tracks[selectedPlaylist.trackIds.first];
                   if (firstTrack != null) {
                     await playTrack(
