@@ -17,7 +17,7 @@ Future<void> playTrack(
     await playerControllerNotifier.setPlayerBackend(await getPlayerBackend());
   }
   await playerControllerNotifier.stop();
-  await playerControllerNotifier.setCurrentTrack(track);
+  await playerControllerNotifier.setCurrentTrack(track, tracks);
   await playerControllerNotifier.play();
 }
 
