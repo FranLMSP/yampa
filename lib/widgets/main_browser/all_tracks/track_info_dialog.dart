@@ -10,6 +10,7 @@ import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/statistics_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/widgets/common/track_title.dart';
 
 class TrackInfoDialog extends ConsumerStatefulWidget {
   const TrackInfoDialog({super.key, required this.track});
@@ -54,7 +55,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
     super.dispose();
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(String label, String value, bool isResponsive) {
     // TODO: make this responsive
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -85,6 +86,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
     TextEditingController controller, {
     TextInputType? keyboardType,
   }) {
+    // TODO: make this responsive
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -171,7 +173,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(widget.track.displayTitle()),
+          Expanded(child: TrackTitle(track: widget.track)),
           // TODO: metadata editing doesn't currently work on Android (permission issue)
           if (!Platform.isAndroid && !Platform.isIOS)
             IconButton(
@@ -240,16 +242,17 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                 keyboardType: TextInputType.number,
               ),
             ] else ...[
-              _buildInfoRow('Title', widget.track.title),
-              _buildInfoRow('Artist', widget.track.artist),
-              _buildInfoRow('Album', widget.track.album),
-              _buildInfoRow('Genre', widget.track.genre),
-              _buildInfoRow('Duration', formatDuration(widget.track.duration)),
+              _buildInfoRow('Title', widget.track.title, true),
+              _buildInfoRow('Artist', widget.track.artist, true),
+              _buildInfoRow('Album', widget.track.album, true),
+              _buildInfoRow('Genre', widget.track.genre, true),
+              _buildInfoRow('Duration', formatDuration(widget.track.duration), false),
               _buildInfoRow(
                 'Track Number',
                 widget.track.trackNumber.toString(),
+                false,
               ),
-              _buildInfoRow('Path', widget.track.path),
+              _buildInfoRow('Path', widget.track.path, true),
             ],
             const SizedBox(height: 24),
             Text(
@@ -277,24 +280,29 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                     _buildInfoRow(
                       'Times Played',
                       formatCount(stats.timesPlayed),
+                      false,
                     ),
                     _buildInfoRow(
                       'Times Skipped',
                       formatCount(stats.timesSkipped),
+                      false,
                     ),
                     _buildInfoRow(
                       'Times Completed',
                       formatCount(stats.completionCount),
+                      false,
                     ),
                     _buildInfoRow(
                       'Total Playback Time',
                       formatDurationLong(
                         Duration(seconds: (stats.minutesPlayed * 60).round()),
                       ),
+                      false,
                     ),
                     _buildInfoRow(
                       'Last Played',
                       formatTimestamp(stats.lastPlayedAt),
+                      false,
                     ),
                   ],
                 );
