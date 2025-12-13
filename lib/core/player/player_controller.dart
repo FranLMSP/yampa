@@ -21,7 +21,7 @@ class PlayerController {
   List<String> shuffledTrackQueueIds = [];
   PlayerState state = PlayerState.stopped;
   LoopMode loopMode = LoopMode.infinite;
-  ShuffleMode shuffleMode = ShuffleMode.sequential;
+  ShuffleMode shuffleMode = ShuffleMode.random;
   TrackQueueDisplayMode trackQueueDisplayMode = TrackQueueDisplayMode.image;
   PlayerBackend? playerBackend;
   Duration lastTrackDuration = Duration.zero;
