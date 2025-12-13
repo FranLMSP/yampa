@@ -38,11 +38,18 @@ class BigPlayer extends ConsumerWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 10),
-        Text(
-          track?.album ?? "",
-          style: const TextStyle(fontSize: 18, color: Colors.grey),
-          textAlign: TextAlign.center,
-        ),
+        if (track != null && track.artist.isNotEmpty)
+          Text(
+            track.artist,
+            style: const TextStyle(fontSize: 18, color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+        if (track != null && track.album.isNotEmpty)
+          Text(
+            track.album,
+            style: const TextStyle(fontSize: 18, color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
         const SizedBox(height: 30),
         const PlayerSlider(),
         const PlayerButtons(),
