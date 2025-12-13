@@ -24,39 +24,53 @@ class BigPlayer extends ConsumerWidget {
       playerControllerProvider.select((p) => p.value?.trackQueueDisplayMode),
     );
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Stack(
       children: [
-        if (trackQueueDisplayMode == TrackQueueDisplayMode.image)
-          PlayerImage(track: track)
-        else
-          const Expanded(child: UpcomingTracksList()),
-        const SizedBox(height: 20),
-        Text(
-          track != null ? track.displayTitle() : "",
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
+        Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (trackQueueDisplayMode == TrackQueueDisplayMode.image)
+                PlayerImage(track: track)
+              else
+                const Expanded(
+                  child: UpcomingTracksList(),
+                ),
+              const SizedBox(height: 20),
+              Text(
+                track != null ? track.displayTitle() : "",
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              if (track != null && track.artist.isNotEmpty)
+                Text(
+                  track.artist,
+                  style: const TextStyle(fontSize: 18, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+              if (track != null && track.album.isNotEmpty)
+                Text(
+                  track.album,
+                  style: const TextStyle(fontSize: 18, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+              const SizedBox(height: 30),
+              const PlayerSlider(),
+              const PlayerButtons(),
+              const SizedBox(height: 10),
+              const PlayerTotalMinutes(),
+              if (trackQueueDisplayMode == TrackQueueDisplayMode.list)
+                const SizedBox(height: 70),
+            ],
+          ),
         ),
-        const SizedBox(height: 10),
-        if (track != null && track.artist.isNotEmpty)
-          Text(
-            track.artist,
-            style: const TextStyle(fontSize: 18, color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
-        if (track != null && track.album.isNotEmpty)
-          Text(
-            track.album,
-            style: const TextStyle(fontSize: 18, color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
-        const SizedBox(height: 30),
-        const PlayerSlider(),
-        const PlayerButtons(),
-        const SizedBox(height: 10),
-        const PlayerTotalMinutes(),
-        const SizedBox(height: 20),
-        const NeighboringTracks(),
+        const Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: NeighboringTracks(),
+        ),
       ],
     );
   }

@@ -55,6 +55,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
   }
 
   Widget _buildInfoRow(String label, String value) {
+    // TODO: make this responsive
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
