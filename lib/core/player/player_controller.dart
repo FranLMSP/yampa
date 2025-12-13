@@ -21,7 +21,7 @@ class PlayerController {
   List<String> shuffledTrackQueueIds = [];
   PlayerState state = PlayerState.stopped;
   LoopMode loopMode = LoopMode.infinite;
-  ShuffleMode shuffleMode = ShuffleMode.sequential;
+  ShuffleMode shuffleMode = ShuffleMode.random;
   TrackQueueDisplayMode trackQueueDisplayMode = TrackQueueDisplayMode.image;
   PlayerBackend? playerBackend;
   Duration lastTrackDuration = Duration.zero;
@@ -103,7 +103,7 @@ class PlayerController {
     final nextTrackId = shuffledTrackQueueIds[currentTrackIndex];
     final nextTrack = tracks[nextTrackId];
     if (nextTrack != null) {
-      await setCurrentTrack(nextTrack);
+      await setCurrentTrack(nextTrack, tracks);
     }
   }
 
@@ -121,7 +121,7 @@ class PlayerController {
   }
 
   Future<void> next(bool forceNext, Map<String, Track> tracks) async {
-    _trackSkipAndCompletionEvents(forceNext);
+    await _trackSkipAndCompletionEvents(forceNext);
     await stop();
     if (currentTrackIndex <= -1) {
       currentTrackIndex = 0;
@@ -199,7 +199,7 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> setCurrentTrack(Track track) async {
+  Future<void> setCurrentTrack(Track track, Map<String, Track> tracks) async {
     if (playerBackend == null) {
       return;
     }
@@ -209,7 +209,13 @@ class PlayerController {
     currentTrackIndex = shuffledTrackQueueIds.indexWhere(
       (e) => e == currentTrackId,
     );
+    // Most likely the user clicked on a track in the "all tracks" list and not a playlist
     if (currentTrackIndex <= -1) {
+      final allTrackIds = tracks.values.map((e) => e.id).toList();
+      trackQueueIds = allTrackIds;
+      shuffledTrackQueueIds = allTrackIds;
+      currentPlaylistId = null;
+      await shuffleTrackQueue();
       currentTrackIndex = 0;
     }
     final trackDuration = await playerBackend!.setTrack(track);
@@ -275,9 +281,6 @@ class PlayerController {
   }
 
   Future<void> setPlaylist(Playlist playlist, Map<String, Track> tracks) async {
-    if (currentPlaylistId == playlist.id) {
-      return;
-    }
     await reloadPlaylist(playlist, tracks);
   }
 
@@ -365,11 +368,15 @@ class PlayerController {
       if (currentTrackIndex == 0) {
         prevTrackId = shuffledTrackQueueIds.last;
       } else {
-        prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
+        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+          prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
+        }
       }
     } else if (loopMode == LoopMode.startToEnd) {
       if (currentTrackIndex > 0) {
-        prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
+        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+          prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
+        }
       }
     }
 

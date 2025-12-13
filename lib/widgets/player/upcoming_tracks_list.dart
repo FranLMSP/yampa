@@ -32,10 +32,6 @@ class UpcomingTracksList extends ConsumerWidget {
         .where((p) => p.id == playerController.currentPlaylistId)
         .firstOrNull;
 
-    if (currentPlaylist == null) {
-      return const SizedBox.shrink();
-    }
-
     final shuffledTrackIds = playerController.shuffledTrackQueueIds;
 
     return Column(
@@ -44,16 +40,17 @@ class UpcomingTracksList extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Row(
             children: [
-              PlaylistImage(
-                playlist: currentPlaylist,
-                width: 40,
-                height: 40,
-                iconSize: 30,
-              ),
+              if (currentPlaylist != null)
+                PlaylistImage(
+                  playlist: currentPlaylist,
+                  width: 40,
+                  height: 40,
+                  iconSize: 30,
+                ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  currentPlaylist.name,
+                  currentPlaylist?.name ?? "Playing all tracks",
                   style: Theme.of(context).textTheme.titleMedium,
                   overflow: TextOverflow.ellipsis,
                 ),

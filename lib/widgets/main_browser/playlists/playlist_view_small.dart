@@ -313,27 +313,28 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             },
           ),
           const SizedBox(height: 24),
-          SizedBox(
-            width: 100,
-            child: ElevatedButton(
-              onPressed: () async {
-                if (selectedPlaylist.trackIds.isNotEmpty &&
-                    playerController != null) {
-                  playerController.setPlaylist(selectedPlaylist, tracks);
-                  final firstTrack = tracks[selectedPlaylist.trackIds.first];
-                  if (firstTrack != null) {
-                    await playTrack(
-                      firstTrack,
-                      tracks,
-                      playerController,
-                      playerControllerNotifier,
-                    );
+          if (selectedPlaylist.trackIds.isNotEmpty)
+            SizedBox(
+              width: 100,
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (selectedPlaylist.trackIds.isNotEmpty &&
+                      playerController != null) {
+                    await playerController.setPlaylist(selectedPlaylist, tracks);
+                    final firstTrack = tracks[selectedPlaylist.trackIds.first];
+                    if (firstTrack != null) {
+                      await playTrack(
+                        firstTrack,
+                        tracks,
+                        playerController,
+                        playerControllerNotifier,
+                      );
+                    }
                   }
-                }
-              },
-              child: Row(children: [Icon(Icons.play_arrow), Text("Play")]),
+                },
+                child: Row(children: [Icon(Icons.play_arrow), Text("Play")]),
+              ),
             ),
-          ),
           const SizedBox(height: 24),
           Column(
             children:
@@ -353,6 +354,9 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                       if (isInSelectMode) {
                         _toggleSelectedTrack(track.id);
                       } else if (playerController != null) {
+                        if (playerController.currentPlaylistId != selectedPlaylist.id) {
+                          await playerControllerNotifier.setPlaylist(selectedPlaylist, tracks);
+                        }
                         await playTrack(
                           track,
                           tracks,

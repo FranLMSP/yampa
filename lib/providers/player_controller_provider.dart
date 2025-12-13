@@ -107,13 +107,13 @@ class PlayerControllerNotifier extends AsyncNotifier<PlayerController> {
     state = result;
   }
 
-  Future<void> setCurrentTrack(Track track) async {
+  Future<void> setCurrentTrack(Track track, Map<String, Track> tracks) async {
     final currentState = state.value;
     if (currentState == null) return;
 
     final result = await AsyncValue.guard(() async {
       final optimistic = currentState.clone();
-      await optimistic.setCurrentTrack(track);
+      await optimistic.setCurrentTrack(track, tracks);
       return optimistic;
     });
     state = result;
@@ -195,7 +195,7 @@ class PlayerControllerNotifier extends AsyncNotifier<PlayerController> {
       await playerController.setSpeed(playerController.speed);
       final currentTrack = tracks[playerController.currentTrackId];
       if (currentTrack != null) {
-        await playerController.setCurrentTrack(currentTrack);
+        await playerController.setCurrentTrack(currentTrack, tracks);
       }
       return playerController;
     });

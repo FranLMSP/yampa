@@ -71,10 +71,10 @@ class PlayerControllerStateSqliteRepository
             : PlayerState.stopped,
         loopMode: row["loop_mode"] != null
             ? LoopMode.values[int.parse(row["loop_mode"].toString())]
-            : LoopMode.none,
+            : LoopMode.infinite,
         shuffleMode: row["shuffle_mode"] != null
             ? ShuffleMode.values[int.parse(row["shuffle_mode"].toString())]
-            : ShuffleMode.sequential,
+            : ShuffleMode.random,
         trackQueueDisplayMode: row["track_queue_display_mode"] != null
             ? TrackQueueDisplayMode.values[int.parse(
                 row["track_queue_display_mode"].toString(),
@@ -90,8 +90,8 @@ class PlayerControllerStateSqliteRepository
       trackQueueIds: [],
       shuffledTrackQueueIds: [],
       state: PlayerState.stopped,
-      loopMode: LoopMode.none,
-      shuffleMode: ShuffleMode.sequential,
+      loopMode: LoopMode.infinite,
+      shuffleMode: ShuffleMode.random,
       trackQueueDisplayMode: TrackQueueDisplayMode.image,
     );
   }
