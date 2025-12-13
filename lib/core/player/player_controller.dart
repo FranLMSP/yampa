@@ -121,7 +121,7 @@ class PlayerController {
   }
 
   Future<void> next(bool forceNext, Map<String, Track> tracks) async {
-    _trackSkipAndCompletionEvents(forceNext);
+    await _trackSkipAndCompletionEvents(forceNext);
     await stop();
     if (currentTrackIndex <= -1) {
       currentTrackIndex = 0;
@@ -275,9 +275,6 @@ class PlayerController {
   }
 
   Future<void> setPlaylist(Playlist playlist, Map<String, Track> tracks) async {
-    if (currentPlaylistId == playlist.id) {
-      return;
-    }
     await reloadPlaylist(playlist, tracks);
   }
 
