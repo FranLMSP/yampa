@@ -14,16 +14,16 @@ String formatDurationLong(Duration duration) {
 
   if (hours > 0) {
     if (minutes > 0) {
-      return "$hours hour${hours != 1 ? 's' : ''} $minutes minute${minutes != 1 ? 's' : ''}";
+      return "$hours hour${hours != 1 ? 's' : ''} $minutes min${minutes != 1 ? 's' : ''}";
     }
     return "$hours hour${hours != 1 ? 's' : ''}";
   } else if (minutes > 0) {
     if (seconds > 0) {
-      return "$minutes minute${minutes != 1 ? 's' : ''} $seconds second${seconds != 1 ? 's' : ''}";
+      return "$minutes min${minutes != 1 ? 's' : ''} $seconds sec${seconds != 1 ? 's' : ''}";
     }
-    return "$minutes minute${minutes != 1 ? 's' : ''}";
+    return "$minutes min${minutes != 1 ? 's' : ''}";
   } else {
-    return "$seconds second${seconds != 1 ? 's' : ''}";
+    return "$seconds sec${seconds != 1 ? 's' : ''}";
   }
 }
 
