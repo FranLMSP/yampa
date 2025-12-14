@@ -184,6 +184,13 @@ class PlayerController {
     };
     final handler = shuffleHandler[shuffleMode]!;
     handler();
+    final newIndex = shuffledTrackQueueIds.indexWhere(
+      (e) => e == currentTrackId,
+    );
+    if (newIndex >= 0) {
+      currentTrackIndex = newIndex;
+    }
+
     await handlePersistPlayerControllerState(this);
   }
 
