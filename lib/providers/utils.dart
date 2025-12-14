@@ -271,11 +271,13 @@ Future<void> handleMultipleTrackRemovedFromPlaylist(
   Playlist playlist,
   List<String> trackIds,
   PlaylistNotifier playlistNotifier,
+  PlayerControllerNotifier playerNotifier,
 ) async {
   playlistNotifier.removeTracks(playlist, trackIds);
   final playlistRepository = getPlaylistRepository();
   await playlistRepository.removeMultipleTracksFromPlaylist(playlist, trackIds);
   await playlistRepository.close();
+  await playerNotifier.handleTracksRemovedFromPlaylist(playlist, trackIds);
 }
 
 Future<void> handlePersistPlayerControllerState(

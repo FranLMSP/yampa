@@ -35,7 +35,7 @@ class FavoriteButton extends ConsumerWidget {
             showButtonActionMessage("Track removed from favorites"),
             handleMultipleTrackRemovedFromPlaylist(favoritesPlaylist, [
               currentTrackId,
-            ], playlistsNotifier),
+            ], playlistsNotifier, playerControllerNotifier),
           ]);
         } else {
           await Future.wait([

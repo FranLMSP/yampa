@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/utils/format_utils.dart';
+import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 
@@ -29,26 +30,42 @@ class TrackItem extends ConsumerWidget {
     );
   }
 
-  Widget _buildTrackPlaceholder(String? currentTrackId) {
-    final icon = track.id == currentTrackId
-        ? Icons.play_arrow
-        : Icons.music_note;
+  Widget _buildTrackPlaceholder(bool isPlaying) {
     return Container(
       width: 50,
       height: 50,
       color: Colors.grey,
-      child: Icon(icon, size: 40, color: Colors.white),
+      child: isPlaying ? null : const Icon(Icons.music_note, size: 40, color: Colors.white),
     );
   }
 
-  Widget _buildTrackIcon(String? currentTrackId) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8.0),
-      child: track.imageBytes != null
-          ? _buildTrackImage()
-          : _buildTrackPlaceholder(currentTrackId),
-    );
-  }
+Widget _buildTrackIcon(bool isPlaying) {
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(8.0),
+    child: Stack(
+      alignment: Alignment.center,
+      children: [
+        track.imageBytes != null
+            ? _buildTrackImage()
+            : _buildTrackPlaceholder(isPlaying),
+
+        if (isPlaying)
+          Container(
+            width: 50,
+            height: 50,
+            color: Colors.black.withValues(alpha: 0.4),
+          ),
+
+        if (isPlaying)
+          const Icon(
+            Icons.play_arrow,
+            color: Colors.white,
+            size: 32,
+          ),
+      ],
+    ),
+  );
+}
 
   Widget _buildDuration(Duration duration) {
     return Text(formatDuration(duration));
@@ -56,9 +73,14 @@ class TrackItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTrackId = ref.watch(
-      playerControllerProvider.select((p) => p.value?.currentTrackId),
-    );
+    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
+    final isPlaying = isTrackCurrentlyBeingPlayed(track, currentTrackId);
+    Color? color;
+    if (isSelected) {
+      color = Theme.of(context).colorScheme.inversePrimary;
+    } else if (isPlaying) {
+      color = Theme.of(context).colorScheme.primaryContainer;
+    }
     return InkWell(
       onTap: () {
         if (onTap != null) {
@@ -71,16 +93,14 @@ class TrackItem extends ConsumerWidget {
         }
       },
       child: Card(
-        color: isSelected
-            ? Theme.of(context).colorScheme.primaryContainer
-            : null,
+        color: color,
         child: ListTile(
-          leading: _buildTrackIcon(currentTrackId),
+          leading: _buildTrackIcon(isPlaying),
           title: Text(track.displayTitle()),
           subtitle: Row(
             children: [
               Text(track.artist),
-              Spacer(),
+              const Spacer(),
               _buildDuration(track.duration),
             ],
           ),

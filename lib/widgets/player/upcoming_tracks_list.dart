@@ -72,7 +72,7 @@ class UpcomingTracksList extends ConsumerWidget {
                 key: Key(track.id),
                 track: track,
                 onTap: (track) async {
-                  playTrack(
+                  await playTrack(
                     track,
                     tracks,
                     playerController,

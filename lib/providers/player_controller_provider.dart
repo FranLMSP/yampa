@@ -142,6 +142,17 @@ class PlayerControllerNotifier extends AsyncNotifier<PlayerController> {
     state = AsyncData(optimistic);
   }
 
+  Future<void> handleTracksRemovedFromPlaylist(
+    Playlist playlist, List<String> trackIds,
+  ) async {
+    final currentState = state.value;
+    if (currentState == null) return;
+
+    final optimistic = currentState.clone();
+    await optimistic.handleTracksRemovedFromPlaylist(playlist, trackIds);
+    state = AsyncData(optimistic);
+  }
+
   Future<LoopMode> toggleLoopMode() async {
     final currentState = state.value;
     if (currentState == null) return LoopMode.none;

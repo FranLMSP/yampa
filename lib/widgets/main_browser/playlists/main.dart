@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/playlist.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/playlists/new_playlist_dialog.dart';
@@ -42,7 +43,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
     );
   }
 
-  Widget _buildRemoveSelectedTracksButton(PlaylistNotifier playlistNotifier) {
+  Widget _buildRemoveSelectedTracksButton(PlaylistNotifier playlistNotifier, PlayerControllerNotifier playerNotifier) {
     return FloatingActionButton(
       backgroundColor: Theme.of(context).colorScheme.error,
       foregroundColor: Theme.of(context).colorScheme.onError,
@@ -68,6 +69,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
                         _selectedPlaylist!,
                         _selectedTrackIds,
                         playlistNotifier,
+                        playerNotifier,
                       );
                       _selectedTrackIds = [];
                       // TODO: show a snackbar with an "undo" button
@@ -86,6 +88,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
   Widget? _buildFloatingActionButton(
     BuildContext context,
     PlaylistNotifier playlistNotifier,
+    PlayerControllerNotifier playerNotifier,
   ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -94,7 +97,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
         if (_selectedTrackIds.isEmpty && _selectedPlaylist == null)
           _buildAddNewTrackFloatingButton(playlistNotifier),
         if (_selectedTrackIds.isNotEmpty)
-          _buildRemoveSelectedTracksButton(playlistNotifier),
+          _buildRemoveSelectedTracksButton(playlistNotifier, playerNotifier),
       ],
     );
   }
@@ -188,6 +191,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
   @override
   Widget build(BuildContext context) {
     final playlistNotifier = ref.read(playlistsProvider.notifier);
+    final playerNotifier = ref.read(playerControllerProvider.notifier);
     return Scaffold(
       body: _selectedPlaylist != null
           ? PlaylistViewSmall(
@@ -226,6 +230,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
       floatingActionButton: _buildFloatingActionButton(
         context,
         playlistNotifier,
+        playerNotifier,
       ),
     );
   }

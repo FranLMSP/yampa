@@ -184,6 +184,13 @@ class PlayerController {
     };
     final handler = shuffleHandler[shuffleMode]!;
     handler();
+    final newIndex = shuffledTrackQueueIds.indexWhere(
+      (e) => e == currentTrackId,
+    );
+    if (newIndex >= 0) {
+      currentTrackIndex = newIndex;
+    }
+
     await handlePersistPlayerControllerState(this);
   }
 
@@ -275,6 +282,22 @@ class PlayerController {
         trackQueueIds.add(trackId);
         shuffledTrackQueueIds.add(trackId);
       }
+    }
+
+    await handlePersistPlayerControllerState(this);
+  }
+
+  Future<void> handleTracksRemovedFromPlaylist(
+    Playlist playlist, List<String> trackIds
+  ) async {
+    if (playlist.id != currentPlaylistId) {
+      return;
+    }
+    trackQueueIds.removeWhere((e) => trackIds.contains(e));
+    shuffledTrackQueueIds.removeWhere((e) => trackIds.contains(e));
+    currentTrackIndex = shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
+    if (currentTrackIndex <= -1) {
+      currentTrackIndex = 0;
     }
 
     await handlePersistPlayerControllerState(this);
@@ -393,11 +416,15 @@ class PlayerController {
       if (currentTrackIndex == shuffledTrackQueueIds.length - 1) {
         nextTrackId = shuffledTrackQueueIds.first;
       } else {
-        nextTrackId = shuffledTrackQueueIds[currentTrackIndex + 1];
+        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+          nextTrackId = shuffledTrackQueueIds[currentTrackIndex + 1];
+        }
       }
     } else if (loopMode == LoopMode.startToEnd) {
       if (currentTrackIndex < shuffledTrackQueueIds.length - 1) {
-        nextTrackId = shuffledTrackQueueIds[currentTrackIndex + 1];
+        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+          nextTrackId = shuffledTrackQueueIds[currentTrackIndex + 1];
+        }
       }
     }
 

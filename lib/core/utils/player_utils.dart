@@ -23,10 +23,10 @@ Future<void> playTrack(
 
 bool isTrackCurrentlyBeingPlayed(
   Track track,
-  PlayerController playerController,
+  String? currentTrackId,
 ) {
-  return (playerController.currentTrackId != null &&
-      track.id == playerController.currentTrackId);
+  return (currentTrackId != null &&
+      track.id == currentTrackId);
 }
 
 Uri bytesToDataUri(Uint8List bytes) {

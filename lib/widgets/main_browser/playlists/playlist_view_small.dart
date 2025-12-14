@@ -148,16 +148,18 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     Track track,
     Map<String, Track> tracks,
     PlaylistNotifier playlistNotifier,
+    PlayerControllerNotifier playerNotifier,
   ) {
     return PopupMenuButton<OptionSelected>(
       initialValue: null,
-      onSelected: (OptionSelected item) {
-        _handleItemOptionSelected(
+      onSelected: (OptionSelected item) async {
+        await _handleItemOptionSelected(
           selectedPlaylist,
           track,
           item,
           tracks,
           playlistNotifier,
+          playerNotifier
         );
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
@@ -191,17 +193,18 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     );
   }
 
-  void _handleItemOptionSelected(
+  Future<void> _handleItemOptionSelected(
     Playlist selectedPlaylist,
     Track track,
     OptionSelected? optionSelected,
     Map<String, Track> tracks,
     PlaylistNotifier playlistNotifier,
-  ) {
+    PlayerControllerNotifier playerNotifier,
+  ) async {
     if (optionSelected == OptionSelected.removeFromPlaylist) {
-      handleMultipleTrackRemovedFromPlaylist(selectedPlaylist, [
+      await handleMultipleTrackRemovedFromPlaylist(selectedPlaylist, [
         track.id,
-      ], playlistNotifier);
+      ], playlistNotifier, playerNotifier);
     } else if (optionSelected == OptionSelected.select) {
       _toggleSelectedTrack(track.id);
     }
@@ -376,6 +379,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                             track,
                             tracks,
                             playlistNotifier,
+                            playerControllerNotifier,
                           ),
                   );
                 }).toList(),
