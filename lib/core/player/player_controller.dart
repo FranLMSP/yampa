@@ -287,6 +287,22 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
+  Future<void> handleTracksRemovedFromPlaylist(
+    Playlist playlist, List<String> trackIds
+  ) async {
+    if (playlist.id != currentPlaylistId) {
+      return;
+    }
+    trackQueueIds.removeWhere((e) => trackIds.contains(e));
+    shuffledTrackQueueIds.removeWhere((e) => trackIds.contains(e));
+    currentTrackIndex = shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
+    if (currentTrackIndex <= -1) {
+      currentTrackIndex = 0;
+    }
+
+    await handlePersistPlayerControllerState(this);
+  }
+
   Future<void> setPlaylist(Playlist playlist, Map<String, Track> tracks) async {
     await reloadPlaylist(playlist, tracks);
   }
