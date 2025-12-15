@@ -3,8 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio_background/just_audio_background.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:yampa/core/player/audio_service.dart';
 import 'package:yampa/core/repositories/user_settings_data/factory.dart';
 import 'package:yampa/models/user_settings.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
@@ -41,11 +42,12 @@ void main() async {
       await windowManager.focus();
     });
   }
-
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-    androidNotificationChannelName: 'Audio playback',
-    androidNotificationOngoing: true,
+  await AudioService.init(
+    builder: () => ExternalAudioHandler(),
+    config: AudioServiceConfig(
+      androidNotificationChannelId: 'com.francoacg.yampa.channel.audio',
+      androidNotificationChannelName: 'Music playback',
+    ),
   );
   runApp(ProviderScope(child: const MyApp()));
 }
@@ -91,7 +93,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
     }
     super.dispose();
   }
-
 
   void _initWindow() async {
     await windowManager.setPreventClose(true);

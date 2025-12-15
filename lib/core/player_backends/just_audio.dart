@@ -4,9 +4,9 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:audiotags/audiotags.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:yampa/core/utils/file_utils.dart';
@@ -189,8 +189,12 @@ class JustAudioBackend implements PlayerBackend {
         genre: tag?.genre ?? "",
         trackNumber: tag?.trackNumber ?? 0,
         path: path,
-        duration: tag?.duration != null ? Duration(seconds: tag!.duration!) : Duration.zero,
-        imageBytes: tag != null && tag.pictures.isNotEmpty ? tag.pictures.first.bytes : null,
+        duration: tag?.duration != null
+            ? Duration(seconds: tag!.duration!)
+            : Duration.zero,
+        imageBytes: tag != null && tag.pictures.isNotEmpty
+            ? tag.pictures.first.bytes
+            : null,
         lastModified: lastModified,
       );
     } catch (e) {
@@ -201,8 +205,8 @@ class JustAudioBackend implements PlayerBackend {
 
   @override
   Future<Duration> setTrack(Track track) async {
-    _ensurePlayerInitialized();
     // TODO: maybe detect here if the path is an URL or not, and call setUrl if that's the case
+    _ensurePlayerInitialized();
     final artUri = track.imageBytes != null
         ? bytesToDataUri(track.imageBytes!)
         : null;
@@ -297,23 +301,25 @@ class JustAudioBackend implements PlayerBackend {
     Tag? existingTag = await AudioTags.read(track.path);
 
     Tag tag = Tag(
-        title: track.title,
-        trackArtist: track.artist,
-        album: track.album,
-        albumArtist: track.artist,
-        genre: track.genre,
-        year: existingTag?.year,
-        trackNumber: track.trackNumber,
-        trackTotal: existingTag?.trackTotal,
-        discNumber: existingTag?.discNumber,
-        discTotal: existingTag?.discTotal,
-        pictures: track.imageBytes != null ? [
-            Picture(
+      title: track.title,
+      trackArtist: track.artist,
+      album: track.album,
+      albumArtist: track.artist,
+      genre: track.genre,
+      year: existingTag?.year,
+      trackNumber: track.trackNumber,
+      trackTotal: existingTag?.trackTotal,
+      discNumber: existingTag?.discNumber,
+      discTotal: existingTag?.discTotal,
+      pictures: track.imageBytes != null
+          ? [
+              Picture(
                 bytes: Uint8List.fromList(track.imageBytes!),
                 mimeType: null,
-                pictureType: PictureType.other
-            )
-        ] : []
+                pictureType: PictureType.other,
+              ),
+            ]
+          : [],
     );
 
     await AudioTags.write(track.path, tag);

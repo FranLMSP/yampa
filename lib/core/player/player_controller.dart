@@ -29,7 +29,11 @@ class PlayerController {
   DateTime? sessionStartTime;
   DateTime? lastPlayStartTime;
 
-  PlayerController();
+  static final PlayerController _instance = PlayerController._internal();
+  factory PlayerController() {
+    return _instance;
+  }
+  PlayerController._internal();
   static Future<PlayerController> fromLastState(
     LastPlayerControllerState lastState,
   ) async {
@@ -194,9 +198,15 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> seek(Duration position) async {
+  Future<void> seek(Duration position, {int index = -1}) async {
     if (playerBackend != null && currentTrackId != null) {
       await playerBackend!.seek(position);
+    }
+    if (index >= 0 && shuffledTrackQueueIds.length - 1 <= index) {
+      currentTrackIndex = index;
+      _setCurrentTrackFromIndex(
+        {},
+      ); // TODO: we will need to store the tracks in the controller for this...
     }
   }
 
@@ -288,14 +298,17 @@ class PlayerController {
   }
 
   Future<void> handleTracksRemovedFromPlaylist(
-    Playlist playlist, List<String> trackIds
+    Playlist playlist,
+    List<String> trackIds,
   ) async {
     if (playlist.id != currentPlaylistId) {
       return;
     }
     trackQueueIds.removeWhere((e) => trackIds.contains(e));
     shuffledTrackQueueIds.removeWhere((e) => trackIds.contains(e));
-    currentTrackIndex = shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
+    currentTrackIndex = shuffledTrackQueueIds.indexWhere(
+      (e) => e == currentTrackId,
+    );
     if (currentTrackIndex <= -1) {
       currentTrackIndex = 0;
     }
@@ -391,13 +404,13 @@ class PlayerController {
       if (currentTrackIndex == 0) {
         prevTrackId = shuffledTrackQueueIds.last;
       } else {
-        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+        if (shuffledTrackQueueIds.length - 1 >= currentTrackIndex - 1) {
           prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
         }
       }
     } else if (loopMode == LoopMode.startToEnd) {
       if (currentTrackIndex > 0) {
-        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+        if (shuffledTrackQueueIds.length - 1 >= currentTrackIndex - 1) {
           prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
         }
       }
@@ -416,13 +429,13 @@ class PlayerController {
       if (currentTrackIndex == shuffledTrackQueueIds.length - 1) {
         nextTrackId = shuffledTrackQueueIds.first;
       } else {
-        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+        if (shuffledTrackQueueIds.length - 1 >= currentTrackIndex - 1) {
           nextTrackId = shuffledTrackQueueIds[currentTrackIndex + 1];
         }
       }
     } else if (loopMode == LoopMode.startToEnd) {
       if (currentTrackIndex < shuffledTrackQueueIds.length - 1) {
-        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+        if (shuffledTrackQueueIds.length - 1 >= currentTrackIndex - 1) {
           nextTrackId = shuffledTrackQueueIds[currentTrackIndex + 1];
         }
       }
