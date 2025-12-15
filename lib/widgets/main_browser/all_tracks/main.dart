@@ -40,12 +40,14 @@ class AllTracksPicker extends ConsumerStatefulWidget {
 class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
   late TextEditingController _searchTextController;
   bool _isSearchingEnabled = false;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _searchTextController = TextEditingController();
     _isSearchingEnabled = false;
+    _scrollController = ScrollController();
   }
 
   Widget _buildItemPopupMenuButton(
@@ -360,8 +362,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
       sortMode,
       allTrackStatisticsAsync.value ?? {},
     );
-
-    final scrollController = ScrollController();
     final isMobile = isPlatformMobile();
 
     if (tracks.isEmpty) {
@@ -395,14 +395,14 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
             ),
           Expanded(
             child: Scrollbar(
-              controller: scrollController,
-              thickness: isMobile ? 16 : null,
+              controller: _scrollController,
+              thickness: isMobile ? 20 : null,
               radius: isMobile ? const Radius.circular(8) : null,
               thumbVisibility: isMobile ? true : null,
               interactive: isMobile ? true : null,
               child: ListView(
                 scrollDirection: Axis.vertical,
-                controller: scrollController,
+                controller: _scrollController,
                 children: sortedTracks.map((track) {
                   Function(Track track)? onTap;
                   Function(Track track)? onLongPress;
