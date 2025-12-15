@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -143,7 +142,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
     PlayerControllerNotifier playerControllerNotifier,
     LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
   ) async {
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (isPlatformMobile()) {
       await Permission.audio.request();
       await Permission.notification.request();
     }

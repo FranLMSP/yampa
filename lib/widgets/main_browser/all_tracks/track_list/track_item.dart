@@ -79,7 +79,7 @@ Widget _buildTrackIcon(bool isPlaying) {
     if (isSelected) {
       color = Theme.of(context).colorScheme.inversePrimary;
     } else if (isPlaying) {
-      color = Theme.of(context).colorScheme.primaryContainer;
+      color = Theme.of(context).colorScheme.surfaceDim;
     }
     return InkWell(
       onTap: () {

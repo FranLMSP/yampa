@@ -3,9 +3,10 @@ import 'package:path/path.dart' as p;
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:yampa/core/utils/file_utils.dart';
+import 'package:yampa/widgets/utils.dart';
 
 Future<Database> openSqliteDatabase() async {
-  if (Platform.isAndroid || Platform.isIOS) {
+  if (isPlatformMobile()) {
     return await openDatabase('app_data.db');
   } else {
     final basePath = await getBasePath();

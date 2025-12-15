@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -220,7 +219,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
             children: [
               Expanded(child: TrackTitle(track: widget.track)),
               // TODO: metadata editing doesn't currently work on Android (permission issue)
-              if (!Platform.isAndroid && !Platform.isIOS)
+              if (isPlatformDesktop())
                 IconButton(
                   icon: Icon(_isEditing ? Icons.close : Icons.edit),
                   onPressed: () {

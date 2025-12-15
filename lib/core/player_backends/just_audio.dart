@@ -19,6 +19,7 @@ import 'package:yampa/core/repositories/cached_tracks/factory.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:yampa/widgets/utils.dart';
 import 'interface.dart';
 
 AudioPlayer? _player;
@@ -29,7 +30,7 @@ class JustAudioBackend implements PlayerBackend {
   @override
   Future<void> init() async {
     _player ??= AudioPlayer();
-    if (!Platform.isAndroid && !Platform.isIOS) {
+    if (isPlatformDesktop()) {
       JustAudioMediaKit.ensureInitialized(
         linux: Platform.isLinux,
         windows: Platform.isWindows,
@@ -288,7 +289,7 @@ class JustAudioBackend implements PlayerBackend {
 
   @override
   Future<Track> updateTrackMetadata(Track track) async {
-    final hasStorageAccess = Platform.isAndroid || Platform.isIOS
+    final hasStorageAccess = isPlatformMobile()
         ? await Permission.storage.isGranted
         : true;
     if (!hasStorageAccess) {

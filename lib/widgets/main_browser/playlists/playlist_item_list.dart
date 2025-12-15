@@ -5,10 +5,11 @@ import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 
 class PlaylistItemList extends ConsumerWidget {
-  const PlaylistItemList({super.key, required this.playlist, this.onTap});
+  const PlaylistItemList({super.key, required this.playlist, this.onTap, this.isEditable = false});
 
   final Playlist playlist;
   final Function(Playlist playlist)? onTap;
+  final bool isEditable;
 
   Widget _buildPlaylistPlaceholder() {
     return Container(

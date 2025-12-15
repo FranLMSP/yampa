@@ -23,7 +23,8 @@ void addToPlaylistsModal(
         scrollable: true,
         title: const Text('Playlists'),
         content: Column(
-          children: playlists
+          children: [
+            ...playlists
               .map(
                 (playlist) => PlaylistItemList(
                   playlist: playlist,
@@ -37,8 +38,14 @@ void addToPlaylistsModal(
                     }
                   },
                 ),
-              )
-              .toList(),
+              ),
+              const SizedBox(height: 10),
+              TextButton(
+                onPressed: () {
+                },
+                child: const Text('New playlist'),
+              ),
+            ],
         ),
         actions: [
           TextButton(
