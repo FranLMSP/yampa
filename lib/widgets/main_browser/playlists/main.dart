@@ -4,6 +4,7 @@ import 'package:yampa/models/playlist.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/widgets/main_browser/playlists/common.dart';
 import 'package:yampa/widgets/main_browser/playlists/new_playlist_dialog.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_list_big.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_view_small.dart';
@@ -153,42 +154,11 @@ class _PlaylistsState extends ConsumerState<Playlists> {
 
     if (selected == 'delete') {
       if (context.mounted) {
-        _removePlaylistModal(context, playlist, playlistsNotifier);
+        removePlaylistModal(context, playlist, playlistsNotifier, null);
       }
     } else if (selected == 'select') {
       // TODO: handle multi select
     }
-  }
-
-  void _removePlaylistModal(
-    BuildContext context,
-    Playlist playlist,
-    PlaylistNotifier playlistsNotifier,
-  ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext ctx) {
-        return AlertDialog(
-          title: const Text('Delete this playlist?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('No'),
-            ),
-            TextButton(
-              onPressed: () {
-                handlePlaylistRemoved(playlist, playlistsNotifier);
-                Navigator.of(context).pop();
-                // TODO: show snackbar with "undo" button
-              },
-              child: const Text('Yes'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
