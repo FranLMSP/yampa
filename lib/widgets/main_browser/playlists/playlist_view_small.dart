@@ -17,6 +17,7 @@ import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/common/image_cropper_screen.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
+import 'package:yampa/widgets/main_browser/playlists/common.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/core/utils/sort_utils.dart';
@@ -254,6 +255,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                   icon: const Icon(Icons.arrow_back),
                   label: const Text('Back'),
                 ),
+                const Spacer(),
                 SortButton(
                   currentSortMode: selectedPlaylist.sortMode,
                   onSortModeChanged: (SortMode mode) {
@@ -270,6 +272,13 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                     );
                     widget.onEdit(editedPlaylist);
                   },
+                ),
+                IconButton(
+                  onPressed: () {
+                    removePlaylistsModal(context, [selectedPlaylist], playlistNotifier, () => widget.onGoBack());
+                  },
+                  tooltip: "Delete this playlist",
+                  icon: const Icon(Icons.delete),
                 ),
               ],
             ),

@@ -7,11 +7,13 @@ import 'package:yampa/widgets/main_browser/playlists/playlist_item_big.dart';
 class PlaylistListBig extends ConsumerWidget {
   const PlaylistListBig({
     super.key,
+    required this.selectedPlaylists,
     this.onTap,
     this.onSecondaryTap,
     this.onLongPress,
   });
 
+  final List<String> selectedPlaylists;
   final Function(Playlist playlist)? onTap;
   final Function(Playlist playlist, TapDownDetails details)? onSecondaryTap;
   final Function(Playlist playlist)? onLongPress;
@@ -38,6 +40,7 @@ class PlaylistListBig extends ConsumerWidget {
               final playlist = playlists[index];
               return PlaylistItemBig(
                 key: Key(playlist.id),
+                isSelected: selectedPlaylists.contains(playlist.id),
                 playlist: playlist,
                 onTap: (Playlist playlist) {
                   if (onTap != null) {
