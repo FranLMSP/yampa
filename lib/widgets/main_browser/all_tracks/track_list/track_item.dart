@@ -35,37 +35,35 @@ class TrackItem extends ConsumerWidget {
       width: 50,
       height: 50,
       color: Colors.grey,
-      child: isPlaying ? null : const Icon(Icons.music_note, size: 40, color: Colors.white),
+      child: isPlaying
+          ? null
+          : const Icon(Icons.music_note, size: 40, color: Colors.white),
     );
   }
 
-Widget _buildTrackIcon(bool isPlaying) {
-  return ClipRRect(
-    borderRadius: BorderRadius.circular(8.0),
-    child: Stack(
-      alignment: Alignment.center,
-      children: [
-        track.imageBytes != null
-            ? _buildTrackImage()
-            : _buildTrackPlaceholder(isPlaying),
+  Widget _buildTrackIcon(bool isPlaying) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8.0),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          track.imageBytes != null
+              ? _buildTrackImage()
+              : _buildTrackPlaceholder(isPlaying),
 
-        if (isPlaying)
-          Container(
-            width: 50,
-            height: 50,
-            color: Colors.black.withValues(alpha: 0.4),
-          ),
+          if (isPlaying)
+            Container(
+              width: 50,
+              height: 50,
+              color: Colors.black.withValues(alpha: 0.4),
+            ),
 
-        if (isPlaying)
-          const Icon(
-            Icons.play_arrow,
-            color: Colors.white,
-            size: 32,
-          ),
-      ],
-    ),
-  );
-}
+          if (isPlaying)
+            const Icon(Icons.play_arrow, color: Colors.white, size: 32),
+        ],
+      ),
+    );
+  }
 
   Widget _buildDuration(Duration duration) {
     return Text(formatDuration(duration));
@@ -73,13 +71,15 @@ Widget _buildTrackIcon(bool isPlaying) {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTrackId = ref.watch(playerControllerProvider.select((p) => p.value?.currentTrackId));
+    final currentTrackId = ref.watch(
+      playerControllerProvider.select((p) => p.value?.currentTrackId),
+    );
     final isPlaying = isTrackCurrentlyBeingPlayed(track, currentTrackId);
     Color? color;
     if (isSelected) {
       color = Theme.of(context).colorScheme.inversePrimary;
     } else if (isPlaying) {
-      color = Theme.of(context).colorScheme.primaryContainer;
+      color = Theme.of(context).colorScheme.surfaceDim;
     }
     return InkWell(
       onTap: () {

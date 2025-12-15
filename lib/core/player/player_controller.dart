@@ -288,14 +288,17 @@ class PlayerController {
   }
 
   Future<void> handleTracksRemovedFromPlaylist(
-    Playlist playlist, List<String> trackIds
+    Playlist playlist,
+    List<String> trackIds,
   ) async {
     if (playlist.id != currentPlaylistId) {
       return;
     }
     trackQueueIds.removeWhere((e) => trackIds.contains(e));
     shuffledTrackQueueIds.removeWhere((e) => trackIds.contains(e));
-    currentTrackIndex = shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
+    currentTrackIndex = shuffledTrackQueueIds.indexWhere(
+      (e) => e == currentTrackId,
+    );
     if (currentTrackIndex <= -1) {
       currentTrackIndex = 0;
     }
@@ -391,13 +394,13 @@ class PlayerController {
       if (currentTrackIndex == 0) {
         prevTrackId = shuffledTrackQueueIds.last;
       } else {
-        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+        if (shuffledTrackQueueIds.length - 1 >= currentTrackIndex - 1) {
           prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
         }
       }
     } else if (loopMode == LoopMode.startToEnd) {
       if (currentTrackIndex > 0) {
-        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+        if (shuffledTrackQueueIds.length - 1 >= currentTrackIndex - 1) {
           prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
         }
       }
@@ -416,13 +419,13 @@ class PlayerController {
       if (currentTrackIndex == shuffledTrackQueueIds.length - 1) {
         nextTrackId = shuffledTrackQueueIds.first;
       } else {
-        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+        if (shuffledTrackQueueIds.length - 1 >= currentTrackIndex - 1) {
           nextTrackId = shuffledTrackQueueIds[currentTrackIndex + 1];
         }
       }
     } else if (loopMode == LoopMode.startToEnd) {
       if (currentTrackIndex < shuffledTrackQueueIds.length - 1) {
-        if (shuffledTrackQueueIds.length -1 >= currentTrackIndex - 1 ) {
+        if (shuffledTrackQueueIds.length - 1 >= currentTrackIndex - 1) {
           nextTrackId = shuffledTrackQueueIds[currentTrackIndex + 1];
         }
       }

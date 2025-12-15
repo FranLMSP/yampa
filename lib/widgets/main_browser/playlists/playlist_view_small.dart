@@ -159,7 +159,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
           item,
           tracks,
           playlistNotifier,
-          playerNotifier
+          playerNotifier,
         );
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
@@ -202,9 +202,12 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     PlayerControllerNotifier playerNotifier,
   ) async {
     if (optionSelected == OptionSelected.removeFromPlaylist) {
-      await handleMultipleTrackRemovedFromPlaylist(selectedPlaylist, [
-        track.id,
-      ], playlistNotifier, playerNotifier);
+      await handleMultipleTrackRemovedFromPlaylist(
+        selectedPlaylist,
+        [track.id],
+        playlistNotifier,
+        playerNotifier,
+      );
     } else if (optionSelected == OptionSelected.select) {
       _toggleSelectedTrack(track.id);
     }
@@ -323,7 +326,10 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 onPressed: () async {
                   if (selectedPlaylist.trackIds.isNotEmpty &&
                       playerController != null) {
-                    await playerController.setPlaylist(selectedPlaylist, tracks);
+                    await playerController.setPlaylist(
+                      selectedPlaylist,
+                      tracks,
+                    );
                     final firstTrack = tracks[selectedPlaylist.trackIds.first];
                     if (firstTrack != null) {
                       await playTrack(
@@ -357,8 +363,12 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                       if (isInSelectMode) {
                         _toggleSelectedTrack(track.id);
                       } else if (playerController != null) {
-                        if (playerController.currentPlaylistId != selectedPlaylist.id) {
-                          await playerControllerNotifier.setPlaylist(selectedPlaylist, tracks);
+                        if (playerController.currentPlaylistId !=
+                            selectedPlaylist.id) {
+                          await playerControllerNotifier.setPlaylist(
+                            selectedPlaylist,
+                            tracks,
+                          );
                         }
                         await playTrack(
                           track,

@@ -20,7 +20,7 @@ class UserSettingsDataSharedPreferences extends UserSettingsData {
 
     final defaultSortModeIndex = await prefs.getInt(defaultSortModeKey) ?? 0;
     return UserSettings(
-      defaultSortMode: SortMode.values[defaultSortModeIndex], 
+      defaultSortMode: SortMode.values[defaultSortModeIndex],
       lastWindowSize: await getLastWindowSize(),
     );
   }
@@ -50,10 +50,7 @@ class UserSettingsDataSharedPreferences extends UserSettingsData {
     final lastWindowWidth = await prefs.getDouble(lastWindowWidthKey);
     final lastWindowHeight = await prefs.getDouble(lastWindowHeightKey);
     if (lastWindowWidth != null && lastWindowHeight != null) {
-      return WindowSize(
-        width: lastWindowWidth,
-        height: lastWindowHeight,
-      );
+      return WindowSize(width: lastWindowWidth, height: lastWindowHeight);
     }
     return null;
   }

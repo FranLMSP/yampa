@@ -19,6 +19,7 @@ import 'package:yampa/core/repositories/cached_tracks/factory.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:yampa/widgets/utils.dart';
 import 'interface.dart';
 
 AudioPlayer? _player;
@@ -29,7 +30,7 @@ class JustAudioBackend implements PlayerBackend {
   @override
   Future<void> init() async {
     _player ??= AudioPlayer();
-    if (!Platform.isAndroid && !Platform.isIOS) {
+    if (isPlatformDesktop()) {
       JustAudioMediaKit.ensureInitialized(
         linux: Platform.isLinux,
         windows: Platform.isWindows,
@@ -189,8 +190,12 @@ class JustAudioBackend implements PlayerBackend {
         genre: tag?.genre ?? "",
         trackNumber: tag?.trackNumber ?? 0,
         path: path,
-        duration: tag?.duration != null ? Duration(seconds: tag!.duration!) : Duration.zero,
-        imageBytes: tag != null && tag.pictures.isNotEmpty ? tag.pictures.first.bytes : null,
+        duration: tag?.duration != null
+            ? Duration(seconds: tag!.duration!)
+            : Duration.zero,
+        imageBytes: tag != null && tag.pictures.isNotEmpty
+            ? tag.pictures.first.bytes
+            : null,
         lastModified: lastModified,
       );
     } catch (e) {
@@ -288,7 +293,7 @@ class JustAudioBackend implements PlayerBackend {
 
   @override
   Future<Track> updateTrackMetadata(Track track) async {
-    final hasStorageAccess = Platform.isAndroid || Platform.isIOS
+    final hasStorageAccess = isPlatformMobile()
         ? await Permission.storage.isGranted
         : true;
     if (!hasStorageAccess) {
@@ -297,23 +302,25 @@ class JustAudioBackend implements PlayerBackend {
     Tag? existingTag = await AudioTags.read(track.path);
 
     Tag tag = Tag(
-        title: track.title,
-        trackArtist: track.artist,
-        album: track.album,
-        albumArtist: track.artist,
-        genre: track.genre,
-        year: existingTag?.year,
-        trackNumber: track.trackNumber,
-        trackTotal: existingTag?.trackTotal,
-        discNumber: existingTag?.discNumber,
-        discTotal: existingTag?.discTotal,
-        pictures: track.imageBytes != null ? [
-            Picture(
+      title: track.title,
+      trackArtist: track.artist,
+      album: track.album,
+      albumArtist: track.artist,
+      genre: track.genre,
+      year: existingTag?.year,
+      trackNumber: track.trackNumber,
+      trackTotal: existingTag?.trackTotal,
+      discNumber: existingTag?.discNumber,
+      discTotal: existingTag?.discTotal,
+      pictures: track.imageBytes != null
+          ? [
+              Picture(
                 bytes: Uint8List.fromList(track.imageBytes!),
                 mimeType: null,
-                pictureType: PictureType.other
-            )
-        ] : []
+                pictureType: PictureType.other,
+              ),
+            ]
+          : [],
     );
 
     await AudioTags.write(track.path, tag);

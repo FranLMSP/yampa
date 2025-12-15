@@ -4,11 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/track.dart';
 
 class TrackTitle extends ConsumerWidget {
-  const TrackTitle({
-    super.key,
-    this.track,
-    this.fontSize,
-  });
+  const TrackTitle({super.key, this.track, this.fontSize});
 
   final Track? track;
   final double? fontSize;

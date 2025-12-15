@@ -13,7 +13,7 @@ ViewMode getViewMode(BoxConstraints constraints) {
 }
 
 Future<void> showButtonActionMessage(String message) async {
-  if (Platform.isAndroid || Platform.isIOS) {
+  if (isPlatformMobile()) {
     await Fluttertoast.cancel();
     await Fluttertoast.showToast(msg: message);
   }
@@ -21,4 +21,8 @@ Future<void> showButtonActionMessage(String message) async {
 
 bool isPlatformDesktop() {
   return Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+}
+
+bool isPlatformMobile() {
+  return Platform.isAndroid || Platform.isIOS;
 }
