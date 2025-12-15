@@ -7,4 +7,3 @@ abstract class UserSettingsData {
   Future<WindowSize?> getLastWindowSize();
   Future<void> close();
 }
-

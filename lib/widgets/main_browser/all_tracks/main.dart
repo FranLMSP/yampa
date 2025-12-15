@@ -173,7 +173,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
       addToPlaylistsModal(
         context,
         selectedTracksNotifier.getTrackIds(),
-        playlists,
         playlistNotifier,
         selectedPlaylistsNotifier,
         selectedTracksNotifier,
@@ -284,7 +283,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
             addToPlaylistsModal(
               context,
               selectedTracks,
-              playlists,
               playlistNotifier,
               selectedPlaylistsNotifier,
               selectedTracksNotifier,

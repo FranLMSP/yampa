@@ -190,8 +190,12 @@ class JustAudioBackend implements PlayerBackend {
         genre: tag?.genre ?? "",
         trackNumber: tag?.trackNumber ?? 0,
         path: path,
-        duration: tag?.duration != null ? Duration(seconds: tag!.duration!) : Duration.zero,
-        imageBytes: tag != null && tag.pictures.isNotEmpty ? tag.pictures.first.bytes : null,
+        duration: tag?.duration != null
+            ? Duration(seconds: tag!.duration!)
+            : Duration.zero,
+        imageBytes: tag != null && tag.pictures.isNotEmpty
+            ? tag.pictures.first.bytes
+            : null,
         lastModified: lastModified,
       );
     } catch (e) {
@@ -298,23 +302,25 @@ class JustAudioBackend implements PlayerBackend {
     Tag? existingTag = await AudioTags.read(track.path);
 
     Tag tag = Tag(
-        title: track.title,
-        trackArtist: track.artist,
-        album: track.album,
-        albumArtist: track.artist,
-        genre: track.genre,
-        year: existingTag?.year,
-        trackNumber: track.trackNumber,
-        trackTotal: existingTag?.trackTotal,
-        discNumber: existingTag?.discNumber,
-        discTotal: existingTag?.discTotal,
-        pictures: track.imageBytes != null ? [
-            Picture(
+      title: track.title,
+      trackArtist: track.artist,
+      album: track.album,
+      albumArtist: track.artist,
+      genre: track.genre,
+      year: existingTag?.year,
+      trackNumber: track.trackNumber,
+      trackTotal: existingTag?.trackTotal,
+      discNumber: existingTag?.discNumber,
+      discTotal: existingTag?.discTotal,
+      pictures: track.imageBytes != null
+          ? [
+              Picture(
                 bytes: Uint8List.fromList(track.imageBytes!),
                 mimeType: null,
-                pictureType: PictureType.other
-            )
-        ] : []
+                pictureType: PictureType.other,
+              ),
+            ]
+          : [],
     );
 
     await AudioTags.write(track.path, tag);

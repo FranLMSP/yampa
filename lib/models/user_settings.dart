@@ -4,10 +4,7 @@ class WindowSize {
   final double width;
   final double height;
 
-  WindowSize ({
-    required this.width,
-    required this.height,
-  });
+  WindowSize({required this.width, required this.height});
 }
 
 class UserSettings {

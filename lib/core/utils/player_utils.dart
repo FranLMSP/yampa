@@ -21,12 +21,8 @@ Future<void> playTrack(
   await playerControllerNotifier.play();
 }
 
-bool isTrackCurrentlyBeingPlayed(
-  Track track,
-  String? currentTrackId,
-) {
-  return (currentTrackId != null &&
-      track.id == currentTrackId);
+bool isTrackCurrentlyBeingPlayed(Track track, String? currentTrackId) {
+  return (currentTrackId != null && track.id == currentTrackId);
 }
 
 Uri bytesToDataUri(Uint8List bytes) {

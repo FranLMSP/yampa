@@ -24,7 +24,6 @@ class PlaylistButton extends ConsumerWidget {
       playerControllerProvider.notifier,
     );
     final tracks = ref.watch(tracksProvider);
-    final playlists = ref.watch(playlistsProvider);
     return IconButton(
       icon: const Icon(Icons.playlist_add),
       tooltip: 'Save to playlist',
@@ -41,7 +40,6 @@ class PlaylistButton extends ConsumerWidget {
         addToPlaylistsModal(
           context,
           selectedTracksNotifier.getTrackIds(),
-          playlists,
           playlistsNotifier,
           selectedPlaylistsNotifier,
           selectedTracksNotifier,

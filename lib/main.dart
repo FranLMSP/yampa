@@ -91,7 +91,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
     super.dispose();
   }
 
-
   void _initWindow() async {
     await windowManager.setPreventClose(true);
     setState(() {});

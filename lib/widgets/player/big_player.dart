@@ -34,9 +34,7 @@ class BigPlayer extends ConsumerWidget {
               if (trackQueueDisplayMode == TrackQueueDisplayMode.image)
                 PlayerImage(track: track)
               else
-                const Expanded(
-                  child: UpcomingTracksList(),
-                ),
+                const Expanded(child: UpcomingTracksList()),
               const SizedBox(height: 20),
               TrackTitle(track: track),
               const SizedBox(height: 10),
