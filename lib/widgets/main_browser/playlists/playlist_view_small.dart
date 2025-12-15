@@ -275,7 +275,12 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 ),
                 IconButton(
                   onPressed: () {
-                    removePlaylistsModal(context, [selectedPlaylist], playlistNotifier, () => widget.onGoBack());
+                    removePlaylistsModal(
+                      context,
+                      [selectedPlaylist],
+                      playlistNotifier,
+                      () => widget.onGoBack(),
+                    );
                   },
                   tooltip: "Delete this playlist",
                   icon: const Icon(Icons.delete),

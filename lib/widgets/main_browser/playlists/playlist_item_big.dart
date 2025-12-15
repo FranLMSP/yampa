@@ -29,7 +29,9 @@ class PlaylistItemBig extends StatelessWidget {
             onSecondaryTap != null ? onSecondaryTap!(playlist, details) : () {},
         onLongPress: () => onLongPress != null ? onLongPress!(playlist) : () {},
         child: Card(
-          color: isSelected ? Theme.of(context).colorScheme.inversePrimary : null,
+          color: isSelected
+              ? Theme.of(context).colorScheme.inversePrimary
+              : null,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -40,7 +42,9 @@ class PlaylistItemBig extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 width: double.infinity,
-                color: isSelected ? Theme.of(context).colorScheme.inversePrimary : Colors.white,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.inversePrimary
+                    : Colors.white,
                 child: Text(
                   playlist.name,
                   style: const TextStyle(
