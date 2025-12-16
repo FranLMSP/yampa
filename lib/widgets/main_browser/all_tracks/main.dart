@@ -401,7 +401,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
               thumbVisibility: isMobile ? true : null,
               interactive: isMobile ? true : null,
               child: ListView(
-                scrollDirection: Axis.vertical,
                 controller: _scrollController,
                 children: sortedTracks.map((track) {
                   Function(Track track)? onTap;
