@@ -22,6 +22,7 @@ import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/core/utils/sort_utils.dart';
 import 'package:yampa/widgets/common/sort_button.dart';
+import 'package:yampa/widgets/utils.dart';
 
 enum ImageTabOptions { changeImage, removeImage }
 
@@ -47,6 +48,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   final List<String> _selectedTrackIds = [];
+  late ScrollController _scrollController;
 
   @override
   void initState() {
@@ -55,6 +57,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
     _descriptionController = TextEditingController(
       text: widget.playlist.description,
     );
+    _scrollController = ScrollController();
   }
 
   Future<void> _updateImage(Playlist selectedPlaylist, String? path) async {
@@ -240,170 +243,185 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
         widget.playlist;
     final isInSelectMode = _selectedTrackIds.isNotEmpty;
     final allTrackStatisticsAsync = ref.watch(allTrackStatisticsProvider);
+    final isMobile = isPlatformMobile();
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton.icon(
-                  onPressed: () => widget.onGoBack(),
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Back'),
-                ),
-                const Spacer(),
-                SortButton(
-                  currentSortMode: selectedPlaylist.sortMode,
-                  onSortModeChanged: (SortMode mode) {
-                    ref.invalidate(allTrackStatisticsProvider);
-                    playlistNotifier.setSortMode(selectedPlaylist, mode);
+    return Scrollbar(
+      controller: _scrollController,
+      thickness: isMobile ? 20 : null,
+      radius: isMobile ? const Radius.circular(8) : null,
+      thumbVisibility: isMobile ? true : null,
+      interactive: isMobile ? true : null,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        controller: _scrollController,
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton.icon(
+                    onPressed: () => widget.onGoBack(),
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text('Back'),
+                  ),
+                  const Spacer(),
+                  SortButton(
+                    currentSortMode: selectedPlaylist.sortMode,
+                    onSortModeChanged: (SortMode mode) {
+                      ref.invalidate(allTrackStatisticsProvider);
+                      playlistNotifier.setSortMode(selectedPlaylist, mode);
 
-                    final editedPlaylist = Playlist(
-                      id: selectedPlaylist.id,
-                      name: selectedPlaylist.name,
-                      description: selectedPlaylist.description,
-                      trackIds: selectedPlaylist.trackIds,
-                      imagePath: selectedPlaylist.imagePath,
-                      sortMode: mode,
-                    );
-                    widget.onEdit(editedPlaylist);
-                  },
-                ),
-                IconButton(
-                  onPressed: () {
-                    removePlaylistsModal(context, [selectedPlaylist], playlistNotifier, () => widget.onGoBack());
-                  },
-                  tooltip: "Delete this playlist",
-                  icon: const Icon(Icons.delete),
-                ),
-              ],
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              if (selectedPlaylist.imagePath == null ||
-                  !isValidImagePath(selectedPlaylist.imagePath!)) {
-                _changeImage(selectedPlaylist);
-              } else {
-                _showImageOptions(context, selectedPlaylist);
-              }
-            },
-            child: PlaylistImage(playlist: selectedPlaylist),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _titleController,
-            readOnly: selectedPlaylist.id == favoritePlaylistId,
-            decoration: const InputDecoration(labelText: 'Title'),
-            onTapOutside: (text) {
-              final editedPlaylist = Playlist(
-                id: selectedPlaylist.id,
-                name: _titleController.text,
-                description: selectedPlaylist.description,
-                trackIds: selectedPlaylist.trackIds,
-                imagePath: selectedPlaylist.imagePath,
-                sortMode: selectedPlaylist.sortMode,
-              );
-              widget.onEdit(editedPlaylist);
-            },
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _descriptionController,
-            decoration: const InputDecoration(labelText: 'Description'),
-            onTapOutside: (text) {
-              final editedPlaylist = Playlist(
-                id: selectedPlaylist.id,
-                name: selectedPlaylist.name,
-                description: _descriptionController.text,
-                trackIds: selectedPlaylist.trackIds,
-                imagePath: selectedPlaylist.imagePath,
-                sortMode: selectedPlaylist.sortMode,
-              );
-              widget.onEdit(editedPlaylist);
-            },
-          ),
-          const SizedBox(height: 24),
-          if (selectedPlaylist.trackIds.isNotEmpty)
-            SizedBox(
-              width: 100,
-              child: ElevatedButton(
-                onPressed: () async {
-                  if (selectedPlaylist.trackIds.isNotEmpty &&
-                      playerController != null) {
-                    await playerController.setPlaylist(
-                      selectedPlaylist,
-                      tracks,
-                    );
-                    final firstTrack = tracks[selectedPlaylist.trackIds.first];
-                    if (firstTrack != null) {
-                      await playTrack(
-                        firstTrack,
-                        tracks,
-                        playerController,
-                        playerControllerNotifier,
+                      final editedPlaylist = Playlist(
+                        id: selectedPlaylist.id,
+                        name: selectedPlaylist.name,
+                        description: selectedPlaylist.description,
+                        trackIds: selectedPlaylist.trackIds,
+                        imagePath: selectedPlaylist.imagePath,
+                        sortMode: mode,
                       );
-                    }
-                  }
-                },
-                child: Row(children: [Icon(Icons.play_arrow), Text("Play")]),
+                      widget.onEdit(editedPlaylist);
+                    },
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      removePlaylistsModal(
+                        context,
+                        [selectedPlaylist],
+                        playlistNotifier,
+                        () => widget.onGoBack(),
+                      );
+                    },
+                    tooltip: "Delete this playlist",
+                    icon: const Icon(Icons.delete),
+                  ),
+                ],
               ),
             ),
-          const SizedBox(height: 24),
-          Column(
-            children:
-                sortTracks(
-                  selectedPlaylist.trackIds
-                      .map((e) => tracks[e])
-                      .whereType<Track>()
-                      .toList(),
-                  selectedPlaylist.sortMode,
-                  allTrackStatisticsAsync.value ?? {},
-                ).map((track) {
-                  final isSelected = _selectedTrackIds.contains(track.id);
-                  return TrackItem(
-                    key: Key(track.id),
-                    track: track,
-                    onTap: (Track track) async {
-                      if (isInSelectMode) {
-                        _toggleSelectedTrack(track.id);
-                      } else if (playerController != null) {
-                        if (playerController.currentPlaylistId !=
-                            selectedPlaylist.id) {
-                          await playerControllerNotifier.setPlaylist(
-                            selectedPlaylist,
-                            tracks,
-                          );
-                        }
+            InkWell(
+              onTap: () {
+                if (selectedPlaylist.imagePath == null ||
+                    !isValidImagePath(selectedPlaylist.imagePath!)) {
+                  _changeImage(selectedPlaylist);
+                } else {
+                  _showImageOptions(context, selectedPlaylist);
+                }
+              },
+              child: PlaylistImage(playlist: selectedPlaylist),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _titleController,
+              readOnly: selectedPlaylist.id == favoritePlaylistId,
+              decoration: const InputDecoration(labelText: 'Title'),
+              onTapOutside: (text) {
+                final editedPlaylist = Playlist(
+                  id: selectedPlaylist.id,
+                  name: _titleController.text,
+                  description: selectedPlaylist.description,
+                  trackIds: selectedPlaylist.trackIds,
+                  imagePath: selectedPlaylist.imagePath,
+                  sortMode: selectedPlaylist.sortMode,
+                );
+                widget.onEdit(editedPlaylist);
+              },
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(labelText: 'Description'),
+              onTapOutside: (text) {
+                final editedPlaylist = Playlist(
+                  id: selectedPlaylist.id,
+                  name: selectedPlaylist.name,
+                  description: _descriptionController.text,
+                  trackIds: selectedPlaylist.trackIds,
+                  imagePath: selectedPlaylist.imagePath,
+                  sortMode: selectedPlaylist.sortMode,
+                );
+                widget.onEdit(editedPlaylist);
+              },
+            ),
+            const SizedBox(height: 24),
+            if (selectedPlaylist.trackIds.isNotEmpty)
+              SizedBox(
+                width: 100,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (selectedPlaylist.trackIds.isNotEmpty &&
+                        playerController != null) {
+                      await playerController.setPlaylist(
+                        selectedPlaylist,
+                        tracks,
+                      );
+                      final firstTrack =
+                          tracks[selectedPlaylist.trackIds.first];
+                      if (firstTrack != null) {
                         await playTrack(
-                          track,
+                          firstTrack,
                           tracks,
                           playerController,
                           playerControllerNotifier,
                         );
                       }
-                    },
-                    onLongPress: (Track track) {
-                      _toggleSelectedTrack(track.id);
-                    },
-                    isSelected: isSelected,
-                    trailing: isInSelectMode
-                        ? null
-                        : _buildItemPopupMenuButton(
-                            selectedPlaylist,
+                    }
+                  },
+                  child: Row(children: [Icon(Icons.play_arrow), Text("Play")]),
+                ),
+              ),
+            const SizedBox(height: 24),
+            Column(
+              children:
+                  sortTracks(
+                    selectedPlaylist.trackIds
+                        .map((e) => tracks[e])
+                        .whereType<Track>()
+                        .toList(),
+                    selectedPlaylist.sortMode,
+                    allTrackStatisticsAsync.value ?? {},
+                  ).map((track) {
+                    final isSelected = _selectedTrackIds.contains(track.id);
+                    return TrackItem(
+                      key: Key(track.id),
+                      track: track,
+                      onTap: (Track track) async {
+                        if (isInSelectMode) {
+                          _toggleSelectedTrack(track.id);
+                        } else if (playerController != null) {
+                          if (playerController.currentPlaylistId !=
+                              selectedPlaylist.id) {
+                            await playerControllerNotifier.setPlaylist(
+                              selectedPlaylist,
+                              tracks,
+                            );
+                          }
+                          await playTrack(
                             track,
                             tracks,
-                            playlistNotifier,
+                            playerController,
                             playerControllerNotifier,
-                          ),
-                  );
-                }).toList(),
-          ),
-        ],
+                          );
+                        }
+                      },
+                      onLongPress: (Track track) {
+                        _toggleSelectedTrack(track.id);
+                      },
+                      isSelected: isSelected,
+                      trailing: isInSelectMode
+                          ? null
+                          : _buildItemPopupMenuButton(
+                              selectedPlaylist,
+                              track,
+                              tracks,
+                              playlistNotifier,
+                              playerControllerNotifier,
+                            ),
+                    );
+                  }).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }

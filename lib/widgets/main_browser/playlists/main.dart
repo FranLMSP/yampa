@@ -67,10 +67,17 @@ class _PlaylistsState extends ConsumerState<Playlists> {
       foregroundColor: Theme.of(context).colorScheme.onError,
       child: Icon(Icons.delete),
       onPressed: () {
-        final selectedPlaylists = allPlaylists.where((e) => _selectedPlaylistIds.contains(e.id)).toList();
-        removePlaylistsModal(context, selectedPlaylists, playlistsNotifier, () => setState(() {
-          _selectedPlaylistIds = [];
-        }));
+        final selectedPlaylists = allPlaylists
+            .where((e) => _selectedPlaylistIds.contains(e.id))
+            .toList();
+        removePlaylistsModal(
+          context,
+          selectedPlaylists,
+          playlistsNotifier,
+          () => setState(() {
+            _selectedPlaylistIds = [];
+          }),
+        );
       },
     );
   }
@@ -132,9 +139,13 @@ class _PlaylistsState extends ConsumerState<Playlists> {
       children: [
         if (_selectedPlaylistIds.isNotEmpty)
           _buildRemoveSelectedPlaylistsButton(allPlaylists, playlistNotifier),
-        if (_selectedPlaylistIds.isEmpty && _selectedTrackIds.isEmpty && _openedPlaylist == null)
+        if (_selectedPlaylistIds.isEmpty &&
+            _selectedTrackIds.isEmpty &&
+            _openedPlaylist == null)
           _buildAddNewTrackFloatingButton(playlistNotifier),
-        if (_selectedPlaylistIds.isEmpty && _selectedTrackIds.isNotEmpty && _openedPlaylist != null)
+        if (_selectedPlaylistIds.isEmpty &&
+            _selectedTrackIds.isNotEmpty &&
+            _openedPlaylist != null)
           _buildRemoveSelectedTracksButton(playlistNotifier, playerNotifier),
       ],
     );
