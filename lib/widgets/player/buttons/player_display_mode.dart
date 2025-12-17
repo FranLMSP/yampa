@@ -10,7 +10,7 @@ class PlayerDisplayModeButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final trackQueueDisplayMode = ref.watch(
       playerControllerProvider.select(
-        (p) => p.value?.trackQueueDisplayMode ?? TrackQueueDisplayMode.image,
+        (p) => p.trackQueueDisplayMode,
       ),
     );
     final playerControllerNotifier = ref.read(

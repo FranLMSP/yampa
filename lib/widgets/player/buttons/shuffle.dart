@@ -36,7 +36,7 @@ class ShuffleButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final shuffleMode = ref.watch(
       playerControllerProvider.select(
-        (p) => p.value?.shuffleMode ?? ShuffleMode.sequential,
+        (p) => p.shuffleMode,
       ),
     );
     final playerControllerNotifier = ref.read(

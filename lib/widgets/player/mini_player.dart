@@ -16,7 +16,7 @@ class MiniPlayer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentTrackId = ref.watch(
-      playerControllerProvider.select((p) => p.value?.currentTrackId),
+      playerControllerProvider.select((p) => p.currentTrackId),
     );
     final tracks = ref.watch(tracksProvider);
     final track = tracks[currentTrackId];

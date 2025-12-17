@@ -332,8 +332,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final selectedPlaylistsNotifier = ref.watch(
       selectedPlaylistsProvider.notifier,
     );
-    final playerControllerState = ref.read(playerControllerProvider);
-    final playerController = playerControllerState.value;
+    final playerController = ref.watch(playerControllerProvider);
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,
     );

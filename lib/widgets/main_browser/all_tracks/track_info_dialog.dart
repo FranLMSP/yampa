@@ -306,8 +306,8 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                     true,
                     viewMode,
                   ),
-                  _buildInfoRow('Path', widget.track.path, true, viewMode),
                 ],
+                _buildInfoRow('Path', widget.track.path, true, viewMode),
                 const SizedBox(height: 24),
                 Text(
                   "Statistics",

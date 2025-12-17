@@ -6,255 +6,152 @@ import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
 
 final playerControllerProvider =
-    AsyncNotifierProvider<PlayerControllerNotifier, PlayerController>(
+    NotifierProvider<PlayerControllerNotifier, PlayerController>(
       PlayerControllerNotifier.new,
     );
 
-class PlayerControllerNotifier extends AsyncNotifier<PlayerController> {
+class PlayerControllerNotifier extends Notifier<PlayerController> {
   @override
-  Future<PlayerController> build() async => PlayerController();
+  PlayerController build() => PlayerController();
 
   Future<void> play() async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final optimistic = currentState.clone();
-    optimistic.state = PlayerState.playing;
-    state = AsyncData(optimistic);
-
-    final result = await AsyncValue.guard(() async {
-      await optimistic.play();
-      return optimistic.clone();
-    });
-    state = result;
+    final currentState = state;
+    await currentState.play();
+    state = currentState.clone();
   }
 
   Future<void> pause() async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final optimistic = currentState.clone();
-    optimistic.state = PlayerState.paused;
-    state = AsyncData(optimistic);
-
-    final result = await AsyncValue.guard(() async {
-      await optimistic.pause();
-      return optimistic.clone();
-    });
-    state = result;
+    final currentState = state;
+    await currentState.pause();
+    state = currentState.clone();
   }
 
   Future<void> next(Map<String, Track> tracks) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final result = await AsyncValue.guard(() async {
-      final player = currentState.clone();
-      await player.next(true, tracks);
-      return player.clone();
-    });
-    state = result;
+    final currentState = state;
+    await currentState.next(true, tracks);
+    state = currentState.clone();
   }
 
   Future<void> prev(Map<String, Track> tracks) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final result = await AsyncValue.guard(() async {
-      final player = currentState.clone();
-      await player.prev(tracks);
-      return player.clone();
-    });
-    state = result;
+    final currentState = state;
+    await currentState.prev(tracks);
+    state = currentState.clone();
   }
 
   Future<void> stop() async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final optimistic = currentState.clone();
-    optimistic.state = PlayerState.stopped;
-    state = AsyncData(optimistic);
-
-    final result = await AsyncValue.guard(() async {
-      await optimistic.stop();
-      return optimistic.clone();
-    });
-    state = result;
+    final currentState = state;
+    await currentState.stop();
+    state = currentState.clone();
   }
 
   Future<void> seek(Duration duration) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final optimistic = currentState.clone();
-    // Seek is usually fast enough that we might not need full async loading state,
-    // but let's be safe or just update optimistically.
-    // For seek, we often want immediate feedback if possible, but the backend seek is async.
-    await optimistic.seek(duration);
-    state = AsyncData(optimistic);
+    final currentState = state;
+    await currentState.seek(duration);
+    state = currentState.clone();
   }
 
-  Future<void> setPlayerBackend(PlayerBackend trackPlayer) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final result = await AsyncValue.guard(() async {
-      final optimistic = currentState.clone();
-      await optimistic.setPlayerBackend(trackPlayer);
-      return optimistic;
-    });
-    state = result;
+  Future<void> setPlayerBackend(PlayerBackend playerBackend) async {
+    final currentState = state;
+    await currentState.setPlayerBackend(playerBackend);
+    state = currentState.clone();
   }
 
   Future<void> setCurrentTrack(Track track, Map<String, Track> tracks) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final result = await AsyncValue.guard(() async {
-      final optimistic = currentState.clone();
-      await optimistic.setCurrentTrack(track, tracks);
-      return optimistic;
-    });
-    state = result;
+    final currentState = state;
+    await currentState.setCurrentTrack(track, tracks);
+    state = currentState.clone();
   }
 
   Future<void> setPlaylist(Playlist playlist, Map<String, Track> tracks) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final result = await AsyncValue.guard(() async {
-      final optimistic = currentState.clone();
-      await optimistic.setPlaylist(playlist, tracks);
-      return optimistic;
-    });
-    state = result;
+    final currentState = state;
+    await currentState.setPlaylist(playlist, tracks);
+    state = currentState.clone();
   }
 
   Future<void> handleTracksAddedToPlaylist(
     List<Map<String, String>> playlistTrackMapping,
   ) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final optimistic = currentState.clone();
-    await optimistic.handleTracksAddedToPlaylist(playlistTrackMapping);
-    state = AsyncData(optimistic);
+    final currentState = state;
+    await currentState.handleTracksAddedToPlaylist(playlistTrackMapping);
+    state = currentState.clone();
   }
 
   Future<void> handleTracksRemovedFromPlaylist(
     Playlist playlist,
     List<String> trackIds,
   ) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final optimistic = currentState.clone();
-    await optimistic.handleTracksRemovedFromPlaylist(playlist, trackIds);
-    state = AsyncData(optimistic);
+    final currentState = state;
+    await currentState.handleTracksRemovedFromPlaylist(playlist, trackIds);
+    state = currentState.clone();
   }
 
   Future<LoopMode> toggleLoopMode() async {
-    final currentState = state.value;
-    if (currentState == null) return LoopMode.none;
-
-    final optimistic = currentState.clone();
-    final newLoopMode = await optimistic.toggleLoopMode();
-    state = AsyncData(optimistic);
-    return newLoopMode;
+    final currentState = state;
+    await currentState.toggleLoopMode();
+    state = currentState.clone();
+    return currentState.loopMode;
   }
 
   Future<ShuffleMode> toggleShuffleMode() async {
-    final currentState = state.value;
-    if (currentState == null) return ShuffleMode.sequential;
-
-    final optimistic = currentState.clone();
-    final newShuffleMode = await optimistic.toggleShuffleMode();
-    state = AsyncData(optimistic);
-    return newShuffleMode;
+    final currentState = state;
+    await currentState.toggleShuffleMode();
+    state = currentState.clone();
+    return currentState.shuffleMode;
   }
 
   Future<void> handleNextAutomatically(Map<String, Track> tracks) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    // This is called automatically, maybe we don't want to show loading state to avoid flickering?
-    // But if it takes time, we should probably know.
-    // Let's stick to optimistic update pattern if possible or just await.
-    final optimistic = currentState.clone();
-    await optimistic.handleNextAutomatically(tracks);
-    state = AsyncData(optimistic);
+    final currentState = state;
+    await currentState.handleNextAutomatically(tracks);
+    state = currentState.clone();
   }
 
-  PlayerController? getPlayerController() {
-    return state.value?.clone();
+  PlayerController getPlayerController() {
+    return state.clone();
   }
 
   Future<void> setSpeed(double value) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final optimistic = currentState.clone();
-    await optimistic.setSpeed(value);
-    state = AsyncData(optimistic);
+    final currentState = state;
+    await currentState.setSpeed(value);
+    state = currentState.clone();
   }
 
   Future<void> setPlayerController(
     PlayerController playerController,
     Map<String, Track> tracks,
   ) async {
-    final result = await AsyncValue.guard(() async {
-      await playerController.setSpeed(playerController.speed);
-      final currentTrack = tracks[playerController.currentTrackId];
-      if (currentTrack != null) {
-        await playerController.setCurrentTrack(currentTrack, tracks);
-      }
-      return playerController;
-    });
-    state = result;
+    final currentState = playerController.clone();
+    await currentState.setSpeed(playerController.speed);
+    final currentTrack = tracks[playerController.currentTrackId];
+    if (currentTrack != null) {
+      await currentState.setCurrentTrack(currentTrack, tracks);
+    }
+    state = currentState.clone();
   }
 
   Future<void> setTrackQueueDisplayMode(TrackQueueDisplayMode mode) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final optimistic = currentState.clone();
-    await optimistic.setTrackQueueDisplayMode(mode);
-    state = AsyncData(optimistic);
+    final currentState = state;
+    await currentState.setTrackQueueDisplayMode(mode);
+    state = currentState.clone();
   }
 
   Future<void> reloadPlaylist(
     Playlist playlist,
     Map<String, Track> tracks,
   ) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final result = await AsyncValue.guard(() async {
-      final optimistic = currentState.clone();
-      await optimistic.reloadPlaylist(playlist, tracks);
-      return optimistic;
-    });
-    state = result;
+    final currentState = state;
+    await currentState.reloadPlaylist(playlist, tracks);
+    state = currentState.clone();
   }
 
   Future<void> updatePlaybackStatistics() async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    // Don't update UI state, just update statistics in background
+    final currentState = state;
     await currentState.updatePlaybackStatistics();
+    state = currentState.clone();
   }
 
   Future<void> handleTrackUpdated(String oldId, String newId) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final result = await AsyncValue.guard(() async {
-      final optimistic = currentState.clone();
-      await optimistic.handleTrackUpdated(oldId, newId);
-      return optimistic;
-    });
-    state = result;
+    final currentState = state;
+    await currentState.handleTrackUpdated(oldId, newId);
+    state = currentState.clone();
   }
 }

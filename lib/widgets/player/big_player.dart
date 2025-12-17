@@ -18,11 +18,11 @@ class BigPlayer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
     final currentTrackId = ref.watch(
-      playerControllerProvider.select((p) => p.value?.currentTrackId),
+      playerControllerProvider.select((p) => p.currentTrackId),
     );
     final track = tracks[currentTrackId];
     final trackQueueDisplayMode = ref.watch(
-      playerControllerProvider.select((p) => p.value?.trackQueueDisplayMode),
+      playerControllerProvider.select((p) => p.trackQueueDisplayMode),
     );
 
     return Stack(

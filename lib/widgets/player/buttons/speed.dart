@@ -8,7 +8,7 @@ class SpeedButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final speed = ref.watch(
-      playerControllerProvider.select((p) => p.value?.speed ?? 1.0),
+      playerControllerProvider.select((p) => p.speed),
     );
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,

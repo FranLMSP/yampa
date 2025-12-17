@@ -38,7 +38,7 @@ class LoopButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loopMode = ref.watch(
       playerControllerProvider.select(
-        (p) => p.value?.loopMode ?? LoopMode.none,
+        (p) => p.loopMode,
       ),
     );
     final playerControllerNotifier = ref.read(

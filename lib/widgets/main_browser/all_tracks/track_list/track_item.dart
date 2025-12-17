@@ -72,7 +72,7 @@ class TrackItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentTrackId = ref.watch(
-      playerControllerProvider.select((p) => p.value?.currentTrackId),
+      playerControllerProvider.select((p) => p.currentTrackId),
     );
     final isPlaying = isTrackCurrentlyBeingPlayed(track, currentTrackId);
     Color? color;
