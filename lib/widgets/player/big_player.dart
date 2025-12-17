@@ -35,25 +35,22 @@ class BigPlayer extends ConsumerWidget {
                 PlayerImage(track: track)
               else
                 const Expanded(child: UpcomingTracksList()),
-              const SizedBox(height: 20),
+              const SizedBox(height: 5),
               TrackTitle(track: track),
-              const SizedBox(height: 10),
               if (track != null && track.artist.isNotEmpty)
                 Text(
                   track.artist,
-                  style: const TextStyle(fontSize: 18, color: Colors.grey),
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
               if (track != null && track.album.isNotEmpty)
                 Text(
                   track.album,
-                  style: const TextStyle(fontSize: 18, color: Colors.grey),
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
-              const SizedBox(height: 30),
               const PlayerSlider(),
               const PlayerButtons(),
-              const SizedBox(height: 10),
               const PlayerTotalMinutes(),
               const SizedBox(height: 70),
             ],

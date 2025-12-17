@@ -5,8 +5,8 @@ class PlayerImage extends StatelessWidget {
   const PlayerImage({
     super.key,
     this.track,
-    this.width = 200.0,
-    this.height = 200.0,
+    this.width = 175.0,
+    this.height = 175.0,
     this.iconSize = 100.0,
   });
 

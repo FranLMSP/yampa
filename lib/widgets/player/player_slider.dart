@@ -88,7 +88,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
       playerControllerProvider.select((p) => p.currentTrackId),
     );
     return Slider(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       value: _currentSliderValue,
       onChanged: (value) =>
           _setPlayerCurrentPosition(tracks, currentTrackId, value),

@@ -18,7 +18,7 @@ class TrackTitle extends ConsumerWidget {
       delayBefore: Duration(seconds: 1),
       pauseBetween: Duration(seconds: 1),
       pauseOnBounce: Duration(seconds: 1),
-      style: TextStyle(fontSize: fontSize ?? 24, fontWeight: FontWeight.bold),
+      style: TextStyle(fontSize: fontSize ?? 20, fontWeight: FontWeight.bold),
       textAlign: TextAlign.center,
       selectable: false,
     );
