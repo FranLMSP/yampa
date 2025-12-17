@@ -65,6 +65,7 @@ class UpcomingTracksList extends ConsumerWidget {
             thumbVisibility: isMobile ? true : null,
             interactive: isMobile ? true : null,
             child: ListView.builder(
+              controller: scrollController,
               itemCount: shuffledTrackIds.length,
               itemBuilder: (context, index) {
                 final trackId = shuffledTrackIds[index];
