@@ -16,54 +16,73 @@ import 'package:yampa/core/player/enums.dart';
 class BigPlayer extends ConsumerWidget {
   const BigPlayer({super.key});
 
-  List<Widget> _buildPlayerTitleAndImageBig(
-    TrackQueueDisplayMode trackQueueDisplayMode,
-    Track? track,
-  ) {
-    return [
-      if (trackQueueDisplayMode == TrackQueueDisplayMode.image) ...[
-        const SizedBox(height: 5),
-        PlayerImage(track: track),
-      ] else
-        Expanded(child: UpcomingTracksList()),
-      const SizedBox(height: 5),
-      DisplayTrackTitle(track: track),
-      DisplayTrackMetadata(track: track),
-    ];
+  Widget _buildTotalMinutes() {
+    return Padding(
+                padding: EdgeInsetsGeometry.only(left: 5, right: 15),
+                child: PlayerTotalMinutes(),
+              );
   }
 
-  List<Widget> _buildPlayerTitleAndImageSmall(
+  Widget _buildSmallImage(Track? track) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
+      child: PlayerImage(track: track, width: 50, height: 50, iconSize: 35),
+    );
+  }
+
+  Widget _buildPlayerTitleAndImageBig(
     TrackQueueDisplayMode trackQueueDisplayMode,
     Track? track,
   ) {
-    return [
-      if (trackQueueDisplayMode == TrackQueueDisplayMode.image) ...[
-        Row(
-          children: [
-            const SizedBox(height: 5),
-            Padding(
-              padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
-              child: PlayerImage(
-                track: track,
-                width: 50,
-                height: 50,
-                iconSize: 35,
+    return Column(
+      children: [
+        if (trackQueueDisplayMode == TrackQueueDisplayMode.image) ...[
+          const SizedBox(height: 5),
+          PlayerImage(track: track),
+          const SizedBox(height: 5),
+          DisplayTrackTitle(track: track),
+        ],
+        if (trackQueueDisplayMode == TrackQueueDisplayMode.list) ...[
+          Row(
+            children: [
+              _buildSmallImage(track),
+              Expanded(
+                child: Column(
+                  children: [
+                    DisplayTrackTitle(track: track),
+                    DisplayTrackMetadata(track: track),
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: Column(
-                children: [
-                  DisplayTrackTitle(track: track),
-                  DisplayTrackMetadata(track: track),
-                ],
-              ),
-            ),
-          ],
+              _buildTotalMinutes(),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildPlayerTitleAndImageSmall(
+    TrackQueueDisplayMode trackQueueDisplayMode,
+    Track? track,
+  ) {
+    return Row(
+      children: [
+        const SizedBox(height: 5),
+        if (trackQueueDisplayMode == TrackQueueDisplayMode.image)
+          _buildSmallImage(track),
+        Expanded(
+          child: Column(
+            children: [
+              DisplayTrackTitle(track: track),
+              if (trackQueueDisplayMode == TrackQueueDisplayMode.image)
+                DisplayTrackMetadata(track: track),
+            ],
+          ),
         ),
-      ] else
-        Expanded(child: UpcomingTracksList()),
-      const SizedBox(height: 5),
-    ];
+        _buildTotalMinutes(),
+      ],
+    );
   }
 
   @override
@@ -86,20 +105,22 @@ class BigPlayer extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (isHeightBig)
-                    ..._buildPlayerTitleAndImageBig(
-                      trackQueueDisplayMode,
-                      track,
-                    ),
+                  if (trackQueueDisplayMode == TrackQueueDisplayMode.list)
+                    Expanded(child: UpcomingTracksList()),
+                  if (isHeightBig) ...[
+                    _buildPlayerTitleAndImageBig(trackQueueDisplayMode, track),
+                    SizedBox(height: 5),
+                  ],
                   if (!isHeightBig)
-                    ..._buildPlayerTitleAndImageSmall(
+                    _buildPlayerTitleAndImageSmall(
                       trackQueueDisplayMode,
                       track,
                     ),
                   const PlayerSlider(),
                   const PlayerButtons(),
-                  const PlayerTotalMinutes(),
-                  const SizedBox(height: 70),
+                  if (isHeightBig && trackQueueDisplayMode == TrackQueueDisplayMode.image)
+                    const PlayerTotalMinutes(),
+                  const SizedBox(height: 50),
                 ],
               ),
             ),
