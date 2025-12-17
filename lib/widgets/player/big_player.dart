@@ -72,7 +72,7 @@ class BigPlayer extends ConsumerWidget {
 
     return LayoutBuilder(
       builder: (ctx, constraints) {
-        final isHeightBig = constraints.maxHeight >= 440;
+        final isHeightBig = constraints.maxHeight >= 460;
         return Stack(
           children: [
             Center(
