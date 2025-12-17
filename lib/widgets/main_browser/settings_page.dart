@@ -14,14 +14,14 @@ class SettingsPage extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return ListTile(
-        leading: Icon(icon, size: 32),
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
+      leading: Icon(icon, size: 32),
+      title: Text(
+        title,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(subtitle),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTap,
     );
   }
 
@@ -63,7 +63,10 @@ class PlayerStatisticsPage extends ConsumerWidget {
   Widget _buildStatCard(String title, String value, IconData icon) {
     return ListTile(
       leading: Icon(icon),
-      title: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      title: Text(
+        title,
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
       subtitle: Text(value),
     );
   }

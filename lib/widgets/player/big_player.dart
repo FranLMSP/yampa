@@ -99,8 +99,7 @@ class BigPlayer extends ConsumerWidget {
           _buildPlayerTitleAndImageSmall(TrackQueueDisplayMode.image, track),
         const PlayerSlider(),
         const PlayerButtons(),
-        if (isHeightBig)
-          const PlayerTotalMinutes(),
+        if (isHeightBig) const PlayerTotalMinutes(),
         const Spacer(),
         NeighboringTracks(),
       ],
@@ -121,7 +120,10 @@ class BigPlayer extends ConsumerWidget {
                 SizedBox(height: 5),
               ],
               if (!isHeightBig)
-                _buildPlayerTitleAndImageSmall(TrackQueueDisplayMode.list, track),
+                _buildPlayerTitleAndImageSmall(
+                  TrackQueueDisplayMode.list,
+                  track,
+                ),
               const PlayerSlider(),
               const PlayerButtons(),
               const NeighboringTracks(),
