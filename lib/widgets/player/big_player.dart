@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
@@ -14,34 +13,14 @@ import 'package:yampa/widgets/player/neighboring_tracks.dart';
 import 'package:yampa/widgets/player/upcoming_tracks_list.dart';
 import 'package:yampa/core/player/enums.dart';
 
-class BigPlayer extends ConsumerStatefulWidget {
+class BigPlayer extends ConsumerWidget {
   const BigPlayer({super.key});
-
-  @override
-  ConsumerState<BigPlayer> createState() => _BigPlayerState();
-}
-
-class _BigPlayerState extends ConsumerState<BigPlayer> {
-  bool _showNeighboringTracks = true;
-
-  void _onScroll(ScrollNotification notification) {
-    if (notification is UserScrollNotification) {
-      final direction = notification.direction;
-
-      if (direction == ScrollDirection.reverse && _showNeighboringTracks) {
-        setState(() => _showNeighboringTracks = false);
-      } else if (direction == ScrollDirection.forward &&
-          !_showNeighboringTracks) {
-        setState(() => _showNeighboringTracks = true);
-      }
-    }
-  }
 
   Widget _buildTotalMinutes() {
     return Padding(
-      padding: EdgeInsetsGeometry.only(left: 5, right: 15),
-      child: PlayerTotalMinutes(),
-    );
+                padding: EdgeInsetsGeometry.only(left: 5, right: 15),
+                child: PlayerTotalMinutes(),
+              );
   }
 
   Widget _buildSmallImage(Track? track) {
@@ -107,7 +86,7 @@ class _BigPlayerState extends ConsumerState<BigPlayer> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
     final currentTrackId = ref.watch(
       playerControllerProvider.select((p) => p.currentTrackId),
@@ -117,61 +96,43 @@ class _BigPlayerState extends ConsumerState<BigPlayer> {
       playerControllerProvider.select((p) => p.trackQueueDisplayMode),
     );
 
-    return NotificationListener<ScrollNotification>(
-      onNotification: (notification) {
-        _onScroll(notification);
-        return false;
-      },
-      child: LayoutBuilder(
-        builder: (ctx, constraints) {
-          final isHeightBig = constraints.maxHeight >= 460;
-          return Stack(
-            children: [
-              Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (trackQueueDisplayMode == TrackQueueDisplayMode.list)
-                      Expanded(child: UpcomingTracksList()),
-                    if (isHeightBig) ...[
-                      _buildPlayerTitleAndImageBig(trackQueueDisplayMode, track),
-                      SizedBox(height: 5),
-                    ],
-                    if (!isHeightBig)
-                      _buildPlayerTitleAndImageSmall(
-                        trackQueueDisplayMode,
-                        track,
-                      ),
-                    const PlayerSlider(),
-                    const PlayerButtons(),
-                    if (isHeightBig &&
-                        trackQueueDisplayMode == TrackQueueDisplayMode.image)
-                      const PlayerTotalMinutes(),
-                    if (_showNeighboringTracks)
-                      const SizedBox(height: 50),
+    return LayoutBuilder(
+      builder: (ctx, constraints) {
+        final isHeightBig = constraints.maxHeight >= 460;
+        return Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (trackQueueDisplayMode == TrackQueueDisplayMode.list)
+                    Expanded(child: UpcomingTracksList()),
+                  if (isHeightBig) ...[
+                    _buildPlayerTitleAndImageBig(trackQueueDisplayMode, track),
+                    SizedBox(height: 5),
                   ],
-                ),
+                  if (!isHeightBig)
+                    _buildPlayerTitleAndImageSmall(
+                      trackQueueDisplayMode,
+                      track,
+                    ),
+                  const PlayerSlider(),
+                  const PlayerButtons(),
+                  if (isHeightBig && trackQueueDisplayMode == TrackQueueDisplayMode.image)
+                    const PlayerTotalMinutes(),
+                  const SizedBox(height: 50),
+                ],
               ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: AnimatedSlide(
-                  offset: _showNeighboringTracks
-                      ? Offset.zero
-                      : Offset(0, 1),
-                  duration: Duration(milliseconds: 200),
-                  child: AnimatedOpacity(
-                    duration: Duration(milliseconds: 200),
-                    opacity: _showNeighboringTracks ? 1 : 0,
-                    child: NeighboringTracks(),
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
+            ),
+            const Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: NeighboringTracks(),
+            ),
+          ],
+        );
+      },
     );
   }
 }
