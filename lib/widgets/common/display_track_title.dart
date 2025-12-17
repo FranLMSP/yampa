@@ -3,7 +3,12 @@ import 'package:text_scroll/text_scroll.dart';
 import 'package:yampa/models/track.dart';
 
 class DisplayTrackTitle extends StatelessWidget {
-  const DisplayTrackTitle({super.key, this.track, this.fontSize, this.textAlign});
+  const DisplayTrackTitle({
+    super.key,
+    this.track,
+    this.fontSize,
+    this.textAlign,
+  });
 
   final Track? track;
   final double? fontSize;

@@ -97,10 +97,13 @@ class TrackItem extends ConsumerWidget {
         selected: isSelected || isPlaying,
         selectedTileColor: color,
         leading: _buildTrackIcon(isPlaying),
-        title: Text(track.displayTitle(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+        title: Text(
+          track.displayTitle(),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        ),
         subtitle: Row(
           children: [
-            Text(track.artist, style: const TextStyle(fontSize: 12),),
+            Text(track.artist, style: const TextStyle(fontSize: 12)),
             const Spacer(),
             _buildDuration(track.duration),
           ],
