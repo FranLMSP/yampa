@@ -35,7 +35,7 @@ class NeighboringTracks extends ConsumerWidget {
                   )
                 : const SizedBox.shrink(),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 5),
           Expanded(
             child: nextTrack != null
                 ? _buildTrackInfo(

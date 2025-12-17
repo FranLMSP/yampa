@@ -13,9 +13,8 @@ class SettingsPage extends StatelessWidget {
     required IconData icon,
     required VoidCallback onTap,
   }) {
-    return Card(
-      child: ListTile(
-        leading: Icon(icon, size: 32, color: Colors.blue),
+    return ListTile(
+        leading: Icon(icon, size: 32),
         title: Text(
           title,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -23,7 +22,6 @@ class SettingsPage extends StatelessWidget {
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
-      ),
     );
   }
 
@@ -31,13 +29,14 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
-        padding: const EdgeInsets.all(16.0),
         children: [
-          const Text(
-            'Settings',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: const Text(
+              'Settings',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
           ),
-          const SizedBox(height: 16),
           _buildSettingsOption(
             context: context,
             title: 'Statistics',
@@ -62,35 +61,10 @@ class PlayerStatisticsPage extends ConsumerWidget {
   const PlayerStatisticsPage({super.key});
 
   Widget _buildStatCard(String title, String value, IconData icon) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Icon(icon, size: 32, color: Colors.blue),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      subtitle: Text(value),
     );
   }
 
@@ -103,7 +77,6 @@ class PlayerStatisticsPage extends ConsumerWidget {
       body: playerStatsAsync.when(
         data: (stats) {
           return ListView(
-            padding: const EdgeInsets.all(16.0),
             children: [
               _buildStatCard(
                 'Total Playback Time',

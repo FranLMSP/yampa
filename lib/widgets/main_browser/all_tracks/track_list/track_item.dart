@@ -99,7 +99,7 @@ class TrackItem extends ConsumerWidget {
         leading: _buildTrackIcon(isPlaying),
         title: Text(
           track.displayTitle(),
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold),
         ),
         subtitle: Row(
           children: [
