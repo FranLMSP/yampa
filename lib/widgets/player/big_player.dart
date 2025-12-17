@@ -24,7 +24,7 @@ class BigPlayer extends ConsumerWidget {
           PlayerImage(track: track),
         ]
       else
-        const Expanded(child: UpcomingTracksList()),
+        Expanded(child: UpcomingTracksList()),
       const SizedBox(height: 5),
       DisplayTrackTitle(track: track),
       DisplayTrackMetadata(track: track),
@@ -54,7 +54,7 @@ class BigPlayer extends ConsumerWidget {
           )
         ]
       else
-        const Expanded(child: UpcomingTracksList()),
+        Expanded(child: UpcomingTracksList()),
       const SizedBox(height: 5),
     ];
   }
