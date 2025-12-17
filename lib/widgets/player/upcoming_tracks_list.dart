@@ -70,18 +70,14 @@ class UpcomingTracksList extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final trackId = shuffledTrackIds[index];
                 final track = tracks[trackId];
-            
+
                 if (track == null) return const SizedBox.shrink();
-            
+
                 return TrackItem(
                   key: Key(track.id),
                   track: track,
                   onTap: (track) async {
-                    await playTrack(
-                      track,
-                      tracks,
-                      playerControllerNotifier,
-                    );
+                    await playTrack(track, tracks, playerControllerNotifier);
                   },
                 );
               },

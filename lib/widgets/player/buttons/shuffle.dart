@@ -35,9 +35,7 @@ class ShuffleButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final shuffleMode = ref.watch(
-      playerControllerProvider.select(
-        (p) => p.shuffleMode,
-      ),
+      playerControllerProvider.select((p) => p.shuffleMode),
     );
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,

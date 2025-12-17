@@ -16,14 +16,15 @@ import 'package:yampa/core/player/enums.dart';
 class BigPlayer extends ConsumerWidget {
   const BigPlayer({super.key});
 
-  List<Widget> _buildPlayerTitleAndImageBig(TrackQueueDisplayMode trackQueueDisplayMode, Track? track) {
+  List<Widget> _buildPlayerTitleAndImageBig(
+    TrackQueueDisplayMode trackQueueDisplayMode,
+    Track? track,
+  ) {
     return [
-      if (trackQueueDisplayMode == TrackQueueDisplayMode.image)
-        ...[
-          const SizedBox(height: 5),
-          PlayerImage(track: track),
-        ]
-      else
+      if (trackQueueDisplayMode == TrackQueueDisplayMode.image) ...[
+        const SizedBox(height: 5),
+        PlayerImage(track: track),
+      ] else
         Expanded(child: UpcomingTracksList()),
       const SizedBox(height: 5),
       DisplayTrackTitle(track: track),
@@ -31,29 +32,35 @@ class BigPlayer extends ConsumerWidget {
     ];
   }
 
-  List<Widget> _buildPlayerTitleAndImageSmall(TrackQueueDisplayMode trackQueueDisplayMode, Track? track) {
+  List<Widget> _buildPlayerTitleAndImageSmall(
+    TrackQueueDisplayMode trackQueueDisplayMode,
+    Track? track,
+  ) {
     return [
-      if (trackQueueDisplayMode == TrackQueueDisplayMode.image)
-        ...[
-          Row(
-            children: [
-              const SizedBox(height: 5),
-              Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
-                child: PlayerImage(track: track, width: 50, height: 50, iconSize: 35,),
+      if (trackQueueDisplayMode == TrackQueueDisplayMode.image) ...[
+        Row(
+          children: [
+            const SizedBox(height: 5),
+            Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
+              child: PlayerImage(
+                track: track,
+                width: 50,
+                height: 50,
+                iconSize: 35,
               ),
-              Expanded(
-                child: Column(
-                  children: [
-                    DisplayTrackTitle(track: track),
-                    DisplayTrackMetadata(track: track),
-                  ],
-                ),
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  DisplayTrackTitle(track: track),
+                  DisplayTrackMetadata(track: track),
+                ],
               ),
-            ],
-          )
-        ]
-      else
+            ),
+          ],
+        ),
+      ] else
         Expanded(child: UpcomingTracksList()),
       const SizedBox(height: 5),
     ];
@@ -80,9 +87,15 @@ class BigPlayer extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (isHeightBig)
-                    ..._buildPlayerTitleAndImageBig(trackQueueDisplayMode, track),
+                    ..._buildPlayerTitleAndImageBig(
+                      trackQueueDisplayMode,
+                      track,
+                    ),
                   if (!isHeightBig)
-                    ..._buildPlayerTitleAndImageSmall(trackQueueDisplayMode, track),
+                    ..._buildPlayerTitleAndImageSmall(
+                      trackQueueDisplayMode,
+                      track,
+                    ),
                   const PlayerSlider(),
                   const PlayerButtons(),
                   const PlayerTotalMinutes(),

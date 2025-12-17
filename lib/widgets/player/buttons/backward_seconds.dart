@@ -9,7 +9,7 @@ class BackwardSecondsButton extends ConsumerWidget {
     if (currentTrackId == null) {
       return;
     }
-    final playerController= ref.watch(playerControllerProvider);
+    final playerController = ref.watch(playerControllerProvider);
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,
     );

@@ -116,10 +116,7 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = currentState.clone();
   }
 
-  Future<void> playTrack(
-    Track track,
-    Map<String, Track> tracks,
-  ) async {
+  Future<void> playTrack(Track track, Map<String, Track> tracks) async {
     final player = state;
     if (player.playerBackend == null) {
       // TODO: here we want to set the track player type depending on the source type of the track
