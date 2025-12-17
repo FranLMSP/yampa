@@ -32,7 +32,7 @@ void main() async {
       windowSize = Size(lastWindowSize.width, lastWindowSize.height);
     }
     WindowOptions windowOptions = WindowOptions(
-      minimumSize: Size(400, 750),
+      minimumSize: Size(400, 460),
       size: windowSize,
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
