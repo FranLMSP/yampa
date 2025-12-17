@@ -3,10 +3,11 @@ import 'package:text_scroll/text_scroll.dart';
 import 'package:yampa/models/track.dart';
 
 class DisplayTrackTitle extends StatelessWidget {
-  const DisplayTrackTitle({super.key, this.track, this.fontSize});
+  const DisplayTrackTitle({super.key, this.track, this.fontSize, this.textAlign});
 
   final Track? track;
   final double? fontSize;
+  final TextAlign? textAlign;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,7 @@ class DisplayTrackTitle extends StatelessWidget {
       pauseBetween: Duration(seconds: 1),
       pauseOnBounce: Duration(seconds: 1),
       style: TextStyle(fontSize: fontSize ?? 20, fontWeight: FontWeight.bold),
-      textAlign: TextAlign.center,
+      textAlign: textAlign ?? TextAlign.center,
       selectable: false,
     );
   }
