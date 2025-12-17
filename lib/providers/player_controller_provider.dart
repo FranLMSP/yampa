@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/core/player/player_controller.dart';
+import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/core/player_backends/interface.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
@@ -113,6 +114,21 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     final currentState = state;
     await currentState.setSpeed(value);
     state = currentState.clone();
+  }
+
+  Future<void> playTrack(
+    Track track,
+    Map<String, Track> tracks,
+  ) async {
+    final player = state;
+    if (player.playerBackend == null) {
+      // TODO: here we want to set the track player type depending on the source type of the track
+      await player.setPlayerBackend(await getPlayerBackend());
+    }
+    await player.stop();
+    await player.setCurrentTrack(track, tracks);
+    await player.play();
+    state = player.clone();
   }
 
   Future<void> setPlayerController(

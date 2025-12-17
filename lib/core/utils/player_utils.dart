@@ -1,25 +1,15 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:yampa/core/player/player_controller.dart';
-import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 
 Future<void> playTrack(
   Track track,
   Map<String, Track> tracks,
-  PlayerController playerController,
   PlayerControllerNotifier playerControllerNotifier,
 ) async {
-  if (playerController.playerBackend == null) {
-    // TODO: here we want to set the track player type depending on the source type of the track
-    await playerController.setPlayerBackend(await getPlayerBackend());
-  }
-  await playerController.stop();
-  await playerController.setCurrentTrack(track, tracks);
-  await playerController.play();
-  await playerControllerNotifier.setPlayerController(playerController, tracks);
+  await playerControllerNotifier.playTrack(track, tracks);
 }
 
 bool isTrackCurrentlyBeingPlayed(Track track, String? currentTrackId) {

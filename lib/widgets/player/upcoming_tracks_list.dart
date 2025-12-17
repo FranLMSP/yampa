@@ -70,7 +70,6 @@ class UpcomingTracksList extends ConsumerWidget {
                   await playTrack(
                     track,
                     tracks,
-                    playerController,
                     playerControllerNotifier,
                   );
                 },

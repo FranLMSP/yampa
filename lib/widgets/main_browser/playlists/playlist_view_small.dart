@@ -359,7 +359,6 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                         await playTrack(
                           firstTrack,
                           tracks,
-                          playerController,
                           playerControllerNotifier,
                         );
                       }
@@ -395,7 +394,6 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                           await playTrack(
                             track,
                             tracks,
-                            playerController,
                             playerControllerNotifier,
                           );
                         }

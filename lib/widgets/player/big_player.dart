@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
-import 'package:yampa/widgets/common/track_title.dart';
+import 'package:yampa/widgets/common/display_track_title.dart';
+import 'package:yampa/widgets/main_browser/playlists/display_track_metadata.dart';
 import 'package:yampa/widgets/player/player_buttons.dart';
 import 'package:yampa/widgets/player/player_image.dart';
 import 'package:yampa/widgets/player/player_slider.dart';
@@ -36,19 +37,8 @@ class BigPlayer extends ConsumerWidget {
               else
                 const Expanded(child: UpcomingTracksList()),
               const SizedBox(height: 5),
-              TrackTitle(track: track),
-              if (track != null && track.artist.isNotEmpty)
-                Text(
-                  track.artist,
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
-              if (track != null && track.album.isNotEmpty)
-                Text(
-                  track.album,
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
+              DisplayTrackTitle(track: track),
+              DisplayTrackMetadata(track: track),
               const PlayerSlider(),
               const PlayerButtons(),
               const PlayerTotalMinutes(),
