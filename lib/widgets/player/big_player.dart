@@ -18,9 +18,9 @@ class BigPlayer extends ConsumerWidget {
 
   Widget _buildTotalMinutes() {
     return Padding(
-                padding: EdgeInsetsGeometry.only(left: 5, right: 15),
-                child: PlayerTotalMinutes(),
-              );
+      padding: EdgeInsetsGeometry.only(left: 5, right: 15),
+      child: PlayerTotalMinutes(),
+    );
   }
 
   Widget _buildSmallImage(Track? track) {
@@ -85,6 +85,53 @@ class BigPlayer extends ConsumerWidget {
     );
   }
 
+  Widget _buildImageMode(bool isHeightBig, Track? track) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        SizedBox.shrink(),
+        const Spacer(),
+        if (isHeightBig) ...[
+          _buildPlayerTitleAndImageBig(TrackQueueDisplayMode.image, track),
+          SizedBox(height: 5),
+        ],
+        if (!isHeightBig)
+          _buildPlayerTitleAndImageSmall(TrackQueueDisplayMode.image, track),
+        const PlayerSlider(),
+        const PlayerButtons(),
+        if (isHeightBig)
+          const PlayerTotalMinutes(),
+        const Spacer(),
+        NeighboringTracks(),
+      ],
+    );
+  }
+
+  Widget _buildListMode(BuildContext context, bool isHeightBig, Track? track) {
+    return Column(
+      children: [
+        Expanded(child: UpcomingTracksList()),
+        Divider(height: 0),
+        Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: Column(
+            children: [
+              if (isHeightBig) ...[
+                _buildPlayerTitleAndImageBig(TrackQueueDisplayMode.list, track),
+                SizedBox(height: 5),
+              ],
+              if (!isHeightBig)
+                _buildPlayerTitleAndImageSmall(TrackQueueDisplayMode.list, track),
+              const PlayerSlider(),
+              const PlayerButtons(),
+              const NeighboringTracks(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tracks = ref.watch(tracksProvider);
@@ -99,39 +146,10 @@ class BigPlayer extends ConsumerWidget {
     return LayoutBuilder(
       builder: (ctx, constraints) {
         final isHeightBig = constraints.maxHeight >= 460;
-        return Stack(
-          children: [
-            Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (trackQueueDisplayMode == TrackQueueDisplayMode.list)
-                    Expanded(child: UpcomingTracksList()),
-                  if (isHeightBig) ...[
-                    _buildPlayerTitleAndImageBig(trackQueueDisplayMode, track),
-                    SizedBox(height: 5),
-                  ],
-                  if (!isHeightBig)
-                    _buildPlayerTitleAndImageSmall(
-                      trackQueueDisplayMode,
-                      track,
-                    ),
-                  const PlayerSlider(),
-                  const PlayerButtons(),
-                  if (isHeightBig && trackQueueDisplayMode == TrackQueueDisplayMode.image)
-                    const PlayerTotalMinutes(),
-                  const SizedBox(height: 50),
-                ],
-              ),
-            ),
-            const Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: NeighboringTracks(),
-            ),
-          ],
-        );
+        if (trackQueueDisplayMode == TrackQueueDisplayMode.image) {
+          return _buildImageMode(isHeightBig, track);
+        }
+        return _buildListMode(context, isHeightBig, track);
       },
     );
   }
