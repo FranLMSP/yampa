@@ -8,31 +8,29 @@ import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
+import 'package:yampa/widgets/utils.dart';
 
 File getFile(String path) => File(path);
 
 class UpcomingTracksList extends ConsumerWidget {
-  const UpcomingTracksList({super.key});
+  UpcomingTracksList({super.key});
+  final ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerControllerState = ref.watch(playerControllerProvider);
-    final playerController = playerControllerState.value;
+    final playerController = ref.watch(playerControllerProvider);
     final playlists = ref.watch(playlistsProvider);
     final tracks = ref.watch(tracksProvider);
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,
     );
 
-    if (playerController == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     final currentPlaylist = playlists
         .where((p) => p.id == playerController.currentPlaylistId)
         .firstOrNull;
 
     final shuffledTrackIds = playerController.shuffledTrackQueueIds;
+    final isMobile = isPlatformMobile();
 
     return Column(
       children: [
@@ -60,27 +58,30 @@ class UpcomingTracksList extends ConsumerWidget {
         ),
         const Divider(height: 1),
         Expanded(
-          child: ListView.builder(
-            itemCount: shuffledTrackIds.length,
-            itemBuilder: (context, index) {
-              final trackId = shuffledTrackIds[index];
-              final track = tracks[trackId];
+          child: Scrollbar(
+            controller: scrollController,
+            thickness: isMobile ? 20 : null,
+            radius: isMobile ? const Radius.circular(8) : null,
+            thumbVisibility: isMobile ? true : null,
+            interactive: isMobile ? true : null,
+            child: ListView.builder(
+              controller: scrollController,
+              itemCount: shuffledTrackIds.length,
+              itemBuilder: (context, index) {
+                final trackId = shuffledTrackIds[index];
+                final track = tracks[trackId];
 
-              if (track == null) return const SizedBox.shrink();
+                if (track == null) return const SizedBox.shrink();
 
-              return TrackItem(
-                key: Key(track.id),
-                track: track,
-                onTap: (track) async {
-                  await playTrack(
-                    track,
-                    tracks,
-                    playerController,
-                    playerControllerNotifier,
-                  );
-                },
-              );
-            },
+                return TrackItem(
+                  key: Key(track.id),
+                  track: track,
+                  onTap: (track) async {
+                    await playTrack(track, tracks, playerControllerNotifier);
+                  },
+                );
+              },
+            ),
           ),
         ),
       ],

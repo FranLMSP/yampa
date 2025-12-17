@@ -9,7 +9,7 @@ import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/statistics_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
-import 'package:yampa/widgets/common/track_title.dart';
+import 'package:yampa/widgets/common/display_track_title.dart';
 import 'package:yampa/widgets/utils.dart';
 
 class TrackInfoDialog extends ConsumerStatefulWidget {
@@ -217,7 +217,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: TrackTitle(track: widget.track)),
+              Expanded(child: DisplayTrackTitle(track: widget.track)),
               // TODO: metadata editing doesn't currently work on Android (permission issue)
               if (isPlatformDesktop())
                 IconButton(
@@ -306,8 +306,8 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                     true,
                     viewMode,
                   ),
-                  _buildInfoRow('Path', widget.track.path, true, viewMode),
                 ],
+                _buildInfoRow('Path', widget.track.path, true, viewMode),
                 const SizedBox(height: 24),
                 Text(
                   "Statistics",

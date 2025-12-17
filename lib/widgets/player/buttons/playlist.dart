@@ -14,7 +14,7 @@ class PlaylistButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playlistsNotifier = ref.read(playlistsProvider.notifier);
     final currentTrackId = ref.watch(
-      playerControllerProvider.select((p) => p.value?.currentTrackId),
+      playerControllerProvider.select((p) => p.currentTrackId),
     );
     final selectedPlaylistsNotifier = ref.read(
       selectedPlaylistsProvider.notifier,

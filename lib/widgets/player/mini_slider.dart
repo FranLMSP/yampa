@@ -25,9 +25,7 @@ class _MiniPlayerSliderState extends ConsumerState<MiniPlayerSlider> {
 
   Future<void> _getPlayerCurrentPosition() async {
     final tracks = ref.watch(tracksProvider);
-    final playerState = ref.watch(playerControllerProvider);
-    final player = playerState.value;
-    if (player == null) return;
+    final player = ref.watch(playerControllerProvider);
     final track = tracks[player.currentTrackId];
     if (track != null) {
       final totalDuration = player.getCurrentTrackDuration();

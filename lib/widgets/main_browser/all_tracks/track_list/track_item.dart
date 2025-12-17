@@ -24,16 +24,16 @@ class TrackItem extends ConsumerWidget {
   Widget _buildTrackImage() {
     return Image.memory(
       track.imageBytes!,
-      width: 50,
-      height: 50,
+      width: 45,
+      height: 45,
       fit: BoxFit.cover,
     );
   }
 
   Widget _buildTrackPlaceholder(bool isPlaying) {
     return Container(
-      width: 50,
-      height: 50,
+      width: 45,
+      height: 45,
       color: Colors.grey,
       child: isPlaying
           ? null
@@ -53,8 +53,8 @@ class TrackItem extends ConsumerWidget {
 
           if (isPlaying)
             Container(
-              width: 50,
-              height: 50,
+              width: 45,
+              height: 45,
               color: Colors.black.withValues(alpha: 0.4),
             ),
 
@@ -66,13 +66,13 @@ class TrackItem extends ConsumerWidget {
   }
 
   Widget _buildDuration(Duration duration) {
-    return Text(formatDuration(duration));
+    return Text(formatDuration(duration), style: const TextStyle(fontSize: 11));
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentTrackId = ref.watch(
-      playerControllerProvider.select((p) => p.value?.currentTrackId),
+      playerControllerProvider.select((p) => p.currentTrackId),
     );
     final isPlaying = isTrackCurrentlyBeingPlayed(track, currentTrackId);
     Color? color;
@@ -92,20 +92,23 @@ class TrackItem extends ConsumerWidget {
           onLongPress!(track);
         }
       },
-      child: Card(
-        color: color,
-        child: ListTile(
-          leading: _buildTrackIcon(isPlaying),
-          title: Text(track.displayTitle()),
-          subtitle: Row(
-            children: [
-              Text(track.artist),
-              const Spacer(),
-              _buildDuration(track.duration),
-            ],
-          ),
-          trailing: trailing,
+      child: ListTile(
+        mouseCursor: MouseCursor.defer,
+        selected: isSelected || isPlaying,
+        selectedTileColor: color,
+        leading: _buildTrackIcon(isPlaying),
+        title: Text(
+          track.displayTitle(),
+          style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold),
         ),
+        subtitle: Row(
+          children: [
+            Text(track.artist, style: const TextStyle(fontSize: 12)),
+            const Spacer(),
+            _buildDuration(track.duration),
+          ],
+        ),
+        trailing: trailing,
       ),
     );
   }

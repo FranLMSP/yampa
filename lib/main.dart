@@ -32,7 +32,7 @@ void main() async {
       windowSize = Size(lastWindowSize.width, lastWindowSize.height);
     }
     WindowOptions windowOptions = WindowOptions(
-      minimumSize: Size(400, 750),
+      minimumSize: Size(400, 475),
       size: windowSize,
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -123,12 +123,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
       final player = playerNotifier.getPlayerController();
       final tracks = ref.watch(tracksProvider);
 
-      if (player != null && player.hasTrackFinishedPlaying()) {
+      if (player.hasTrackFinishedPlaying()) {
         await playerNotifier.handleNextAutomatically(tracks);
       }
-      if (player != null) {
-        await playerNotifier.updatePlaybackStatistics();
-      }
+      await playerNotifier.updatePlaybackStatistics();
     });
   }
 

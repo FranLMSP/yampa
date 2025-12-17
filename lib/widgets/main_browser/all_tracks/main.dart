@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/core/utils/search_utils.dart';
 import 'package:yampa/models/playlist.dart';
@@ -205,11 +204,9 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
   Future<void> _playSelectedTrack(
     Track track,
     Map<String, Track> tracks,
-    PlayerController? playerController,
     PlayerControllerNotifier playerControllerNotifier,
   ) async {
-    if (playerController == null) return;
-    await playTrack(track, tracks, playerController, playerControllerNotifier);
+    await playTrack(track, tracks, playerControllerNotifier);
   }
 
   void _toggleSelectedTrack(
@@ -332,8 +329,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final selectedPlaylistsNotifier = ref.watch(
       selectedPlaylistsProvider.notifier,
     );
-    final playerControllerState = ref.read(playerControllerProvider);
-    final playerController = playerControllerState.value;
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,
     );
@@ -420,7 +415,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                       await _playSelectedTrack(
                         track,
                         tracks,
-                        playerController,
                         playerControllerNotifier,
                       );
                     };

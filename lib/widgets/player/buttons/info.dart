@@ -11,7 +11,7 @@ class InfoButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final allTracks = ref.watch(tracksProvider);
     final currentTrackId = ref.watch(
-      playerControllerProvider.select((p) => p.value?.currentTrackId),
+      playerControllerProvider.select((p) => p.currentTrackId),
     );
     final track = allTracks[currentTrackId];
     if (track == null) {

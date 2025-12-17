@@ -230,8 +230,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
 
   @override
   Widget build(BuildContext context) {
-    final playerControllerState = ref.read(playerControllerProvider);
-    final playerController = playerControllerState.value;
+    final playerController = ref.watch(playerControllerProvider);
     final playerControllerNotifier = ref.watch(
       playerControllerProvider.notifier,
     );
@@ -349,8 +348,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 width: 100,
                 child: ElevatedButton(
                   onPressed: () async {
-                    if (selectedPlaylist.trackIds.isNotEmpty &&
-                        playerController != null) {
+                    if (selectedPlaylist.trackIds.isNotEmpty) {
                       await playerController.setPlaylist(
                         selectedPlaylist,
                         tracks,
@@ -361,7 +359,6 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                         await playTrack(
                           firstTrack,
                           tracks,
-                          playerController,
                           playerControllerNotifier,
                         );
                       }
@@ -388,18 +385,15 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                       onTap: (Track track) async {
                         if (isInSelectMode) {
                           _toggleSelectedTrack(track.id);
-                        } else if (playerController != null) {
-                          if (playerController.currentPlaylistId !=
-                              selectedPlaylist.id) {
-                            await playerControllerNotifier.setPlaylist(
-                              selectedPlaylist,
-                              tracks,
-                            );
-                          }
+                        } else if (playerController.currentPlaylistId !=
+                            selectedPlaylist.id) {
+                          await playerControllerNotifier.setPlaylist(
+                            selectedPlaylist,
+                            tracks,
+                          );
                           await playTrack(
                             track,
                             tracks,
-                            playerController,
                             playerControllerNotifier,
                           );
                         }

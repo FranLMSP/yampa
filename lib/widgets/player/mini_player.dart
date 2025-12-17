@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
-import 'package:yampa/widgets/common/track_title.dart';
+import 'package:yampa/widgets/common/display_track_title.dart';
 import 'package:yampa/widgets/player/buttons/play_and_pause.dart';
 import 'package:yampa/widgets/player/mini_slider.dart';
 import 'package:yampa/widgets/player/player_image.dart';
@@ -16,7 +16,7 @@ class MiniPlayer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentTrackId = ref.watch(
-      playerControllerProvider.select((p) => p.value?.currentTrackId),
+      playerControllerProvider.select((p) => p.currentTrackId),
     );
     final tracks = ref.watch(tracksProvider);
     final track = tracks[currentTrackId];
@@ -46,7 +46,7 @@ class MiniPlayer extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      TrackTitle(track: track, fontSize: 16),
+                      DisplayTrackTitle(track: track, fontSize: 16),
                       Text(track.album),
                     ],
                   ),

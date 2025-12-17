@@ -31,9 +31,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
       return;
     }
     final tracks = ref.watch(tracksProvider);
-    final playerState = ref.watch(playerControllerProvider);
-    final player = playerState.value;
-    if (player == null) return;
+    final player = ref.watch(playerControllerProvider);
     final track = tracks[player.currentTrackId];
     final totalDuration = player.getCurrentTrackDuration();
     if (track == null ||
@@ -66,9 +64,7 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
     if (currentTrack == null || currentTrack.duration == Duration.zero) {
       return;
     }
-    final playerControllerState = ref.read(playerControllerProvider);
-    final playerController = playerControllerState.value;
-    if (playerController == null) return;
+    final playerController = ref.read(playerControllerProvider);
     final totalDuration = playerController.getCurrentTrackDuration();
     final newPosition = Duration(
       milliseconds: (totalDuration.inMilliseconds * value).toInt(),
@@ -89,10 +85,10 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   Widget build(BuildContext context) {
     final tracks = ref.watch(tracksProvider);
     final currentTrackId = ref.watch(
-      playerControllerProvider.select((p) => p.value?.currentTrackId),
+      playerControllerProvider.select((p) => p.currentTrackId),
     );
     return Slider(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       value: _currentSliderValue,
       onChanged: (value) =>
           _setPlayerCurrentPosition(tracks, currentTrackId, value),
