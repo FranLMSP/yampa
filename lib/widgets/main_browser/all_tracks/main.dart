@@ -233,6 +233,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         },
       ),
       title: TextField(
+        autofocus: true,
         controller: _searchTextController,
         decoration: const InputDecoration(labelText: 'Search'),
         onChanged: (_) => setState(() => {}),
