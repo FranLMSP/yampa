@@ -16,6 +16,7 @@ import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/common/image_cropper_screen.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
+import 'package:yampa/widgets/main_browser/all_tracks/track_info_dialog.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/playlists/common.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
@@ -214,6 +215,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
       );
     } else if (optionSelected == OptionSelected.select) {
       _toggleSelectedTrack(track.id);
+    } else if (optionSelected == OptionSelected.info) {
+      showDialog(
+        context: context,
+        builder: (BuildContext ctx) => TrackInfoDialog(track: track),
+      );
     }
   }
 
