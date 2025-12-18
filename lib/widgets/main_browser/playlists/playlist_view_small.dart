@@ -366,7 +366,10 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [Icon(Icons.play_arrow), Text("Play (${selectedPlaylist.trackIds.length})")]
+                    children: [
+                      Icon(Icons.play_arrow),
+                      Text("Play (${selectedPlaylist.trackIds.length})"),
+                    ],
                   ),
                 ),
               ),
