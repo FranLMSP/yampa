@@ -2,7 +2,7 @@ import 'package:yampa/models/playlist.dart';
 
 abstract class PlaylistsRepository {
   Future<List<Playlist>> getPlaylists();
-  Future<String> addPlaylist(Playlist playlist);
+  Future<String> addPlaylist(Playlist playlist, {String? forceWithId});
   Future<void> updatePlaylist(Playlist playlist);
   Future<void> addTrackToPlaylist(Playlist playlist, String trackId);
   Future<void> linkTracksWithPlaylists(

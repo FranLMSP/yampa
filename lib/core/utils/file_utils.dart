@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io' as io;
 import 'dart:typed_data';
+import 'dart:convert';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:ulid/ulid.dart';
@@ -96,18 +97,24 @@ Future<String> getBasePath() async {
   }
   return basePath;
 }
+Future<String> getLocalDirectoryPath(String folderName, {bool create = false}) async {
+  final basePath = await getBasePath();
+  final dirPath = p.join(basePath, folderName);
+  if (create) {
+    final dir = io.Directory(dirPath);
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+  }
+  return dirPath;
+}
 
 Future<String?> copyFileToLocal(String srcPath, String targetFolder) async {
   try {
     final srcFile = io.File(srcPath);
     if (!await srcFile.exists()) return null;
 
-    final basePath = await getBasePath();
-    final imagesDirPath = p.join(basePath, targetFolder);
-    final imagesDir = io.Directory(imagesDirPath);
-    if (!await imagesDir.exists()) {
-      await imagesDir.create(recursive: true);
-    }
+    final imagesDirPath = await getLocalDirectoryPath(targetFolder, create: true);
 
     final extension = p.extension(srcPath);
     final destFilename = '${Ulid().toString()}$extension';
@@ -127,8 +134,7 @@ Future<String?> copyImageToLocal(String srcPath) async {
 
 Future<List<String>> listUserImages() async {
   try {
-    final basePath = await getBasePath();
-    final imagesDirPath = p.join(basePath, kUserImagesFolder);
+    final imagesDirPath = await getLocalDirectoryPath(kUserImagesFolder);
     final imagesDir = io.Directory(imagesDirPath);
     if (!await imagesDir.exists()) {
       return [];
@@ -161,4 +167,36 @@ Future<Uint8List> convertToJpeg(Uint8List bytes) async {
     throw Exception("Failed to decode image");
   }
   return Uint8List.fromList(img.encodeJpg(decoded, quality: 90));
+}
+
+Future<String?> saveBase64Image(String base64String) async {
+  try {
+    final bytes = base64.decode(base64String);
+    final imagesDirPath = await getLocalDirectoryPath(
+      kUserImagesFolder,
+      create: true,
+    );
+
+    final destFilename = '${Ulid().toString()}.jpg';
+    final destPath = p.join(imagesDirPath, destFilename);
+
+    final file = io.File(destPath);
+    await file.writeAsBytes(bytes);
+    return destPath;
+  } catch (e) {
+    log("Couldn't save base64 image", error: e);
+    return null;
+  }
+}
+
+Future<String?> fileToBase64(String path) async {
+  try {
+    final file = io.File(path);
+    if (!await file.exists()) return null;
+    final bytes = await file.readAsBytes();
+    return base64.encode(bytes);
+  } catch (e) {
+    log("Couldn't convert file to base64", error: e);
+    return null;
+  }
 }

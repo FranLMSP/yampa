@@ -266,11 +266,6 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton.icon(
-                    onPressed: () => widget.onGoBack(),
-                    icon: const Icon(Icons.arrow_back),
-                    label: const Text('Back'),
-                  ),
                   const Spacer(),
                   SortButton(
                     currentSortMode: selectedPlaylist.sortMode,
@@ -291,16 +286,24 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                   ),
                   IconButton(
                     onPressed: () {
-                      removePlaylistsModal(
-                        context,
-                        [selectedPlaylist],
-                        playlistNotifier,
-                        () => widget.onGoBack(),
-                      );
+                      handlePlaylistsExport([selectedPlaylist]);
                     },
-                    tooltip: "Delete this playlist",
-                    icon: const Icon(Icons.delete),
+                    tooltip: "Export this playlist",
+                    icon: const Icon(Icons.file_upload),
                   ),
+                  if (selectedPlaylist.id != favoritePlaylistId)
+                    IconButton(
+                      onPressed: () {
+                        removePlaylistsModal(
+                          context,
+                          [selectedPlaylist],
+                          playlistNotifier,
+                          () => widget.onGoBack(),
+                        );
+                      },
+                      tooltip: "Delete this playlist",
+                      icon: const Icon(Icons.delete),
+                    ),
                 ],
               ),
             ),

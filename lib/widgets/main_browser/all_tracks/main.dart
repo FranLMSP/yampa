@@ -304,7 +304,10 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
           icon: const Icon(Icons.refresh),
           tooltip: "Re-load tracks",
           onPressed: () {
-            reloadTracks(ref.read(tracksProvider.notifier), ref.read(loadedTracksCountProvider.notifier));
+            reloadTracks(
+              ref.read(tracksProvider.notifier),
+              ref.read(loadedTracksCountProvider.notifier),
+            );
           },
         ),
         IconButton(

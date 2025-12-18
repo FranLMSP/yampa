@@ -87,20 +87,36 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
   }
 
   @override
-  Future<String> addPlaylist(Playlist playlist) async {
+  Future<String> addPlaylist(Playlist playlist, {String? forceWithId}) async {
     final db = await _getdb();
 
-    final id = playlist.id == favoritePlaylistId
-        ? favoritePlaylistId
-        : Ulid().toString();
+    String effectiveId = Ulid().toString();
+    if (playlist.id == favoritePlaylistId) {
+      effectiveId = favoritePlaylistId;
+    } else if (forceWithId != null) {
+      effectiveId = forceWithId;
+    }
+
     await db.insert(playlistsTableName, {
-      'id': id,
+      'id': effectiveId,
       'name': playlist.name,
       'description': playlist.description,
       'image_path': playlist.imagePath,
       'sort_mode': playlist.sortMode.index,
     }, conflictAlgorithm: ConflictAlgorithm.replace);
-    return id;
+
+    final batch = db.batch();
+    for (final trackId in playlist.trackIds) {
+      final id = Ulid().toString();
+      batch.insert(
+        playlistsTracksRelationsTableName,
+        {'id': id, 'playlist_id': effectiveId, 'track_id': trackId},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit();
+
+    return effectiveId;
   }
 
   @override
@@ -117,6 +133,23 @@ class PlaylistSqliteRepository extends PlaylistsRepository {
       where: 'id = ?',
       whereArgs: [playlist.id],
     );
+    await db.delete(
+      playlistsTracksRelationsTableName,
+      where: 'playlist_id = ?',
+      whereArgs: [playlist.id],
+    );
+
+    final batch = db.batch();
+    for (final trackId in playlist.trackIds) {
+      final id = Ulid().toString();
+      batch.insert(
+        playlistsTracksRelationsTableName,
+        {'id': id, 'playlist_id': playlist.id, 'track_id': trackId},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    await batch.commit();
   }
 
   @override
