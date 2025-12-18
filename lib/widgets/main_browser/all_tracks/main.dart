@@ -300,6 +300,13 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
       title: Text('All Tracks ${tracksCount > 0 ? "($tracksCount)" : ""}'),
       actions: [
         IconButton(
+          icon: const Icon(Icons.refresh),
+          tooltip: "Re-load tracks",
+          onPressed: () {
+            reloadTracks(ref.read(tracksProvider.notifier), ref.read(loadedTracksCountProvider.notifier));
+          },
+        ),
+        IconButton(
           icon: const Icon(Icons.search),
           onPressed: () {
             setState(() {

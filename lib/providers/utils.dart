@@ -82,6 +82,7 @@ Future<void> doInitialLoad(
   final cachedTracksRepository = getCachedTracksRepository();
   final cachedTracks = await cachedTracksRepository.getAll();
   tracksNotifier.setTracks(cachedTracks);
+  await cachedTracksRepository.close();
 
   initialLoadNotifier.setInitialLoadDone();
 
@@ -99,6 +100,27 @@ Future<void> _fetchAndSetTracks(
   LoadedTracksCountProviderNotifier loadedTracksCountNotifier, {
   List<Track>? cachedTracks,
 }) async {
+  final tracksPlayer = await getPlayerBackend();
+  await tracksPlayer.fetchTracks(
+    paths,
+    tracksNotifier,
+    loadedTracksCountNotifier,
+    cachedTracks: cachedTracks,
+  );
+}
+
+Future<void> reloadTracks(
+  TracksNotifier tracksNotifier,
+  LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
+) async {
+  final storedPathsRepository = getStoredPathsRepository();
+  final paths = await storedPathsRepository.getStoredPaths();
+  await storedPathsRepository.close();
+
+  final cachedTracksRepository = getCachedTracksRepository();
+  final cachedTracks = await cachedTracksRepository.getAll();
+  await cachedTracksRepository.close();
+
   final tracksPlayer = await getPlayerBackend();
   await tracksPlayer.fetchTracks(
     paths,
