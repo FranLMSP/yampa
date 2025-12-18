@@ -13,6 +13,7 @@ import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/theme_mode_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
+import 'package:yampa/providers/sort_mode_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/main.dart';
 import 'package:yampa/widgets/main_page_loader.dart';
@@ -62,19 +63,21 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> {
   bool _initialLoadDone = false;
 
-  Future<void> _loadTheme() async {
+  Future<void> _loadSettings() async {
     if (_initialLoadDone) {
       return;
     }
     final userSettingsRepo = getUserSettingsDataRepository();
-    final userThemeMode = await userSettingsRepo.getUserTheme();
-    ref.read(themeModeProvider.notifier).setThemeMode(userThemeMode);
+    final userSettings = await userSettingsRepo.getUserSettings();
+    ref.read(themeModeProvider.notifier).setThemeMode(userSettings.themeMode ?? UserThemeMode.system);
+    ref.read(allTracksSortModeProvider.notifier).setSortMode(userSettings.defaultSortMode);
+    await userSettingsRepo.close();
     _initialLoadDone = true;
   }
 
   @override
   Widget build(BuildContext context) {
-    _loadTheme();
+    _loadSettings();
     final themeMode = getMaterialThemeFromUserTheme(
       ref.watch(themeModeProvider),
     );
