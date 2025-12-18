@@ -17,13 +17,8 @@ SharedPreferencesAsync _getPrefs() {
 class UserSettingsDataSharedPreferences extends UserSettingsData {
   @override
   Future<UserSettings> getUserSettings() async {
-    final prefs = _getPrefs();
-
-    final defaultSortModeIndex = await prefs.getInt(defaultSortModeKey) ?? 0;
     return UserSettings(
-      defaultSortMode: defaultSortModeIndex <= SortMode.values.length - 1
-          ? SortMode.values[defaultSortModeIndex]
-          : SortMode.titleAtoZ,
+      defaultSortMode: await getDefaultSortMode(),
       lastWindowSize: await getLastWindowSize(),
       themeMode: await getUserTheme(),
     );
@@ -52,6 +47,25 @@ class UserSettingsDataSharedPreferences extends UserSettingsData {
     final prefs = _getPrefs();
 
     await prefs.setInt(userThemeModeKey, userTheme.index);
+  }
+
+  @override
+  Future<void> saveDefaultSortMode(SortMode sortMode) async {
+    final prefs = _getPrefs();
+
+    await prefs.setInt(defaultSortModeKey, sortMode.index);
+  }
+
+  @override
+  Future<SortMode> getDefaultSortMode() async {
+    final prefs = _getPrefs();
+
+    final defaultSortModeIndex = await prefs.getInt(defaultSortModeKey);
+    if (defaultSortModeIndex != null &&
+        defaultSortModeIndex <= SortMode.values.length - 1) {
+      return SortMode.values[defaultSortModeIndex];
+    }
+    return SortMode.titleAtoZ;
   }
 
   @override
