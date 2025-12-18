@@ -345,7 +345,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             const SizedBox(height: 24),
             if (selectedPlaylist.trackIds.isNotEmpty)
               SizedBox(
-                width: 100,
+                width: 150,
                 child: ElevatedButton(
                   onPressed: () async {
                     if (selectedPlaylist.trackIds.isNotEmpty) {
@@ -364,7 +364,10 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                       }
                     }
                   },
-                  child: Row(children: [Icon(Icons.play_arrow), Text("Play")]),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [Icon(Icons.play_arrow), Text("Play (${selectedPlaylist.trackIds.length})")]
+                  ),
                 ),
               ),
             const SizedBox(height: 24),

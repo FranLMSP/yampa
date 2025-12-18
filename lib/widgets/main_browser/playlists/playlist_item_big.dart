@@ -46,7 +46,7 @@ class PlaylistItemBig extends StatelessWidget {
                     ? Theme.of(context).colorScheme.inversePrimary
                     : Theme.of(context).colorScheme.surface,
                 child: Text(
-                  playlist.name,
+                  "${playlist.name} (${playlist.trackIds.length})",
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
