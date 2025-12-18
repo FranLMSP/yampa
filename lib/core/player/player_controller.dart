@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math' hide log;
 
 import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/core/player_backends/interface.dart';
@@ -169,21 +170,20 @@ class PlayerController {
 
   Future<void> shuffleTrackQueue() async {
     final shuffleHandler = {
-      ShuffleMode.sequential: () {
+      ShuffleMode.sequential: () async {
         shuffledTrackQueueIds = List.from(trackQueueIds);
       },
-      ShuffleMode.random: () {
+      ShuffleMode.random: () async {
         shuffledTrackQueueIds = List.from(trackQueueIds);
         shuffledTrackQueueIds.shuffle();
       },
-      ShuffleMode.randomBasedOnHistory: () {
-        // TODO: implement this in the future after collecting statistics of each track
-        shuffledTrackQueueIds = List.from(trackQueueIds);
-        shuffledTrackQueueIds.shuffle();
+      ShuffleMode.randomBasedOnHistory: () async {
+        final allStats = await _getAllTrackStatistics();
+        shuffledTrackQueueIds = _weightedShuffle(trackQueueIds, allStats);
       },
     };
     final handler = shuffleHandler[shuffleMode]!;
-    handler();
+    await handler();
     final newIndex = shuffledTrackQueueIds.indexWhere(
       (e) => e == currentTrackId,
     );
@@ -193,6 +193,46 @@ class PlayerController {
 
     await handlePersistPlayerControllerState(this);
   }
+
+  List<String> _weightedShuffle(
+    List<String> ids,
+    Map<String, TrackStatistics> allStats,
+  ) {
+    if (ids.isEmpty) return [];
+    final random = Random();
+    final items = List.from(ids);
+
+    // Create a map of weights for quick lookup
+    final weights = <String, double>{};
+    for (final id in ids) {
+      final stats = allStats[id];
+      if (stats == null) {
+        weights[id] = 1.0; // Default weight for tracks with no stats
+      } else {
+        // Higher plays and completions increase weight
+        // More skips decrease weight significantly
+        final playWeight = stats.timesPlayed * 0.5;
+        final completionWeight = stats.completionCount * 1.5;
+        final skipPenalty = stats.timesSkipped * 2.0;
+        weights[id] = (playWeight + completionWeight + 1.0) / (skipPenalty + 1.0);
+      }
+    }
+
+    // Weighted Random Sampling (A-Res)
+    // For each item, calculate a priority: r^(1/w) where r ~ U(0,1)
+    // Sorting by priority gives a weighted shuffle
+    final priorities = <String, double>{};
+    for (final id in items) {
+      final weight = weights[id] ?? 1.0;
+      final r = random.nextDouble();
+      // Using r^(1/weight) for weighted random sampling.
+      priorities[id] = pow(r, 1.0 / weight).toDouble();
+    }
+
+    items.sort((a, b) => priorities[b]!.compareTo(priorities[a]!));
+    return List<String>.from(items);
+  }
+
 
   Future<void> seek(Duration position) async {
     if (playerBackend != null && currentTrackId != null) {
