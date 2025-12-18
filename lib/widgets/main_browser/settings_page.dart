@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yampa/core/repositories/user_settings_data/factory.dart';
 import 'package:yampa/core/utils/format_utils.dart';
+import 'package:yampa/models/user_settings.dart';
 import 'package:yampa/providers/statistics_provider.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -47,6 +49,20 @@ class SettingsPage extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const PlayerStatisticsPage(),
+                ),
+              );
+            },
+          ),
+          _buildSettingsOption(
+            context: context,
+            title: 'Theme',
+            subtitle: 'Customize the look and feel of the app',
+            icon: Icons.brush,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const UserThemePage(),
                 ),
               );
             },
@@ -143,6 +159,63 @@ class PlayerStatisticsPage extends ConsumerWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class UserThemePage extends StatefulWidget {
+  const UserThemePage({super.key});
+
+  @override
+  State<UserThemePage> createState() => _UserThemePageState();
+}
+
+class _UserThemePageState extends State<UserThemePage> {
+  bool _initialLoadDone = false;
+  UserThemeMode _userThemeMode = UserThemeMode.system;
+
+  Future<void> _loadUserTheme() async {
+    if (_initialLoadDone) {
+      return;
+    }
+    final userSettingsRepo = getUserSettingsDataRepository();
+    final theme = await userSettingsRepo.getUserTheme();
+    setState(() {
+      _userThemeMode = theme;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _loadUserTheme();
+    return Scaffold(
+      appBar: AppBar(title: const Text('Theme')),
+      body: RadioGroup(
+        groupValue: _userThemeMode,
+        onChanged: (UserThemeMode? pickedTheme) async {
+          final userSettingsRepo = getUserSettingsDataRepository();
+          userSettingsRepo.saveUserTheme(pickedTheme ?? UserThemeMode.system);
+          setState(() {
+            _userThemeMode = pickedTheme ?? UserThemeMode.system;
+          });
+        },
+        child: Column(
+          children: [
+            ListTile(
+              leading: Radio(value: UserThemeMode.system),
+              title: Text("System"),
+            ),
+            ListTile(
+              leading: Radio(value: UserThemeMode.light),
+              title: Text("Light"),
+            ),
+            ListTile(
+              leading: Radio(value: UserThemeMode.dark),
+              title: Text("Dark"),
+            ),
+          ],
         ),
       ),
     );
