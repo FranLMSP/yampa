@@ -30,18 +30,22 @@ class TrackItem extends ConsumerWidget {
     );
   }
 
-  Widget _buildTrackPlaceholder(bool isPlaying) {
+  Widget _buildTrackPlaceholder(BuildContext context, bool isPlaying) {
     return Container(
       width: 45,
       height: 45,
-      color: Colors.grey,
+      color: Theme.of(context).hintColor,
       child: isPlaying
           ? null
-          : const Icon(Icons.music_note, size: 40, color: Colors.white),
+          : Icon(
+              Icons.music_note,
+              size: 40,
+              color: Theme.of(context).canvasColor,
+            ),
     );
   }
 
-  Widget _buildTrackIcon(bool isPlaying) {
+  Widget _buildTrackIcon(BuildContext context, bool isPlaying) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
       child: Stack(
@@ -49,17 +53,21 @@ class TrackItem extends ConsumerWidget {
         children: [
           track.imageBytes != null
               ? _buildTrackImage()
-              : _buildTrackPlaceholder(isPlaying),
+              : _buildTrackPlaceholder(context, isPlaying),
 
           if (isPlaying)
             Container(
               width: 45,
               height: 45,
-              color: Colors.black.withValues(alpha: 0.4),
+              color: Theme.of(context).hintColor.withAlpha(70),
             ),
 
           if (isPlaying)
-            const Icon(Icons.play_arrow, color: Colors.white, size: 32),
+            Icon(
+              Icons.play_arrow,
+              color: Theme.of(context).canvasColor,
+              size: 32,
+            ),
         ],
       ),
     );
@@ -96,7 +104,7 @@ class TrackItem extends ConsumerWidget {
         mouseCursor: MouseCursor.defer,
         selected: isSelected || isPlaying,
         selectedTileColor: color,
-        leading: _buildTrackIcon(isPlaying),
+        leading: _buildTrackIcon(context, isPlaying),
         title: Text(
           track.displayTitle(),
           style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold),

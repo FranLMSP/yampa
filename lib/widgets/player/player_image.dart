@@ -24,12 +24,16 @@ class PlayerImage extends StatelessWidget {
     );
   }
 
-  Widget _buildImagePlaceholder() {
+  Widget _buildImagePlaceholder(BuildContext context) {
     return Container(
       width: width,
       height: height,
-      color: Colors.grey,
-      child: Icon(Icons.music_note, size: iconSize, color: Colors.white),
+      color: Theme.of(context).hintColor,
+      child: Icon(
+        Icons.music_note,
+        size: iconSize,
+        color: Theme.of(context).canvasColor,
+      ),
     );
   }
 
@@ -39,7 +43,7 @@ class PlayerImage extends StatelessWidget {
       borderRadius: BorderRadius.circular(8.0),
       child: track?.imageBytes != null
           ? _buildImage(track!)
-          : _buildImagePlaceholder(),
+          : _buildImagePlaceholder(context),
     );
   }
 }

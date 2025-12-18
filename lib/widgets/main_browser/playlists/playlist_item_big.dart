@@ -44,7 +44,7 @@ class PlaylistItemBig extends StatelessWidget {
                 width: double.infinity,
                 color: isSelected
                     ? Theme.of(context).colorScheme.inversePrimary
-                    : Colors.white,
+                    : Theme.of(context).colorScheme.surface,
                 child: Text(
                   playlist.name,
                   style: const TextStyle(

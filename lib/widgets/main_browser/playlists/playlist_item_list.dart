@@ -53,13 +53,13 @@ class _PlaylistItemListState extends ConsumerState<PlaylistItemList> {
     return Container(
       width: 50,
       height: 50,
-      color: Colors.grey,
+      color: Theme.of(context).colorScheme.outline,
       child: Icon(
         widget.playlist.id == favoritePlaylistId
             ? Icons.favorite
             : Icons.playlist_add,
         size: 40,
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }
@@ -85,9 +85,6 @@ class _PlaylistItemListState extends ConsumerState<PlaylistItemList> {
         if (widget.onTap != null && !widget.isEditable) {
           widget.onTap!(widget.playlist);
         }
-      },
-      onLongPress: () => {
-        // TODO: implement functionality to select multiple playlists
       },
       child: Card(
         color: selectedPlaylists.contains(widget.playlist.id)

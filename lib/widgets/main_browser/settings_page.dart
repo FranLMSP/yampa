@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yampa/core/repositories/user_settings_data/factory.dart';
 import 'package:yampa/core/utils/format_utils.dart';
+import 'package:yampa/models/user_settings.dart';
 import 'package:yampa/providers/statistics_provider.dart';
+import 'package:yampa/providers/theme_mode_provider.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -48,6 +51,18 @@ class SettingsPage extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => const PlayerStatisticsPage(),
                 ),
+              );
+            },
+          ),
+          _buildSettingsOption(
+            context: context,
+            title: 'Theme',
+            subtitle: 'Customize the look and feel of the app',
+            icon: Icons.brush,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const UserThemePage()),
               );
             },
           ),
@@ -128,7 +143,11 @@ class PlayerStatisticsPage extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error, size: 48, color: Colors.red),
+                Icon(
+                  Icons.error,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   'Error loading statistics',
@@ -137,12 +156,79 @@ class PlayerStatisticsPage extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(
                   error.toString(),
-                  style: const TextStyle(color: Colors.grey),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class UserThemePage extends ConsumerStatefulWidget {
+  const UserThemePage({super.key});
+
+  @override
+  ConsumerState<UserThemePage> createState() => _UserThemePageState();
+}
+
+class _UserThemePageState extends ConsumerState<UserThemePage> {
+  bool _initialLoadDone = false;
+  UserThemeMode _userThemeMode = UserThemeMode.system;
+
+  Future<void> _loadUserTheme() async {
+    if (_initialLoadDone) {
+      return;
+    }
+    final userSettingsRepo = getUserSettingsDataRepository();
+    final theme = await userSettingsRepo.getUserTheme();
+    setState(() {
+      _userThemeMode = theme;
+    });
+    _initialLoadDone = true;
+  }
+
+  Future<void> _setTheme(UserThemeMode? pickedTheme) async {
+    final theme = pickedTheme ?? UserThemeMode.system;
+    ref.read(themeModeProvider.notifier).setThemeMode(theme);
+    final userSettingsRepo = getUserSettingsDataRepository();
+    userSettingsRepo.saveUserTheme(theme);
+    setState(() {
+      _userThemeMode = theme;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _loadUserTheme();
+    return Scaffold(
+      appBar: AppBar(title: const Text('Theme')),
+      body: RadioGroup(
+        groupValue: _userThemeMode,
+        onChanged: _setTheme,
+        child: Column(
+          children: [
+            ListTile(
+              leading: Radio(value: UserThemeMode.system),
+              title: Text("System"),
+              onTap: () => _setTheme(UserThemeMode.system),
+            ),
+            ListTile(
+              leading: Radio(value: UserThemeMode.light),
+              title: Text("Light"),
+              onTap: () => _setTheme(UserThemeMode.light),
+            ),
+            ListTile(
+              leading: Radio(value: UserThemeMode.dark),
+              title: Text("Dark"),
+              onTap: () => _setTheme(UserThemeMode.dark),
+            ),
+          ],
         ),
       ),
     );

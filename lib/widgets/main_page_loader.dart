@@ -5,13 +5,13 @@ class MainPageLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.black,
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
         child: Icon(
           Icons.music_note,
-          color: Colors.white,
-          size: 120.0, // Large size for full-screen effect
+          color: Theme.of(context).colorScheme.primary,
+          size: 120.0,
         ),
       ),
     );

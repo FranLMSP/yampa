@@ -32,24 +32,25 @@ class PlaylistImage extends StatelessWidget {
           width: width ?? double.infinity,
           height: height,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildPlaceholder(context),
         ),
       );
     }
-    return _buildPlaceholder();
+    return _buildPlaceholder(context);
   }
 
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder(BuildContext context) {
     return Container(
       width: width ?? double.infinity,
       height: height ?? 100,
-      color: Colors.grey[300],
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Icon(
         playlist.id == favoritePlaylistId
             ? Icons.favorite
             : Icons.playlist_play,
         size: iconSize,
-        color: Colors.black54,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
     );
   }
