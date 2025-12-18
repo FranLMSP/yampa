@@ -16,7 +16,8 @@ class PlayerController {
   // TODO: consider holding all the tracks here instead of a separate provider
   String? currentTrackId;
   String? currentPlaylistId;
-  int currentTrackIndex = 0; // TODO: we may want to get rid of this and just calculate it on demand from currentTrackId, to avoid having to keep them in sync
+  int currentTrackIndex =
+      0; // TODO: we may want to get rid of this and just calculate it on demand from currentTrackId, to avoid having to keep them in sync
   double speed = 1;
   List<String> trackQueueIds = [];
   List<String> shuffledTrackQueueIds = [];
@@ -214,7 +215,8 @@ class PlayerController {
         final playWeight = stats.timesPlayed * 0.5;
         final completionWeight = stats.completionCount * 1.5;
         final skipPenalty = stats.timesSkipped * 2.0;
-        weights[id] = (playWeight + completionWeight + 1.0) / (skipPenalty + 1.0);
+        weights[id] =
+            (playWeight + completionWeight + 1.0) / (skipPenalty + 1.0);
       }
     }
 
@@ -232,7 +234,6 @@ class PlayerController {
     items.sort((a, b) => priorities[b]!.compareTo(priorities[a]!));
     return List<String>.from(items);
   }
-
 
   Future<void> seek(Duration position) async {
     if (playerBackend != null && currentTrackId != null) {
