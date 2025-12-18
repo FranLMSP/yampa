@@ -223,7 +223,13 @@ class PlayerController {
       shuffledTrackQueueIds = allTrackIds;
       currentPlaylistId = null;
       await shuffleTrackQueue();
-      currentTrackIndex = 0;
+      // Try to find again the track that the user picked, fallback to 0 as a failsafe
+      currentTrackIndex = shuffledTrackQueueIds.indexWhere(
+        (e) => e == currentTrackId,
+      );
+      if (currentTrackIndex <= -1) {
+        currentTrackIndex = 0;
+      }
     }
     final trackDuration = await playerBackend!.setTrack(track);
     lastTrackDuration = trackDuration;
