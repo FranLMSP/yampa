@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:yampa/models/user_settings.dart';
 
 enum ViewMode { portrait, landscape, desktop }
 
@@ -25,4 +26,16 @@ bool isPlatformDesktop() {
 
 bool isPlatformMobile() {
   return Platform.isAndroid || Platform.isIOS;
+}
+
+
+ThemeMode getMaterialThemeFromUserTheme(UserThemeMode? userThemeMode) {
+  final themeMap = {
+    UserThemeMode.light: ThemeMode.light,
+    UserThemeMode.dark: ThemeMode.dark,
+    UserThemeMode.system: ThemeMode.system,
+    UserThemeMode.custom: ThemeMode.system,
+  };
+
+  return themeMap[userThemeMode] ?? ThemeMode.system;
 }

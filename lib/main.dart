@@ -22,12 +22,13 @@ import 'package:window_manager/window_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final userSettingsRepo = getUserSettingsDataRepository();
+  final userSettings = await userSettingsRepo.getUserSettings();
   if (isPlatformDesktop()) {
     await windowManager.ensureInitialized();
-    final userSettingsRepo = getUserSettingsDataRepository();
-    final lastWindowSize = await userSettingsRepo.getLastWindowSize();
     await userSettingsRepo.close();
     Size? windowSize;
+    final lastWindowSize = userSettings.lastWindowSize;
     if (lastWindowSize != null) {
       windowSize = Size(lastWindowSize.width, lastWindowSize.height);
     }
@@ -46,16 +47,28 @@ void main() async {
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
   );
-  runApp(ProviderScope(child: const MyApp()));
+
+  runApp(
+    ProviderScope(
+      child: MyApp(
+        themeMode: getMaterialThemeFromUserTheme(userSettings.themeMode),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({
+    super.key,
+    this.themeMode = ThemeMode.system,
+  });
+  final ThemeMode themeMode;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'YAMPA - Yet Another Music Player App',
+      darkTheme: ThemeData.dark(),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),

@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 const defaultSortModeKey = "defaultSortMode";
 const lastWindowWidthKey = "lastWindowWidth";
 const lastWindowHeightKey = "lastWindowHeight";
+const userThemeModeKey = "userThemeModeKey";
 
 SharedPreferencesAsync _getPrefs() {
   // change preferences here if necessary
@@ -20,8 +21,9 @@ class UserSettingsDataSharedPreferences extends UserSettingsData {
 
     final defaultSortModeIndex = await prefs.getInt(defaultSortModeKey) ?? 0;
     return UserSettings(
-      defaultSortMode: SortMode.values[defaultSortModeIndex],
+      defaultSortMode: defaultSortModeIndex <= SortMode.values.length - 1 ? SortMode.values[defaultSortModeIndex] : SortMode.titleAtoZ,
       lastWindowSize: await getLastWindowSize(),
+      themeMode: await getUserTheme(),
     );
   }
 
@@ -41,6 +43,24 @@ class UserSettingsDataSharedPreferences extends UserSettingsData {
 
     await prefs.setDouble(lastWindowWidthKey, lastWindowSize.width);
     await prefs.setDouble(lastWindowHeightKey, lastWindowSize.height);
+  }
+
+  @override
+  Future<void> saveUserTheme(UserThemeMode userTheme) async {
+    final prefs = _getPrefs();
+
+    await prefs.setInt(userThemeModeKey, userTheme.index);
+  }
+
+  @override
+  Future<UserThemeMode> getUserTheme() async {
+    final prefs = _getPrefs();
+
+    final themeIndex = await prefs.getInt(userThemeModeKey);
+    if (themeIndex != null && themeIndex <= UserThemeMode.values.length - 1) {
+      return UserThemeMode.values[themeIndex];
+    }
+    return UserThemeMode.system;
   }
 
   @override
