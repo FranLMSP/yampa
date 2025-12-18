@@ -49,15 +49,11 @@ void main() async {
     androidNotificationOngoing: true,
   );
 
-  runApp(
-    ProviderScope(child: MyApp()),
-  );
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
-  const MyApp({
-    super.key,
-  });
+  const MyApp({super.key});
 
   @override
   ConsumerState<MyApp> createState() => _MyAppState();
@@ -79,7 +75,9 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     _loadTheme();
-    final themeMode = getMaterialThemeFromUserTheme(ref.watch(themeModeProvider));
+    final themeMode = getMaterialThemeFromUserTheme(
+      ref.watch(themeModeProvider),
+    );
     return MaterialApp(
       title: 'YAMPA - Yet Another Music Player App',
       darkTheme: ThemeData.dark(),

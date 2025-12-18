@@ -74,7 +74,9 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
           Text(
             value.isEmpty ? "Unknown" : value,
             textAlign: TextAlign.right,
-            style: const TextStyle(color: Colors.grey),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       );
@@ -93,7 +95,9 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
             child: Text(
               value.isEmpty ? "Unknown" : value,
               textAlign: TextAlign.right,
-              style: const TextStyle(color: Colors.grey),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ],
@@ -251,7 +255,9 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                           : Container(
                               width: 200,
                               height: 200,
-                              color: Colors.grey.shade300,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
                               child: const Icon(Icons.music_note, size: 64),
                             ),
                     ),
@@ -262,9 +268,11 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                   Center(
                     child: TextButton(
                       onPressed: () => setState(() => _imageBytes = null),
-                      child: const Text(
+                      child: Text(
                         "Remove Image",
-                        style: TextStyle(color: Colors.red),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                       ),
                     ),
                   ),
@@ -321,13 +329,15 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                 trackStatsAsync.when(
                   data: (stats) {
                     if (stats.timesPlayed == 0) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Text(
                           'No statistics yet - play this track to start tracking!',
                           style: TextStyle(
                             fontStyle: FontStyle.italic,
-                            color: Colors.grey,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       );

@@ -62,9 +62,7 @@ class SettingsPage extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const UserThemePage(),
-                ),
+                MaterialPageRoute(builder: (context) => const UserThemePage()),
               );
             },
           ),
@@ -145,7 +143,11 @@ class PlayerStatisticsPage extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error, size: 48, color: Colors.red),
+                Icon(
+                  Icons.error,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   'Error loading statistics',
@@ -154,7 +156,9 @@ class PlayerStatisticsPage extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(
                   error.toString(),
-                  style: const TextStyle(color: Colors.grey),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ],

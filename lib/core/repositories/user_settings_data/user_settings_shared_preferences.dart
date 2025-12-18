@@ -21,7 +21,9 @@ class UserSettingsDataSharedPreferences extends UserSettingsData {
 
     final defaultSortModeIndex = await prefs.getInt(defaultSortModeKey) ?? 0;
     return UserSettings(
-      defaultSortMode: defaultSortModeIndex <= SortMode.values.length - 1 ? SortMode.values[defaultSortModeIndex] : SortMode.titleAtoZ,
+      defaultSortMode: defaultSortModeIndex <= SortMode.values.length - 1
+          ? SortMode.values[defaultSortModeIndex]
+          : SortMode.titleAtoZ,
       lastWindowSize: await getLastWindowSize(),
       themeMode: await getUserTheme(),
     );

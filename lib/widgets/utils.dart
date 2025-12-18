@@ -28,7 +28,6 @@ bool isPlatformMobile() {
   return Platform.isAndroid || Platform.isIOS;
 }
 
-
 ThemeMode getMaterialThemeFromUserTheme(UserThemeMode? userThemeMode) {
   final themeMap = {
     UserThemeMode.light: ThemeMode.light,

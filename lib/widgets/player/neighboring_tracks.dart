@@ -63,7 +63,7 @@ class NeighboringTracks extends ConsumerWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: Colors.grey,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -88,7 +88,10 @@ class NeighboringTracks extends ConsumerWidget {
                     ),
                     Text(
                       track.artist.isNotEmpty ? track.artist : "",
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.right,
@@ -113,7 +116,10 @@ class NeighboringTracks extends ConsumerWidget {
                     ),
                     Text(
                       track.artist.isNotEmpty ? track.artist : "",
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

@@ -139,7 +139,10 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text("Delete", style: TextStyle(color: Colors.red)),
+            child: Text(
+              "Delete",
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ),
         ],
       ),
@@ -171,7 +174,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
             currentPaths,
             context,
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
           child: Icon(Icons.delete),
         ),
       ];
