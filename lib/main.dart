@@ -11,6 +11,7 @@ import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
+import 'package:yampa/providers/theme_mode_provider.dart';
 import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/main.dart';
@@ -49,26 +50,40 @@ void main() async {
   );
 
   runApp(
-    ProviderScope(
-      child: MyApp(
-        themeMode: getMaterialThemeFromUserTheme(userSettings.themeMode),
-      ),
-    ),
+    ProviderScope(child: MyApp()),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({
     super.key,
-    this.themeMode = ThemeMode.system,
   });
-  final ThemeMode themeMode;
+
+  @override
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  bool _initialLoadDone = false;
+
+  Future<void> _loadTheme() async {
+    if (_initialLoadDone) {
+      return;
+    }
+    final userSettingsRepo = getUserSettingsDataRepository();
+    final userThemeMode = await userSettingsRepo.getUserTheme();
+    ref.read(themeModeProvider.notifier).setThemeMode(userThemeMode);
+    _initialLoadDone = true;
+  }
 
   @override
   Widget build(BuildContext context) {
+    _loadTheme();
+    final themeMode = getMaterialThemeFromUserTheme(ref.watch(themeModeProvider));
     return MaterialApp(
       title: 'YAMPA - Yet Another Music Player App',
       darkTheme: ThemeData.dark(),
+      themeMode: themeMode,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),

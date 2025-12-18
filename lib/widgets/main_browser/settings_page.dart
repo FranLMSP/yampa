@@ -4,6 +4,7 @@ import 'package:yampa/core/repositories/user_settings_data/factory.dart';
 import 'package:yampa/core/utils/format_utils.dart';
 import 'package:yampa/models/user_settings.dart';
 import 'package:yampa/providers/statistics_provider.dart';
+import 'package:yampa/providers/theme_mode_provider.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -165,14 +166,14 @@ class PlayerStatisticsPage extends ConsumerWidget {
   }
 }
 
-class UserThemePage extends StatefulWidget {
+class UserThemePage extends ConsumerStatefulWidget {
   const UserThemePage({super.key});
 
   @override
-  State<UserThemePage> createState() => _UserThemePageState();
+  ConsumerState<UserThemePage> createState() => _UserThemePageState();
 }
 
-class _UserThemePageState extends State<UserThemePage> {
+class _UserThemePageState extends ConsumerState<UserThemePage> {
   bool _initialLoadDone = false;
   UserThemeMode _userThemeMode = UserThemeMode.system;
 
@@ -185,6 +186,17 @@ class _UserThemePageState extends State<UserThemePage> {
     setState(() {
       _userThemeMode = theme;
     });
+    _initialLoadDone = true;
+  }
+
+  Future<void> _setTheme(UserThemeMode? pickedTheme) async {
+    final theme = pickedTheme ?? UserThemeMode.system;
+    ref.read(themeModeProvider.notifier).setThemeMode(theme);
+    final userSettingsRepo = getUserSettingsDataRepository();
+    userSettingsRepo.saveUserTheme(theme);
+    setState(() {
+      _userThemeMode = theme;
+    });
   }
 
   @override
@@ -194,26 +206,23 @@ class _UserThemePageState extends State<UserThemePage> {
       appBar: AppBar(title: const Text('Theme')),
       body: RadioGroup(
         groupValue: _userThemeMode,
-        onChanged: (UserThemeMode? pickedTheme) async {
-          final userSettingsRepo = getUserSettingsDataRepository();
-          userSettingsRepo.saveUserTheme(pickedTheme ?? UserThemeMode.system);
-          setState(() {
-            _userThemeMode = pickedTheme ?? UserThemeMode.system;
-          });
-        },
+        onChanged: _setTheme,
         child: Column(
           children: [
             ListTile(
               leading: Radio(value: UserThemeMode.system),
               title: Text("System"),
+              onTap: () => _setTheme(UserThemeMode.system),
             ),
             ListTile(
               leading: Radio(value: UserThemeMode.light),
               title: Text("Light"),
+              onTap: () => _setTheme(UserThemeMode.light),
             ),
             ListTile(
               leading: Radio(value: UserThemeMode.dark),
               title: Text("Dark"),
+              onTap: () => _setTheme(UserThemeMode.dark),
             ),
           ],
         ),
