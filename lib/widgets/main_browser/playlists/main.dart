@@ -22,9 +22,6 @@ class _PlaylistsState extends ConsumerState<Playlists> {
   List<String> _selectedPlaylistIds = [];
 
   void _toggleSelectedPlaylist(String playlistId) {
-    if (playlistId == favoritePlaylistId) {
-      return;
-    }
     setState(() {
       if (_selectedPlaylistIds.contains(playlistId)) {
         _selectedPlaylistIds.removeWhere((e) => e == playlistId);
@@ -34,51 +31,102 @@ class _PlaylistsState extends ConsumerState<Playlists> {
     });
   }
 
-  Widget _buildAddNewTrackFloatingButton(PlaylistNotifier playlistNotifier) {
-    return FloatingActionButton(
-      child: Icon(Icons.add),
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return NewPlaylistDialog(
-              onSaved: (newPlaylist) async {
-                final createdPlaylist = await handlePlaylistCreated(
-                  newPlaylist,
-                  playlistNotifier,
+  PreferredSizeWidget _buildAppBar(
+    List<Playlist> allPlaylists,
+    PlaylistNotifier playlistNotifier,
+  ) {
+    final isMultiSelecting = _selectedPlaylistIds.isNotEmpty;
+
+    if (isMultiSelecting) {
+      return AppBar(
+        title: Text('${_selectedPlaylistIds.length} selected'),
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () => setState(() => _selectedPlaylistIds = []),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.file_upload),
+            onPressed: () {
+              final selectedPlaylists = allPlaylists
+                  .where((e) => _selectedPlaylistIds.contains(e.id))
+                  .toList();
+              handlePlaylistsExport(selectedPlaylists);
+            },
+            tooltip: 'Export selected',
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              final selectedPlaylists = allPlaylists
+                  .where((e) => _selectedPlaylistIds.contains(e.id))
+                  .toList();
+              removePlaylistsModal(
+                context,
+                selectedPlaylists,
+                playlistNotifier,
+                () => setState(() => _selectedPlaylistIds = []),
+              );
+            },
+            tooltip: 'Delete selected',
+          ),
+        ],
+      );
+    }
+
+    if (_openedPlaylist != null) {
+      return AppBar(
+        title: Text(_openedPlaylist!.name),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => setState(() {
+            _openedPlaylist = null;
+            _selectedTrackIds = [];
+          }),
+        ),
+      );
+    }
+
+    return AppBar(
+      title: Text('Playlists'),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.add_circle_outline),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return NewPlaylistDialog(
+                  onSaved: (newPlaylist) async {
+                    final createdPlaylist = await handlePlaylistCreated(
+                      newPlaylist,
+                      playlistNotifier,
+                    );
+                    setState(() {
+                      _openedPlaylist = createdPlaylist;
+                    });
+                  },
                 );
-                setState(() {
-                  _openedPlaylist = createdPlaylist;
-                });
               },
             );
           },
-        );
-      },
-    );
-  }
-
-  Widget _buildRemoveSelectedPlaylistsButton(
-    List<Playlist> allPlaylists,
-    PlaylistNotifier playlistsNotifier,
-  ) {
-    return FloatingActionButton(
-      backgroundColor: Theme.of(context).colorScheme.error,
-      foregroundColor: Theme.of(context).colorScheme.onError,
-      child: Icon(Icons.delete),
-      onPressed: () {
-        final selectedPlaylists = allPlaylists
-            .where((e) => _selectedPlaylistIds.contains(e.id))
-            .toList();
-        removePlaylistsModal(
-          context,
-          selectedPlaylists,
-          playlistsNotifier,
-          () => setState(() {
-            _selectedPlaylistIds = [];
-          }),
-        );
-      },
+          tooltip: 'New Playlist',
+        ),
+        IconButton(
+          icon: Icon(Icons.file_download),
+          onPressed: () async {
+            await handlePlaylistsImport(playlistNotifier, allPlaylists);
+          },
+          tooltip: 'Import Playlists',
+        ),
+        IconButton(
+          icon: Icon(Icons.file_upload),
+          onPressed: () {
+            handlePlaylistsExport(allPlaylists);
+          },
+          tooltip: 'Export All',
+        ),
+      ],
     );
   }
 
@@ -128,27 +176,13 @@ class _PlaylistsState extends ConsumerState<Playlists> {
   }
 
   Widget? _buildFloatingActionButton(
-    BuildContext context,
-    List<Playlist> allPlaylists,
     PlaylistNotifier playlistNotifier,
     PlayerControllerNotifier playerNotifier,
   ) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        if (_selectedPlaylistIds.isNotEmpty)
-          _buildRemoveSelectedPlaylistsButton(allPlaylists, playlistNotifier),
-        if (_selectedPlaylistIds.isEmpty &&
-            _selectedTrackIds.isEmpty &&
-            _openedPlaylist == null)
-          _buildAddNewTrackFloatingButton(playlistNotifier),
-        if (_selectedPlaylistIds.isEmpty &&
-            _selectedTrackIds.isNotEmpty &&
-            _openedPlaylist != null)
-          _buildRemoveSelectedTracksButton(playlistNotifier, playerNotifier),
-      ],
-    );
+    if (_openedPlaylist != null && _selectedTrackIds.isNotEmpty) {
+      return _buildRemoveSelectedTracksButton(playlistNotifier, playerNotifier);
+    }
+    return null;
   }
 
   void _handlePlaylistOpened(Playlist playlist) {
@@ -194,6 +228,16 @@ class _PlaylistsState extends ConsumerState<Playlists> {
             ],
           ),
         ),
+        PopupMenuItem<String>(
+          value: 'export',
+          child: Row(
+            children: [
+              Icon(Icons.file_upload),
+              SizedBox(width: 12),
+              Text('Export'),
+            ],
+          ),
+        ),
       ],
     );
 
@@ -203,6 +247,8 @@ class _PlaylistsState extends ConsumerState<Playlists> {
       }
     } else if (selected == 'select') {
       _toggleSelectedPlaylist(playlist.id);
+    } else if (selected == 'export') {
+      handlePlaylistsExport([playlist]);
     }
   }
 
@@ -213,6 +259,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
     final playerNotifier = ref.read(playerControllerProvider.notifier);
     final isMultiSelecting = _selectedPlaylistIds.isNotEmpty;
     return Scaffold(
+      appBar: _buildAppBar(allPlaylists, playlistNotifier),
       body: _openedPlaylist != null && !isMultiSelecting
           ? PlaylistViewSmall(
               playlist: _openedPlaylist!,
@@ -257,8 +304,6 @@ class _PlaylistsState extends ConsumerState<Playlists> {
               },
             ),
       floatingActionButton: _buildFloatingActionButton(
-        context,
-        allPlaylists,
         playlistNotifier,
         playerNotifier,
       ),

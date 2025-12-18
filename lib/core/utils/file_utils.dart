@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io' as io;
 import 'dart:typed_data';
+import 'dart:convert';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:ulid/ulid.dart';
@@ -161,4 +162,39 @@ Future<Uint8List> convertToJpeg(Uint8List bytes) async {
     throw Exception("Failed to decode image");
   }
   return Uint8List.fromList(img.encodeJpg(decoded, quality: 90));
+}
+
+Future<String?> saveBase64Image(String base64String) async {
+  try {
+    // TODO: this block of code seems duplicated so we have to find a way to reuse some of the logic here
+    final bytes = base64.decode(base64String);
+    final basePath = await getBasePath();
+    final imagesDirPath = p.join(basePath, kUserImagesFolder);
+    final imagesDir = io.Directory(imagesDirPath);
+    if (!await imagesDir.exists()) {
+      await imagesDir.create(recursive: true);
+    }
+
+    final destFilename = '${Ulid().toString()}.jpg';
+    final destPath = p.join(imagesDirPath, destFilename);
+
+    final file = io.File(destPath);
+    await file.writeAsBytes(bytes);
+    return destPath;
+  } catch (e) {
+    log("Couldn't save base64 image", error: e);
+    return null;
+  }
+}
+
+Future<String?> fileToBase64(String path) async {
+  try {
+    final file = io.File(path);
+    if (!await file.exists()) return null;
+    final bytes = await file.readAsBytes();
+    return base64.encode(bytes);
+  } catch (e) {
+    log("Couldn't convert file to base64", error: e);
+    return null;
+  }
 }

@@ -1,7 +1,12 @@
 import 'dart:collection';
 import 'dart:developer';
+import 'dart:convert';
+import 'dart:io' as io;
+
+import 'package:file_picker/file_picker.dart';
 
 import 'package:yampa/core/player/player_controller.dart';
+import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/core/repositories/player_controller_state/factory.dart';
 import 'package:yampa/core/repositories/playlists/factory.dart';
 import 'package:yampa/core/repositories/statistics/factory.dart';
@@ -223,10 +228,14 @@ Future<void> handlePathsRemoved(
 
 Future<Playlist> handlePlaylistCreated(
   Playlist playlist,
-  PlaylistNotifier playlistNotifier,
-) async {
+  PlaylistNotifier playlistNotifier, {
+  String? forceWithId,
+}) async {
   final playlistRepository = getPlaylistRepository();
-  final id = await playlistRepository.addPlaylist(playlist);
+  final id = await playlistRepository.addPlaylist(
+    playlist,
+    forceWithId: forceWithId,
+  );
   final newPlaylist = Playlist(
     id: id,
     name: playlist.name,
@@ -261,6 +270,18 @@ Future<void> handlePlaylistRemoved(
   Playlist playlist,
   PlaylistNotifier playlistNotifier,
 ) async {
+  if (playlist.id == favoritePlaylistId) {
+    await handlePlaylistEdited(
+      Playlist(
+        id: favoritePlaylistId,
+        name: "Favorites",
+        description: "",
+        trackIds: [],
+      ),
+      playlistNotifier,
+    );
+    return;
+  }
   final playlistRepository = getPlaylistRepository();
   await playlistRepository.removePlaylist(playlist);
   playlistNotifier.removePlaylist(playlist);
@@ -374,4 +395,104 @@ Future<void> handleAppWindowSizeChanged(WindowSize windowSize) async {
   final repo = getUserSettingsDataRepository();
   await repo.saveLastWindowSize(windowSize);
   await repo.close();
+}
+
+Future<void> handlePlaylistsExport(List<Playlist> playlists) async {
+  try {
+    final List<Map<String, dynamic>> exportData = [];
+    for (final playlist in playlists) {
+      String? imageB64;
+      if (playlist.imagePath != null) {
+        imageB64 = await fileToBase64(playlist.imagePath!);
+      }
+      exportData.add(playlist.toJson(imageB64: imageB64));
+    }
+
+    final jsonString = jsonEncode(exportData);
+    final String? outputFile = await FilePicker.platform.saveFile(
+      dialogTitle: 'Export Playlists',
+      fileName: 'playlists.json',
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+
+    if (outputFile != null) {
+      final file = io.File(outputFile);
+      await file.writeAsString(jsonString);
+    }
+  } catch (e) {
+    log("Error exporting playlists", error: e);
+  }
+}
+
+Future<void> handlePlaylistsImport(
+  PlaylistNotifier playlistNotifier,
+  List<Playlist> currentPlaylists,
+) async {
+  try {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+
+    if (result == null || result.files.single.path == null) {
+      return;
+    }
+
+    final file = io.File(result.files.single.path!);
+    final jsonString = await file.readAsString();
+    final List<dynamic> importData = jsonDecode(jsonString);
+
+    final playlistRepository = getPlaylistRepository();
+    final existingPlaylists = await playlistRepository.getPlaylists();
+
+    for (final item in importData) {
+      final Map<String, dynamic> json = item as Map<String, dynamic>;
+      final String? imageB64 = json['imageB64'];
+      String? newImagePath;
+      if (imageB64 != null) {
+        newImagePath = await saveBase64Image(imageB64);
+      }
+
+      final existingPlaylist = existingPlaylists
+          .where((e) => e.id == json['id'])
+          .firstOrNull;
+
+      if (existingPlaylist != null) {
+        // Merge track IDs
+        final List<String> importedTrackIds = List<String>.from(
+          json['trackIds'],
+        );
+        final Set<String> mergedTrackIds = {
+          ...existingPlaylist.trackIds,
+          ...importedTrackIds,
+        };
+
+        final updatedPlaylist = Playlist(
+          id: existingPlaylist.id,
+          name: json['name'] ?? existingPlaylist.name,
+          description: json['description'] ?? existingPlaylist.description,
+          trackIds: mergedTrackIds.toList(),
+          imagePath: newImagePath ?? existingPlaylist.imagePath,
+          sortMode: SortMode
+              .values[json['sortMode'] ?? existingPlaylist.sortMode.index],
+        );
+
+        await handlePlaylistEdited(updatedPlaylist, playlistNotifier);
+      } else {
+        final newPlaylistData = Playlist.fromJson(
+          json,
+          imagePath: newImagePath,
+        );
+        await handlePlaylistCreated(
+          newPlaylistData,
+          playlistNotifier,
+          forceWithId: newPlaylistData.id,
+        );
+      }
+    }
+    await playlistRepository.close();
+  } catch (e) {
+    log("Error importing playlists", error: e);
+  }
 }
