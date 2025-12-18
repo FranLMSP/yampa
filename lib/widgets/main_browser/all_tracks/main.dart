@@ -294,10 +294,10 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     );
   }
 
-  PreferredSizeWidget _buildDefaultAppBar(WidgetRef ref) {
+  PreferredSizeWidget _buildDefaultAppBar(int tracksCount) {
     final sortMode = ref.watch(allTracksSortModeProvider);
     return AppBar(
-      title: const Text('All Tracks'),
+      title: Text('All Tracks ${tracksCount > 0 ? "($tracksCount)" : ""}'),
       actions: [
         IconButton(
           icon: const Icon(Icons.search),
@@ -378,7 +378,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                     selectedPlaylistsNotifier,
                     playerControllerNotifier,
                   )
-                : _buildDefaultAppBar(ref)),
+                : _buildDefaultAppBar(tracks.values.length)),
       body: Column(
         children: [
           if (loadedTracksCountNotifier.isLoading())
