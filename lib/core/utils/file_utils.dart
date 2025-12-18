@@ -97,18 +97,24 @@ Future<String> getBasePath() async {
   }
   return basePath;
 }
+Future<String> getLocalDirectoryPath(String folderName, {bool create = false}) async {
+  final basePath = await getBasePath();
+  final dirPath = p.join(basePath, folderName);
+  if (create) {
+    final dir = io.Directory(dirPath);
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+  }
+  return dirPath;
+}
 
 Future<String?> copyFileToLocal(String srcPath, String targetFolder) async {
   try {
     final srcFile = io.File(srcPath);
     if (!await srcFile.exists()) return null;
 
-    final basePath = await getBasePath();
-    final imagesDirPath = p.join(basePath, targetFolder);
-    final imagesDir = io.Directory(imagesDirPath);
-    if (!await imagesDir.exists()) {
-      await imagesDir.create(recursive: true);
-    }
+    final imagesDirPath = await getLocalDirectoryPath(targetFolder, create: true);
 
     final extension = p.extension(srcPath);
     final destFilename = '${Ulid().toString()}$extension';
@@ -128,8 +134,7 @@ Future<String?> copyImageToLocal(String srcPath) async {
 
 Future<List<String>> listUserImages() async {
   try {
-    final basePath = await getBasePath();
-    final imagesDirPath = p.join(basePath, kUserImagesFolder);
+    final imagesDirPath = await getLocalDirectoryPath(kUserImagesFolder);
     final imagesDir = io.Directory(imagesDirPath);
     if (!await imagesDir.exists()) {
       return [];
@@ -166,14 +171,11 @@ Future<Uint8List> convertToJpeg(Uint8List bytes) async {
 
 Future<String?> saveBase64Image(String base64String) async {
   try {
-    // TODO: this block of code seems duplicated so we have to find a way to reuse some of the logic here
     final bytes = base64.decode(base64String);
-    final basePath = await getBasePath();
-    final imagesDirPath = p.join(basePath, kUserImagesFolder);
-    final imagesDir = io.Directory(imagesDirPath);
-    if (!await imagesDir.exists()) {
-      await imagesDir.create(recursive: true);
-    }
+    final imagesDirPath = await getLocalDirectoryPath(
+      kUserImagesFolder,
+      create: true,
+    );
 
     final destFilename = '${Ulid().toString()}.jpg';
     final destPath = p.join(imagesDirPath, destFilename);
