@@ -15,7 +15,7 @@ class PlayerController {
   // TODO: consider holding all the tracks here instead of a separate provider
   String? currentTrackId;
   String? currentPlaylistId;
-  int currentTrackIndex = 0;
+  int currentTrackIndex = 0; // TODO: we may want to get rid of this and just calculate it on demand from currentTrackId, to avoid having to keep them in sync
   double speed = 1;
   List<String> trackQueueIds = [];
   List<String> shuffledTrackQueueIds = [];
