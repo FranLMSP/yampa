@@ -46,4 +46,4 @@ app.*.map.json
 
 /scripts/bin
 /AppDir
-/appimage-output
+/outputs

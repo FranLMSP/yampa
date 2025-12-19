@@ -32,7 +32,7 @@ Categories=Utility;
 Terminal=false
 EOF
 
-export OUTPUT="yampa-x86_64.AppImage"
+export LDAI_OUTPUT="./outputs/yampa-x86_64.AppImage"
 
 "$BIN_DIR/linuxdeploy" \
     --appdir AppDir \
