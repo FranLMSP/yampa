@@ -69,8 +69,12 @@ class _MyAppState extends ConsumerState<MyApp> {
     }
     final userSettingsRepo = getUserSettingsDataRepository();
     final userSettings = await userSettingsRepo.getUserSettings();
-    ref.read(themeModeProvider.notifier).setThemeMode(userSettings.themeMode ?? UserThemeMode.system);
-    ref.read(allTracksSortModeProvider.notifier).setSortMode(userSettings.defaultSortMode);
+    ref
+        .read(themeModeProvider.notifier)
+        .setThemeMode(userSettings.themeMode ?? UserThemeMode.system);
+    ref
+        .read(allTracksSortModeProvider.notifier)
+        .setSortMode(userSettings.defaultSortMode);
     await userSettingsRepo.close();
     _initialLoadDone = true;
   }

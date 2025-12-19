@@ -325,7 +325,7 @@ class PlayerController {
         continue;
       }
       final trackId = row["track_id"];
-      if (trackId != null) {
+      if (trackId != null && !trackQueueIds.contains(trackId)) {
         trackQueueIds.add(trackId);
         shuffledTrackQueueIds.add(trackId);
       }

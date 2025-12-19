@@ -97,7 +97,11 @@ Future<String> getBasePath() async {
   }
   return basePath;
 }
-Future<String> getLocalDirectoryPath(String folderName, {bool create = false}) async {
+
+Future<String> getLocalDirectoryPath(
+  String folderName, {
+  bool create = false,
+}) async {
   final basePath = await getBasePath();
   final dirPath = p.join(basePath, folderName);
   if (create) {
@@ -114,7 +118,10 @@ Future<String?> copyFileToLocal(String srcPath, String targetFolder) async {
     final srcFile = io.File(srcPath);
     if (!await srcFile.exists()) return null;
 
-    final imagesDirPath = await getLocalDirectoryPath(targetFolder, create: true);
+    final imagesDirPath = await getLocalDirectoryPath(
+      targetFolder,
+      create: true,
+    );
 
     final extension = p.extension(srcPath);
     final destFilename = '${Ulid().toString()}$extension';
