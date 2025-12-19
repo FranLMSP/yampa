@@ -4,6 +4,7 @@ import 'package:yampa/core/utils/format_utils.dart';
 import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/widgets/utils.dart';
 
 class TrackItem extends ConsumerWidget {
   const TrackItem({
@@ -13,6 +14,7 @@ class TrackItem extends ConsumerWidget {
     this.onLongPress,
     this.trailing,
     this.isSelected = false,
+    this.isDraggable = true,
   });
 
   final Track track;
@@ -20,6 +22,7 @@ class TrackItem extends ConsumerWidget {
   final Function(Track track)? onLongPress;
   final Widget? trailing;
   final bool isSelected;
+  final bool isDraggable;
 
   Widget _buildTrackImage() {
     return Image.memory(
@@ -89,7 +92,7 @@ class TrackItem extends ConsumerWidget {
     } else if (isPlaying) {
       color = Theme.of(context).colorScheme.surfaceDim;
     }
-    return InkWell(
+    final item = InkWell(
       onTap: () {
         if (onTap != null) {
           onTap!(track);
@@ -118,6 +121,61 @@ class TrackItem extends ConsumerWidget {
         ),
         trailing: trailing,
       ),
+    );
+
+    if (!isDraggable) {
+      return item;
+    }
+
+    final isMobile = isPlatformMobile();
+
+    Widget feedback = Material(
+      color: Colors.transparent,
+      child: Container(
+        width: 250,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor.withAlpha(200),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(50),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: ListTile(
+          leading: _buildTrackIcon(context, isPlaying),
+          title: Text(
+            track.displayTitle(),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(
+            track.artist,
+            style: const TextStyle(fontSize: 11),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    );
+
+    if (isMobile) {
+      return LongPressDraggable<Track>(
+        data: track,
+        feedback: feedback,
+        childWhenDragging: Opacity(opacity: 0.5, child: item),
+        child: item,
+      );
+    }
+
+    return Draggable<Track>(
+      data: track,
+      feedback: feedback,
+      childWhenDragging: Opacity(opacity: 0.5, child: item),
+      child: item,
     );
   }
 }
