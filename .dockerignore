@@ -1,5 +1,3 @@
-.git
-
 # Miscellaneous
 *.class
 *.log
@@ -45,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+/scripts/bin
+/AppDir
+/outputs

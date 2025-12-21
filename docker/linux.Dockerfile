@@ -1,34 +1,41 @@
-FROM ubuntu:22.04
+FROM debian:13.2-slim AS flutter
 
-RUN apt update -y && apt upgrade -y && apt install -y wget curl git unzip xz-utils zip libglu1-mesa libmpv-dev libsqlite3-0 libsqlite3-dev build-essential cmake ninja-build libgtk-3-dev pkg-config clang mesa-utils
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN mkdir /tmp/downloads \
-    && cd /tmp/downloads \
-    && wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.35.7-stable.tar.xz -O /tmp/downloads/flutter_linux_stable.tar.xz \
-    && mkdir -p /app/develop \
-    && cd /app/develop \
-    && tar -xf /tmp/downloads/flutter_linux_stable.tar.xz -C /app/develop/
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    curl \
+    wget \
+    libfuse2 \
+    fuse \
+    file \
+    clang \
+    ninja-build \
+    mesa-utils \
+    libglu1-mesa \
+    libgtk-3-dev \
+    cmake \
+    build-essential \
+    git \
+    lcov \
+    libglu1-mesa \
+    libsqlite3-0 \
+    libsqlite3-dev \
+    libmpv-dev \
+    ca-certificates \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV PATH="$PATH:/app/develop/flutter/bin"
+ENV TAR_OPTIONS="--no-same-owner --no-same-permissions"
+RUN git clone https://github.com/flutter/flutter.git -b stable /opt/flutter
+ENV PATH="$PATH:/opt/flutter/bin"
+RUN flutter config --enable-linux-desktop --no-enable-android --no-enable-ios --no-enable-web && flutter doctor && flutter precache --linux
 
-RUN useradd -m -u 1000 -s /bin/bash builder
-RUN mkdir -p /app/project/build
-RUN chown -R builder:builder /app/project/
-USER builder
+WORKDIR /app
 
-WORKDIR /app/project
+COPY . .
 
-COPY ./lib .
-COPY ./linux .
-COPY ./test .
-COPY ./.gitignore .
-COPY ./.metadata .
-COPY ./analysis_options.yaml .
-COPY ./pubspec.lock .
-COPY ./pubspec.yaml .
+COPY ./docker/scripts/docker_linux_entrypoint.sh "/docker_entrypoint.sh"
+RUN chmod +x "/docker_entrypoint.sh"
 
-RUN dart --disable-analytics
-RUN flutter --disable-analytics
-RUN flutter pub get
-
-ENTRYPOINT ["bash", "-lc"]
+ENTRYPOINT [ "/docker_entrypoint.sh" ]

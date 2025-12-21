@@ -1,0 +1,27 @@
+when:
+  - event: [tag]
+
+labels:
+  platform: windows/amd64
+
+steps:
+  - name: build-windows-binaries
+    image: powershell
+    commands:
+      - powershell -Command "if (Test-Path dist) { Write-Host 'Removing old dist...'; Remove-Item -Recurse -Force dist }"
+      - mkdir dist
+      - flutter pub get
+      - flutter clean
+      - flutter build windows --release
+      - powershell -Command "Write-Host 'Checking build output...'; if (Test-Path build\windows\x64\runner\Release) { Get-ChildItem build\windows\x64\runner\Release } else { Write-Warning 'Build output NOT found!' }"
+      - xcopy /E /I build\windows\x64\runner\Release dist\yampa-windows-release
+      - powershell -Command "Write-Host 'Creating zip...'; Compress-Archive -Path dist\yampa-windows-release\* -DestinationPath dist\yampa-windows-x64-${CI_COMMIT_TAG}.zip -Force"
+      - powershell -Command "Write-Host 'Final dist contents:'; if (Test-Path dist) { Get-ChildItem dist } else { Write-Warning 'dist directory missing' }"
+
+  - name: publish-release
+    image: powershell
+    environment:
+      GITEA_TOKEN:
+        from_secret: GITEA_TOKEN
+    commands:
+      - powershell -ExecutionPolicy Bypass -File scripts\publish-windows-release.ps1
