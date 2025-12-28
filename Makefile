@@ -15,8 +15,9 @@ format:
 .PHONY: docker/clean-images build/linux build/windows build/android build/all
 
 docker/clean-images:
-	docker image rm $(DOCKER_IMAGE_LINUX) \
-	&& docker image rm $(DOCKER_IMAGE_ANDROID)
+	docker image rm $(DOCKER_IMAGE_LINUX) || true
+	docker image rm $(DOCKER_IMAGE_ANDROID) || true
+	docker image rm $(DOCKER_IMAGE_WINDOWS) || true
 
 docker/build-image/linux:
 	docker build -t $(DOCKER_IMAGE_LINUX) -f docker/linux.Dockerfile ./
@@ -24,16 +25,19 @@ docker/build-image/linux:
 docker/build-image/android:
 	docker build -t $(DOCKER_IMAGE_ANDROID) -f docker/android.Dockerfile ./
 
+docker/build-image/windows:
+	echo "There is no cross compilation from Linux at the moment"
+
 build/linux:
 	make docker/build-image/linux \
-	&& docker run --rm -v ./:/app/project/ -v yampa_build:/app/project/build/ $(DOCKER_IMAGE_LINUX) "flutter clean && flutter doctor && flutter build linux --release"
+	&& docker run --rm --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined -v ./:/app $(DOCKER_IMAGE_LINUX) "flutter clean && flutter doctor && ./scripts/build-linux-appimage.sh"
 
 build/android:
 	make docker/build-image/android \
-	&& docker run --rm -v ./:/app/project/ -v yampa_build:/app/project/build/ $(DOCKER_IMAGE_ANDROID) "flutter clean && flutter doctor && flutter build apk --release"
+	&& docker run --rm -v ./:/app $(DOCKER_IMAGE_ANDROID) "flutter clean && flutter doctor && flutter build apk --release"
 
 build/windows:
-	echo "TODO"
+	echo "There is no cross compilation from Linux at the moment"
 
 build/all: build/linux build/windows build/android
 

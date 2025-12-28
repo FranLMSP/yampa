@@ -1,50 +1,55 @@
-FROM ubuntu:22.04
+FROM debian:13.2-slim AS flutter
 
-RUN apt update -y && apt upgrade -y && apt install -y wget curl git unzip xz-utils zip libglu1-mesa libmpv-dev libsqlite3-0 libsqlite3-dev build-essential cmake ninja-build libgtk-3-dev pkg-config clang mesa-utils unzip xz-utils zip libglu1-mesa openjdk-17-jdk
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN mkdir /tmp/downloads \
-    && cd /tmp/downloads \
-    && wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.35.7-stable.tar.xz -O /tmp/downloads/flutter_linux_stable.tar.xz \
-    && mkdir -p /app/develop \
-    && cd /app/develop \
-    && tar -xf /tmp/downloads/flutter_linux_stable.tar.xz -C /app/develop/
-
-ENV PATH="$PATH:/app/develop/flutter/bin"
-
-WORKDIR /opt/tmp
-RUN curl https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip > cmdlinetools.zip
-RUN unzip cmdlinetools.zip
-RUN rm cmdlinetools.zip
-
-RUN mkdir -p /opt/android_sdk
-RUN yes|./cmdline-tools/bin/sdkmanager --sdk_root=/opt/android_sdk "cmdline-tools;latest"
-RUN rm -r /opt/tmp
-ENV ANDROID_HOME="/opt/android_sdk"
-ENV PATH="${PATH}:/opt/android_sdk/cmdline-tools/latest/bin"
-
-RUN yes|sdkmanager --sdk_root="/opt/android_sdk" "platform-tools" "platforms;android-33"  "build-tools;34.0.0"
-RUN yes|sdkmanager --licenses
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    curl \
+    build-essential \
+    git \
+    lcov \
+    libglu1-mesa \
+    libsqlite3-0 \
+    libsqlite3-dev \
+    libmpv-dev \
+    ca-certificates \
+    unzip \
+    openjdk-21-jdk \
+    && rm -rf /var/lib/apt/lists/*
 
 
-RUN useradd -m -u 1000 -s /bin/bash builder
-RUN mkdir -p /app/project/build
-RUN chown -R builder:builder /app/project/
-RUN chown -R builder:builder $ANDROID_HOME
-USER builder
+ENV TAR_OPTIONS="--no-same-owner --no-same-permissions"
+RUN git clone https://github.com/flutter/flutter.git -b stable /opt/flutter
+ENV SDK_ROOT="/opt/android/sdks"
+ENV ANDROID_HOME="$SDK_ROOT/android-sdk" \
+    JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+ENV PATH="$PATH:/opt/flutter/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
 
-WORKDIR /app/project
 
-COPY ./android .
-COPY ./lib .
-COPY ./test .
-COPY ./.gitignore .
-COPY ./.metadata .
-COPY ./analysis_options.yaml .
-COPY ./pubspec.lock .
-COPY ./pubspec.yaml .
+RUN mkdir -p "$ANDROID_HOME" \
+    && command_line_tools_url="$(curl -s https://developer.android.com/studio/ | grep -o 'https://dl.google.com/android/repository/commandlinetools-linux-[0-9]\+_latest.zip')" \
+    && curl -o android-cmdline-tools.zip "$command_line_tools_url" \
+    && mkdir -p "$ANDROID_HOME/cmdline-tools/" \
+    && unzip -q android-cmdline-tools.zip -d "$ANDROID_HOME/cmdline-tools/" \
+    && mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest" \
+    && rm android-cmdline-tools.zip \
+    && (yes || true) | sdkmanager --licenses \
+    && sdkmanager --update \
+    && (yes || true) | sdkmanager \
+    "platform-tools" \
+    "build-tools;36.1.0" \
+    "ndk;29.0.14206865" \
+    "cmake;4.1.2" \
+    && for version in 36; do (yes || true) | sdkmanager "platforms;android-$version"; done \
+    && flutter config --enable-android --no-enable-ios --no-enable-web --no-enable-linux-desktop \
+    && (yes || true) | flutter doctor --android-licenses \
+    && flutter precache --android
 
-RUN dart --disable-analytics
-RUN flutter --disable-analytics
-RUN flutter pub get
+WORKDIR /app
 
-ENTRYPOINT ["bash", "-lc"]
+COPY . .
+
+COPY ./docker/scripts/docker_linux_entrypoint.sh "/docker_entrypoint.sh"
+RUN chmod +x "/docker_entrypoint.sh"
+
+ENTRYPOINT ["/docker_entrypoint.sh"]

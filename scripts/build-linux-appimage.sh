@@ -40,7 +40,7 @@ Categories=AudioVideo;Audio;Player;
 Terminal=false
 EOF
 
-export LDAI_OUTPUT="./outputs/yampa-x86_64.AppImage"
+export LDAI_OUTPUT="./outputs/yampa-x64.AppImage"
 mkdir -p ./outputs
 
 # Automatically find all libraries in the Flutter bundle and pass them to linuxdeploy.
