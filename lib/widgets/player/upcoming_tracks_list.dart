@@ -59,29 +59,32 @@ class UpcomingTracksList extends ConsumerWidget {
           ),
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                child: Row(
-                  children: [
-                    if (currentPlaylist != null)
-                      PlaylistImage(
-                        playlist: currentPlaylist,
-                        width: 40,
-                        height: 40,
-                        iconSize: 30,
+              Container(
+                decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
+                  child: Row(
+                    children: [
+                      if (currentPlaylist != null)
+                        PlaylistImage(
+                          playlist: currentPlaylist,
+                          width: 40,
+                          height: 40,
+                          iconSize: 30,
+                        ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          currentPlaylist?.name ?? "Playing all tracks",
+                          style: Theme.of(context).textTheme.titleMedium,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        currentPlaylist?.name ?? "Playing all tracks",
-                        style: Theme.of(context).textTheme.titleMedium,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const Divider(height: 1),
