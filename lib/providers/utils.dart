@@ -331,7 +331,6 @@ Future<void> handlePersistPlayerControllerState(
     LastPlayerControllerState(
       currentTrackId: playerController.currentTrackId ?? "",
       currentPlaylistId: playerController.currentPlaylistId ?? "",
-      currentTrackIndex: playerController.currentTrackIndex,
       speed: playerController.speed,
       trackQueueIds: playerController.trackQueueIds,
       shuffledTrackQueueIds: playerController.shuffledTrackQueueIds,

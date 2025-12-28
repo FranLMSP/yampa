@@ -3,7 +3,6 @@ import 'package:yampa/core/player/enums.dart';
 class LastPlayerControllerState {
   final String? currentTrackId;
   final String? currentPlaylistId;
-  final int currentTrackIndex;
   final double speed;
   final List<String> trackQueueIds;
   final List<String> shuffledTrackQueueIds;
@@ -15,7 +14,6 @@ class LastPlayerControllerState {
   LastPlayerControllerState({
     required this.currentTrackId,
     required this.currentPlaylistId,
-    required this.currentTrackIndex,
     required this.speed,
     required this.trackQueueIds,
     required this.shuffledTrackQueueIds,

@@ -16,8 +16,6 @@ class PlayerController {
   // TODO: consider holding all the tracks here instead of a separate provider
   String? currentTrackId;
   String? currentPlaylistId;
-  int currentTrackIndex =
-      0; // TODO: we may want to get rid of this and just calculate it on demand from currentTrackId, to avoid having to keep them in sync
   double speed = 1;
   List<String> trackQueueIds = [];
   List<String> shuffledTrackQueueIds = [];
@@ -38,9 +36,6 @@ class PlayerController {
     return PlayerController._clone(
       currentTrackId: lastState.currentTrackId,
       currentPlaylistId: lastState.currentPlaylistId,
-      currentTrackIndex: lastState.currentTrackIndex >= 0
-          ? lastState.currentTrackIndex
-          : 0,
       speed: lastState.speed,
       trackQueueIds: lastState.trackQueueIds,
       shuffledTrackQueueIds: lastState.shuffledTrackQueueIds,
@@ -59,7 +54,6 @@ class PlayerController {
   PlayerController._clone({
     required this.currentTrackId,
     required this.currentPlaylistId,
-    required this.currentTrackIndex,
     required this.speed,
     required this.trackQueueIds,
     required this.shuffledTrackQueueIds,
@@ -98,11 +92,15 @@ class PlayerController {
     }
   }
 
-  Future<void> _setCurrentTrackFromIndex(Map<String, Track> tracks) async {
+  int _getCurrentTraxIndex() {
+    return shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
+  }
+
+  Future<void> _setCurrentTrackFromIndex(Map<String, Track> tracks, int index) async {
     if (shuffledTrackQueueIds.isEmpty) {
       return;
     }
-    final nextTrackId = shuffledTrackQueueIds[currentTrackIndex];
+    final nextTrackId = shuffledTrackQueueIds[index];
     final nextTrack = tracks[nextTrackId];
     if (nextTrack != null) {
       await setCurrentTrack(nextTrack, tracks);
@@ -125,6 +123,7 @@ class PlayerController {
   Future<void> next(bool forceNext, Map<String, Track> tracks) async {
     await _trackSkipAndCompletionEvents(forceNext);
     await stop();
+    int currentTrackIndex = _getCurrentTraxIndex();
     if (currentTrackIndex <= -1) {
       currentTrackIndex = 0;
     }
@@ -144,7 +143,7 @@ class PlayerController {
         }
       }
     }
-    await _setCurrentTrackFromIndex(tracks);
+    await _setCurrentTrackFromIndex(tracks, currentTrackIndex);
     await play();
     await handlePersistPlayerControllerState(this);
   }
@@ -153,6 +152,7 @@ class PlayerController {
     if (currentTrackId != null) {
       await _trackSkipEvent(currentTrackId!);
     }
+    int currentTrackIndex = _getCurrentTraxIndex();
 
     await stop();
     if (currentTrackIndex > 0) {
@@ -164,7 +164,7 @@ class PlayerController {
         currentTrackIndex = shuffledTrackQueueIds.length - 1;
       }
     }
-    await _setCurrentTrackFromIndex(tracks);
+    await _setCurrentTrackFromIndex(tracks, currentTrackIndex);
     await play();
     await handlePersistPlayerControllerState(this);
   }
@@ -185,12 +185,6 @@ class PlayerController {
     };
     final handler = shuffleHandler[shuffleMode]!;
     await handler();
-    final newIndex = shuffledTrackQueueIds.indexWhere(
-      (e) => e == currentTrackId,
-    );
-    if (newIndex >= 0) {
-      currentTrackIndex = newIndex;
-    }
 
     await handlePersistPlayerControllerState(this);
   }
@@ -254,23 +248,13 @@ class PlayerController {
     await stop();
     await _trackPlayEvent(track.id);
     currentTrackId = track.id;
-    currentTrackIndex = shuffledTrackQueueIds.indexWhere(
-      (e) => e == currentTrackId,
-    );
     // Most likely the user clicked on a track in the "all tracks" list and not a playlist
-    if (currentTrackIndex <= -1) {
+    if (_getCurrentTraxIndex() <= -1) {
       final allTrackIds = tracks.values.map((e) => e.id).toList();
       trackQueueIds = allTrackIds;
       shuffledTrackQueueIds = allTrackIds;
       currentPlaylistId = null;
       await shuffleTrackQueue();
-      // Try to find again the track that the user picked, fallback to 0 as a failsafe
-      currentTrackIndex = shuffledTrackQueueIds.indexWhere(
-        (e) => e == currentTrackId,
-      );
-      if (currentTrackIndex <= -1) {
-        currentTrackIndex = 0;
-      }
     }
     final trackDuration = await playerBackend!.setTrack(track);
     lastTrackDuration = trackDuration;
@@ -281,7 +265,6 @@ class PlayerController {
     return PlayerController._clone(
       currentTrackId: currentTrackId,
       currentPlaylistId: currentPlaylistId,
-      currentTrackIndex: currentTrackIndex,
       speed: speed,
       trackQueueIds: List.from(trackQueueIds),
       shuffledTrackQueueIds: List.from(shuffledTrackQueueIds),
@@ -343,12 +326,6 @@ class PlayerController {
     }
     trackQueueIds.removeWhere((e) => trackIds.contains(e));
     shuffledTrackQueueIds.removeWhere((e) => trackIds.contains(e));
-    currentTrackIndex = shuffledTrackQueueIds.indexWhere(
-      (e) => e == currentTrackId,
-    );
-    if (currentTrackIndex <= -1) {
-      currentTrackIndex = 0;
-    }
 
     await handlePersistPlayerControllerState(this);
   }
@@ -437,6 +414,7 @@ class PlayerController {
     }
 
     String? prevTrackId;
+    int currentTrackIndex = _getCurrentTraxIndex();
     if (loopMode == LoopMode.infinite) {
       if (currentTrackIndex == 0) {
         prevTrackId = shuffledTrackQueueIds.last;
@@ -462,6 +440,7 @@ class PlayerController {
     }
 
     String? nextTrackId;
+    int currentTrackIndex = _getCurrentTraxIndex();
     if (loopMode == LoopMode.infinite) {
       if (currentTrackIndex == shuffledTrackQueueIds.length - 1) {
         nextTrackId = shuffledTrackQueueIds.first;
