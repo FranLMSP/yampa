@@ -71,7 +71,11 @@ class PlayerController {
     state = PlayerState.playing;
     lastPlayStartTime = DateTime.now();
     if (playerBackend != null) {
-      await playerBackend!.play();
+      try {
+        await playerBackend!.play();
+      } catch (e) {
+        log("Couldn't play track", error: e);
+      }
     }
   }
 
@@ -256,8 +260,12 @@ class PlayerController {
       currentPlaylistId = null;
       await shuffleTrackQueue();
     }
-    final trackDuration = await playerBackend!.setTrack(track);
-    lastTrackDuration = trackDuration;
+    lastTrackDuration = Duration.zero;
+    try {
+      lastTrackDuration = await playerBackend!.setTrack(track);
+    } catch (e) {
+      log("Couldn't set the current track", error: e);
+    }
     await handlePersistPlayerControllerState(this);
   }
 
