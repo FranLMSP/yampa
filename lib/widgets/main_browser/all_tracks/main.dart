@@ -10,7 +10,6 @@ import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/providers/selected_tracks_provider.dart';
 import 'package:yampa/providers/statistics_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_info_dialog.dart';
@@ -203,10 +202,9 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
 
   Future<void> _playSelectedTrack(
     Track track,
-    Map<String, Track> tracks,
     PlayerControllerNotifier playerControllerNotifier,
   ) async {
-    await playTrack(track, tracks, playerControllerNotifier);
+    await playTrack(track, playerControllerNotifier);
   }
 
   void _toggleSelectedTrack(
@@ -305,7 +303,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
           tooltip: "Re-load tracks",
           onPressed: () {
             reloadTracks(
-              ref.read(tracksProvider.notifier),
+              ref.read(playerControllerProvider.notifier),
               ref.read(loadedTracksCountProvider.notifier),
             );
           },
@@ -332,7 +330,12 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
 
   @override
   Widget build(BuildContext context) {
-    final tracks = ref.watch(tracksProvider);
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
+    final tracks = playerControllerNotifier.getPlayerController().tracks;
+    final loadedTracksCount = ref.watch(loadedTracksCountProvider);
+    debugPrint(loadedTracksCount.toString());
     final playlists = ref.watch(playlistsProvider);
     final playlistsNotifier = ref.watch(playlistsProvider.notifier);
     final selectedTracks = ref.watch(selectedTracksProvider);
@@ -340,11 +343,6 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final selectedPlaylistsNotifier = ref.watch(
       selectedPlaylistsProvider.notifier,
     );
-    final playerControllerNotifier = ref.read(
-      playerControllerProvider.notifier,
-    );
-    final loadedTracksCount = ref.watch(loadedTracksCountProvider);
-    debugPrint(loadedTracksCount.toString());
     final loadedTracksCountNotifier = ref.watch(
       loadedTracksCountProvider.notifier,
     );
@@ -423,11 +421,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                     onTap = onSelect;
                   } else {
                     onTap = (Track track) async {
-                      await _playSelectedTrack(
-                        track,
-                        tracks,
-                        playerControllerNotifier,
-                      );
+                      await _playSelectedTrack(track, playerControllerNotifier);
                     };
                     onLongPress = onSelect;
                   }

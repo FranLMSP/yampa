@@ -27,15 +27,15 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = currentState.clone();
   }
 
-  Future<void> next(Map<String, Track> tracks) async {
+  Future<void> next() async {
     final currentState = state;
-    await currentState.next(true, tracks);
+    await currentState.next(true);
     state = currentState.clone();
   }
 
-  Future<void> prev(Map<String, Track> tracks) async {
+  Future<void> prev() async {
     final currentState = state;
-    await currentState.prev(tracks);
+    await currentState.prev();
     state = currentState.clone();
   }
 
@@ -57,15 +57,15 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = currentState.clone();
   }
 
-  Future<void> setCurrentTrack(Track track, Map<String, Track> tracks) async {
+  Future<void> setCurrentTrack(Track track) async {
     final currentState = state;
-    await currentState.setCurrentTrack(track, tracks);
+    await currentState.setCurrentTrack(track);
     state = currentState.clone();
   }
 
-  Future<void> setPlaylist(Playlist playlist, Map<String, Track> tracks) async {
+  Future<void> setPlaylist(Playlist playlist) async {
     final currentState = state;
-    await currentState.setPlaylist(playlist, tracks);
+    await currentState.setPlaylist(playlist);
     state = currentState.clone();
   }
 
@@ -100,9 +100,9 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     return currentState.shuffleMode;
   }
 
-  Future<void> handleNextAutomatically(Map<String, Track> tracks) async {
+  Future<void> handleNextAutomatically() async {
     final currentState = state;
-    await currentState.handleNextAutomatically(tracks);
+    await currentState.handleNextAutomatically();
     state = currentState.clone();
   }
 
@@ -116,29 +116,26 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = currentState.clone();
   }
 
-  Future<void> playTrack(Track track, Map<String, Track> tracks) async {
+  Future<void> playTrack(Track track) async {
     final player = state;
     if (player.playerBackend == null) {
       // TODO: here we want to set the track player type depending on the source type of the track
       await player.setPlayerBackend(await getPlayerBackend());
     }
     await player.stop();
-    await player.setCurrentTrack(track, tracks);
+    await player.setCurrentTrack(track);
     await player.play();
     state = player.clone();
   }
 
-  Future<void> setPlayerController(
-    PlayerController playerController,
-    Map<String, Track> tracks,
-  ) async {
+  Future<void> setPlayerController(PlayerController playerController) async {
     final currentState = playerController.clone();
     await currentState.setSpeed(playerController.speed);
     await currentState.setVolume(playerController.volume);
     await currentState.setEqualizerGains(playerController.equalizerGains);
-    final currentTrack = tracks[playerController.currentTrackId];
+    final currentTrack = currentState.tracks[playerController.currentTrackId];
     if (currentTrack != null) {
-      await currentState.setCurrentTrack(currentTrack, tracks);
+      await currentState.setCurrentTrack(currentTrack);
     }
     state = currentState.clone();
   }
@@ -149,12 +146,9 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     state = currentState.clone();
   }
 
-  Future<void> reloadPlaylist(
-    Playlist playlist,
-    Map<String, Track> tracks,
-  ) async {
+  Future<void> reloadPlaylist(Playlist playlist) async {
     final currentState = state;
-    await currentState.reloadPlaylist(playlist, tracks);
+    await currentState.reloadPlaylist(playlist);
     state = currentState.clone();
   }
 
@@ -185,6 +179,28 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   Future<void> restoreDefaults() async {
     final currentState = state;
     await currentState.restoreDefaults();
+    state = currentState.clone();
+  }
+
+  void setTracks(List<Track> tracks) {
+    final currentState = state;
+    currentState.setTracks(tracks);
+    state = currentState.clone();
+  }
+
+  List<Track> getTracks() {
+    return state.getTracks();
+  }
+
+  void addTracks(List<Track> tracks) {
+    final currentState = state;
+    currentState.addTracks(tracks);
+    state = currentState.clone();
+  }
+
+  void removeTracks(List<String> trackIds) {
+    final currentState = state;
+    currentState.removeTracks(trackIds);
     state = currentState.clone();
   }
 }

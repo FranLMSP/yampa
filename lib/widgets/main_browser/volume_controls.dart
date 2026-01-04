@@ -28,10 +28,7 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Master Volume",
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text("Master Volume", style: Theme.of(context).textTheme.titleLarge),
           Row(
             children: [
               const Icon(Icons.volume_mute),
@@ -42,7 +39,9 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
                     setState(() {
                       _volume = value;
                     });
-                    ref.read(playerControllerProvider.notifier).setVolume(value);
+                    ref
+                        .read(playerControllerProvider.notifier)
+                        .setVolume(value);
                   },
                 ),
               ),
@@ -51,15 +50,14 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
             ],
           ),
           const SizedBox(height: 24),
-          Text(
-            "Equalizer",
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text("Equalizer", style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
           if (_equalizerGains.isEmpty)
             const Expanded(
               child: Center(
-                child: Text("Equalizer not available for the current backend or platform."),
+                child: Text(
+                  "Equalizer not available for the current backend or platform.",
+                ),
               ),
             )
           else
@@ -80,7 +78,9 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
                               min: -10.0,
                               max: 10.0,
                               onChanged: (value) {
-                                final newGains = List<double>.from(_equalizerGains);
+                                final newGains = List<double>.from(
+                                  _equalizerGains,
+                                );
                                 setState(() {
                                   _equalizerGains = newGains;
                                 });

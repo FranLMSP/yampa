@@ -12,7 +12,6 @@ import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/statistics_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/common/image_cropper_screen.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
@@ -241,7 +240,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
       playerControllerProvider.notifier,
     );
     final playlistNotifier = ref.watch(playlistsProvider.notifier);
-    final tracks = ref.watch(tracksProvider);
+    final tracks = ref.watch(playerControllerProvider.select((p) => p.tracks));
     final playlists = ref.watch(playlistsProvider);
     final selectedPlaylist =
         playlists.where((e) => e.id == widget.playlist.id).firstOrNull ??
@@ -321,9 +320,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 child: SizedBox(
                   width: 200,
                   height: 200,
-                  child: PlaylistImage(
-                    playlist: selectedPlaylist,
-                  )
+                  child: PlaylistImage(playlist: selectedPlaylist),
                 ),
               ),
             ),
@@ -367,18 +364,13 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (selectedPlaylist.trackIds.isNotEmpty) {
-                      await playerController.setPlaylist(
+                      await playerControllerNotifier.setPlaylist(
                         selectedPlaylist,
-                        tracks,
                       );
                       final firstTrack =
                           tracks[selectedPlaylist.trackIds.first];
                       if (firstTrack != null) {
-                        await playTrack(
-                          firstTrack,
-                          tracks,
-                          playerControllerNotifier,
-                        );
+                        await playTrack(firstTrack, playerControllerNotifier);
                       }
                     }
                   },
@@ -409,17 +401,14 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                       onTap: (Track track) async {
                         if (isInSelectMode) {
                           _toggleSelectedTrack(track.id);
-                        } else if (playerController.currentPlaylistId !=
-                            selectedPlaylist.id) {
-                          await playerControllerNotifier.setPlaylist(
-                            selectedPlaylist,
-                            tracks,
-                          );
-                          await playTrack(
-                            track,
-                            tracks,
-                            playerControllerNotifier,
-                          );
+                        } else {
+                          if (playerController.currentPlaylistId !=
+                              selectedPlaylist.id) {
+                            await playerControllerNotifier.setPlaylist(
+                              selectedPlaylist,
+                            );
+                          }
+                          await playTrack(track, playerControllerNotifier);
                         }
                       },
                       onLongPress: (Track track) {

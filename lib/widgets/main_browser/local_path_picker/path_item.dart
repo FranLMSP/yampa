@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/utils.dart';
 
 class PathItem extends ConsumerStatefulWidget {
@@ -29,7 +29,7 @@ class _PathItemState extends ConsumerState<PathItem> {
   Widget _buildDeleteButton(
     BuildContext context,
     LocalPathsNotifier localPathsNotifier,
-    TracksNotifier tracksNotifier,
+    PlayerControllerNotifier playerControllerNotifier,
   ) {
     return IconButton(
       onPressed: () async {
@@ -55,7 +55,7 @@ class _PathItemState extends ConsumerState<PathItem> {
                     handlePathsRemoved(
                       [widget.path],
                       localPathsNotifier,
-                      tracksNotifier,
+                      playerControllerNotifier,
                     );
                     Navigator.of(context).pop();
                   },
@@ -75,7 +75,7 @@ class _PathItemState extends ConsumerState<PathItem> {
     IconData icon,
     String name,
     LocalPathsNotifier localPathsNotifier,
-    TracksNotifier tracksNotifier,
+    PlayerControllerNotifier playerControllerNotifier,
   ) {
     final theme = Theme.of(context);
     final int selectionAlpha = (0.12 * 255).round();
@@ -94,44 +94,54 @@ class _PathItemState extends ConsumerState<PathItem> {
       subtitle: Text(getParentFolder(name)),
       onTap: widget.onTap,
       onLongPress: widget.onLongPress,
-      trailing: _buildDeleteButton(context, localPathsNotifier, tracksNotifier),
+      trailing: _buildDeleteButton(
+        context,
+        localPathsNotifier,
+        playerControllerNotifier,
+      ),
     );
   }
 
   Widget _buildFolderCard(
     BuildContext context,
     LocalPathsNotifier localPathsNotifier,
-    TracksNotifier tracksNotifier,
+    PlayerControllerNotifier playerControllerNotifier,
   ) {
     return _buildCard(
       context,
       Icons.folder,
       widget.path.folder!,
       localPathsNotifier,
-      tracksNotifier,
+      playerControllerNotifier,
     );
   }
 
   Widget _buildFileCard(
     BuildContext context,
     LocalPathsNotifier localPathsNotifier,
-    TracksNotifier tracksNotifier,
+    PlayerControllerNotifier playerControllerNotifier,
   ) {
     return _buildCard(
       context,
       Icons.file_present,
       widget.path.filename!,
       localPathsNotifier,
-      tracksNotifier,
+      playerControllerNotifier,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final localPathsNotifier = ref.read(localPathsProvider.notifier);
-    final tracksNotifier = ref.read(tracksProvider.notifier);
+    final playerControllerNotifier = ref.read(
+      playerControllerProvider.notifier,
+    );
     return widget.path.filename != null
-        ? _buildFileCard(context, localPathsNotifier, tracksNotifier)
-        : _buildFolderCard(context, localPathsNotifier, tracksNotifier);
+        ? _buildFileCard(context, localPathsNotifier, playerControllerNotifier)
+        : _buildFolderCard(
+            context,
+            localPathsNotifier,
+            playerControllerNotifier,
+          );
   }
 }

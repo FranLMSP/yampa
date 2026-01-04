@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:developer';
 import 'dart:math' hide log;
 
@@ -13,7 +14,6 @@ import 'package:yampa/providers/utils.dart';
 import 'package:yampa/core/utils/sort_utils.dart';
 
 class PlayerController {
-  // TODO: consider holding all the tracks here instead of a separate provider
   String? currentTrackId;
   String? currentPlaylistId;
   double speed = 1;
@@ -27,6 +27,7 @@ class PlayerController {
   Duration lastTrackDuration = Duration.zero;
   double volume = 1.0;
   List<double> equalizerGains = [];
+  Map<String, Track> tracks = {};
 
   DateTime? sessionStartTime;
   DateTime? lastPlayStartTime;
@@ -52,6 +53,7 @@ class PlayerController {
       lastPlayStartTime: null,
       volume: lastState.volume,
       equalizerGains: lastState.equalizerGains,
+      tracks: {},
     );
   }
 
@@ -71,6 +73,7 @@ class PlayerController {
     required this.lastPlayStartTime,
     required this.volume,
     required this.equalizerGains,
+    required this.tracks,
   });
 
   Future<void> play() async {
@@ -106,14 +109,14 @@ class PlayerController {
     return shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
   }
 
-  Future<void> _setCurrentTrackFromIndex(Map<String, Track> tracks, int index) async {
+  Future<void> _setCurrentTrackFromIndex(int index) async {
     if (shuffledTrackQueueIds.isEmpty) {
       return;
     }
     final nextTrackId = shuffledTrackQueueIds[index];
     final nextTrack = tracks[nextTrackId];
     if (nextTrack != null) {
-      await setCurrentTrack(nextTrack, tracks);
+      await setCurrentTrack(nextTrack);
     }
   }
 
@@ -130,7 +133,7 @@ class PlayerController {
     }
   }
 
-  Future<void> next(bool forceNext, Map<String, Track> tracks) async {
+  Future<void> next(bool forceNext) async {
     await _trackSkipAndCompletionEvents(forceNext);
     await stop();
     int currentTrackIndex = _getCurrentTraxIndex();
@@ -153,12 +156,12 @@ class PlayerController {
         }
       }
     }
-    await _setCurrentTrackFromIndex(tracks, currentTrackIndex);
+    await _setCurrentTrackFromIndex(currentTrackIndex);
     await play();
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> prev(Map<String, Track> tracks) async {
+  Future<void> prev() async {
     if (currentTrackId != null) {
       await _trackSkipEvent(currentTrackId!);
     }
@@ -174,7 +177,7 @@ class PlayerController {
         currentTrackIndex = shuffledTrackQueueIds.length - 1;
       }
     }
-    await _setCurrentTrackFromIndex(tracks, currentTrackIndex);
+    await _setCurrentTrackFromIndex(currentTrackIndex);
     await play();
     await handlePersistPlayerControllerState(this);
   }
@@ -251,7 +254,7 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> setCurrentTrack(Track track, Map<String, Track> tracks) async {
+  Future<void> setCurrentTrack(Track track) async {
     if (playerBackend == null) {
       return;
     }
@@ -292,6 +295,7 @@ class PlayerController {
       lastPlayStartTime: lastPlayStartTime,
       volume: volume,
       equalizerGains: List.from(equalizerGains),
+      tracks: Map.from(tracks),
     );
   }
 
@@ -346,14 +350,11 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Future<void> setPlaylist(Playlist playlist, Map<String, Track> tracks) async {
-    await reloadPlaylist(playlist, tracks);
+  Future<void> setPlaylist(Playlist playlist) async {
+    await reloadPlaylist(playlist);
   }
 
-  Future<void> reloadPlaylist(
-    Playlist playlist,
-    Map<String, Track> tracks,
-  ) async {
+  Future<void> reloadPlaylist(Playlist playlist) async {
     currentPlaylistId = playlist.id;
 
     final allTrackStatistics = await _getAllTrackStatistics();
@@ -400,7 +401,7 @@ class PlayerController {
     return shuffleMode;
   }
 
-  Future<void> handleNextAutomatically(Map<String, Track> tracks) async {
+  Future<void> handleNextAutomatically() async {
     if (state != PlayerState.playing) {
       return;
     }
@@ -410,10 +411,10 @@ class PlayerController {
         await play();
       },
       LoopMode.infinite: () async {
-        await next(false, tracks);
+        await next(false);
       },
       LoopMode.startToEnd: () async {
-        await next(false, tracks);
+        await next(false);
       },
       LoopMode.none: () async {
         await stop();
@@ -424,7 +425,7 @@ class PlayerController {
     await handlePersistPlayerControllerState(this);
   }
 
-  Track? getPreviousTrack(Map<String, Track> tracks) {
+  Track? getPreviousTrack() {
     if (shuffledTrackQueueIds.length <= 1) {
       return null;
     }
@@ -435,22 +436,22 @@ class PlayerController {
       if (currentTrackIndex == 0) {
         prevTrackId = shuffledTrackQueueIds.last;
       } else {
-        if (shuffledTrackQueueIds.length - 1 >= currentTrackIndex - 1) {
-          prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
+        if (currentTrackIndex >= 0 &&
+            shuffledTrackQueueIds.length - 1 >= currentTrackIndex) {
+          prevTrackId = shuffledTrackQueueIds[currentTrackIndex];
         }
       }
     } else if (loopMode == LoopMode.startToEnd) {
-      if (currentTrackIndex > 0) {
-        if (shuffledTrackQueueIds.length - 1 >= currentTrackIndex - 1) {
-          prevTrackId = shuffledTrackQueueIds[currentTrackIndex - 1];
-        }
+      if (currentTrackIndex > 0 &&
+          shuffledTrackQueueIds.length - 1 >= currentTrackIndex) {
+        prevTrackId = shuffledTrackQueueIds[currentTrackIndex];
       }
     }
 
     return tracks[prevTrackId];
   }
 
-  Track? getNextTrack(Map<String, Track> tracks) {
+  Track? getNextTrack() {
     if (shuffledTrackQueueIds.length <= 1) {
       return null;
     }
@@ -583,5 +584,33 @@ class PlayerController {
       await playerBackend!.setEqualizerGains(equalizerGains);
     }
     await handlePersistPlayerControllerState(this);
+  }
+
+  void setTracks(List<Track> tracks) {
+    Map<String, Track> newState = HashMap();
+    for (final track in tracks) {
+      newState[track.id] = track;
+    }
+    this.tracks = newState;
+  }
+
+  List<Track> getTracks() {
+    return tracks.values.toList();
+  }
+
+  void addTracks(List<Track> tracks) {
+    Map<String, Track> newState = HashMap.from(this.tracks);
+    for (final track in tracks) {
+      newState[track.id] = track;
+    }
+    this.tracks = newState;
+  }
+
+  void removeTracks(List<String> trackIds) {
+    Map<String, Track> newState = HashMap.from(tracks);
+    for (final id in trackIds) {
+      newState.remove(id);
+    }
+    tracks = newState;
   }
 }

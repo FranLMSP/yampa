@@ -6,7 +6,7 @@ import 'package:yampa/models/path.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/local_path_picker/path_item.dart';
 import 'package:yampa/widgets/misc/loader.dart';
@@ -48,7 +48,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
 
   void _pickDirectory(
     LocalPathsNotifier localPathsNotifier,
-    TracksNotifier tracksNotifier,
+    PlayerControllerNotifier playerControllerNotifier,
     LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
   ) async {
     String? result = await FilePicker.platform.getDirectoryPath();
@@ -61,7 +61,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       await handlePathsAdded(
         [genericPath],
         localPathsNotifier,
-        tracksNotifier,
+        playerControllerNotifier,
         loadedTracksCountNotifier,
       );
     }
@@ -69,7 +69,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
 
   void _pickIndividualFiles(
     LocalPathsNotifier localPathsNotifier,
-    TracksNotifier tracksNotifier,
+    PlayerControllerNotifier playerControllerNotifier,
     LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
   ) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -87,7 +87,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       handlePathsAdded(
         genericPaths,
         localPathsNotifier,
-        tracksNotifier,
+        playerControllerNotifier,
         loadedTracksCountNotifier,
       );
     }
@@ -114,7 +114,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
 
   Future<void> _confirmDeleteSelected(
     LocalPathsNotifier localPathsNotifier,
-    TracksNotifier tracksNotifier,
+    PlayerControllerNotifier playerControllerNotifier,
     LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
     List<GenericPath> currentPaths,
     BuildContext context,
@@ -152,7 +152,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
       await handlePathsRemoved(
         selectedPaths,
         localPathsNotifier,
-        tracksNotifier,
+        playerControllerNotifier,
       );
       _clearSelection();
     }
@@ -160,7 +160,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
 
   List<Widget> _buildShowActionsWidgets(
     LocalPathsNotifier localPathsNotifier,
-    TracksNotifier tracksNotifier,
+    PlayerControllerNotifier playerControllerNotifier,
     LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
     List<GenericPath> currentPaths,
   ) {
@@ -169,7 +169,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
         FloatingActionButton(
           onPressed: () => _confirmDeleteSelected(
             localPathsNotifier,
-            tracksNotifier,
+            playerControllerNotifier,
             loadedTracksCountNotifier,
             currentPaths,
             context,
@@ -186,7 +186,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
           Icons.file_present,
           () => _pickIndividualFiles(
             localPathsNotifier,
-            tracksNotifier,
+            playerControllerNotifier,
             loadedTracksCountNotifier,
           ),
         ),
@@ -195,7 +195,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
           Icons.folder,
           () => _pickDirectory(
             localPathsNotifier,
-            tracksNotifier,
+            playerControllerNotifier,
             loadedTracksCountNotifier,
           ),
         ),
@@ -238,7 +238,9 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     final initialLoadDone = ref.watch(initialLoadProvider);
     final localPaths = ref.watch(localPathsProvider);
     final localPathsNotifier = ref.watch(localPathsProvider.notifier);
-    final tracksNotifier = ref.watch(tracksProvider.notifier);
+    final playerControllerNotifier = ref.watch(
+      playerControllerProvider.notifier,
+    );
     final loadedTracksCountNotifier = ref.watch(
       loadedTracksCountProvider.notifier,
     );
@@ -252,7 +254,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: _buildShowActionsWidgets(
           localPathsNotifier,
-          tracksNotifier,
+          playerControllerNotifier,
           loadedTracksCountNotifier,
           localPaths,
         ),

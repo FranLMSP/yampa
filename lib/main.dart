@@ -12,7 +12,6 @@ import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/theme_mode_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/sort_mode_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/main.dart';
@@ -154,10 +153,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
     _timer = Timer.periodic(const Duration(milliseconds: 2000), (timer) async {
       final playerNotifier = ref.watch(playerControllerProvider.notifier);
       final player = playerNotifier.getPlayerController();
-      final tracks = ref.watch(tracksProvider);
 
       if (player.hasTrackFinishedPlaying()) {
-        await playerNotifier.handleNextAutomatically(tracks);
+        await playerNotifier.handleNextAutomatically();
       }
       await playerNotifier.updatePlaybackStatistics();
     });
@@ -167,7 +165,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
     bool initialLoadDone,
     InitialLoadNotifier initialLoadNotifier,
     LocalPathsNotifier localPathsNotifier,
-    TracksNotifier tracksNotifier,
     PlaylistNotifier playlistNotifier,
     PlayerControllerNotifier playerControllerNotifier,
     LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
@@ -180,7 +177,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
       initialLoadDone,
       initialLoadNotifier,
       localPathsNotifier,
-      tracksNotifier,
       playlistNotifier,
       playerControllerNotifier,
       loadedTracksCountNotifier,
@@ -228,7 +224,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
     if (!initialLoadDone) {
       final initialLoadNotifier = ref.read(initialLoadProvider.notifier);
       final localPathsNotifier = ref.read(localPathsProvider.notifier);
-      final tracksNotifier = ref.read(tracksProvider.notifier);
       final playlistsNotifier = ref.read(playlistsProvider.notifier);
       final playerControllerNotifier = ref.read(
         playerControllerProvider.notifier,
@@ -240,7 +235,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
         initialLoadDone,
         initialLoadNotifier,
         localPathsNotifier,
-        tracksNotifier,
         playlistsNotifier,
         playerControllerNotifier,
         loadedTracksCountNotifier,

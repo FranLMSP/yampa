@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/widgets/player/player_image.dart';
 
 class NeighboringTracks extends ConsumerWidget {
@@ -11,10 +10,8 @@ class NeighboringTracks extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerController = ref.watch(playerControllerProvider);
-    final tracks = ref.watch(tracksProvider);
-
-    final prevTrack = playerController.getPreviousTrack(tracks);
-    final nextTrack = playerController.getNextTrack(tracks);
+    final prevTrack = playerController.getPreviousTrack();
+    final nextTrack = playerController.getNextTrack();
 
     if (prevTrack == null && nextTrack == null) {
       return const SizedBox.shrink();

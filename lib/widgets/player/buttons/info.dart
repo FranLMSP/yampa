@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_info_dialog.dart';
 
 class InfoButton extends ConsumerWidget {
@@ -9,7 +8,9 @@ class InfoButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allTracks = ref.watch(tracksProvider);
+    final allTracks = ref.watch(
+      playerControllerProvider.select((p) => p.tracks),
+    );
     final currentTrackId = ref.watch(
       playerControllerProvider.select((p) => p.currentTrackId),
     );
