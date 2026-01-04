@@ -401,11 +401,12 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                       onTap: (Track track) async {
                         if (isInSelectMode) {
                           _toggleSelectedTrack(track.id);
-                        } else if (playerController.currentPlaylistId !=
-                            selectedPlaylist.id) {
-                          await playerControllerNotifier.setPlaylist(
-                            selectedPlaylist,
-                          );
+                        } else {
+                          if (playerController.currentPlaylistId != selectedPlaylist.id) {
+                            await playerControllerNotifier.setPlaylist(
+                              selectedPlaylist,
+                            );
+                          }
                           await playTrack(track, playerControllerNotifier);
                         }
                       },
