@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 
 class MiniPlayerSlider extends ConsumerStatefulWidget {
   const MiniPlayerSlider({super.key});
@@ -24,9 +23,8 @@ class _MiniPlayerSliderState extends ConsumerState<MiniPlayerSlider> {
   }
 
   Future<void> _getPlayerCurrentPosition() async {
-    final tracks = ref.watch(tracksProvider);
     final player = ref.watch(playerControllerProvider);
-    final track = tracks[player.currentTrackId];
+    final track = player.tracks[player.currentTrackId];
     if (track != null) {
       final totalDuration = player.getCurrentTrackDuration();
       final currentPosition = await player.getCurrentPosition();

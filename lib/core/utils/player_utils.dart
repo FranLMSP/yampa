@@ -6,10 +6,9 @@ import 'package:yampa/providers/player_controller_provider.dart';
 
 Future<void> playTrack(
   Track track,
-  Map<String, Track> tracks,
   PlayerControllerNotifier playerControllerNotifier,
 ) async {
-  await playerControllerNotifier.playTrack(track, tracks);
+  await playerControllerNotifier.playTrack(track);
 }
 
 bool isTrackCurrentlyBeingPlayed(Track track, String? currentTrackId) {

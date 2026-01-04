@@ -7,7 +7,6 @@ import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/statistics_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/common/display_track_title.dart';
 import 'package:yampa/widgets/utils.dart';
@@ -182,9 +181,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
       lastModified: DateTime.now(),
     );
 
-    final allTracks = ref.read(tracksProvider);
     final allPlaylists = ref.read(playlistsProvider);
-    final tracksNotifier = ref.read(tracksProvider.notifier);
     final playlistNotifier = ref.read(playlistsProvider.notifier);
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,
@@ -192,9 +189,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
 
     await handleTrackMetadataEdited(
       updatedTrack,
-      allTracks,
       allPlaylists,
-      tracksNotifier,
       playlistNotifier,
       playerControllerNotifier,
     );

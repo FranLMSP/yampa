@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/widgets/common/display_track_title.dart';
 import 'package:yampa/widgets/main_browser/playlists/display_track_metadata.dart';
 import 'package:yampa/widgets/player/player_buttons.dart';
@@ -136,11 +135,8 @@ class BigPlayer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tracks = ref.watch(tracksProvider);
-    final currentTrackId = ref.watch(
-      playerControllerProvider.select((p) => p.currentTrackId),
-    );
-    final track = tracks[currentTrackId];
+    final player = ref.watch(playerControllerProvider);
+    final track = player.tracks[player.currentTrackId];
     final trackQueueDisplayMode = ref.watch(
       playerControllerProvider.select((p) => p.trackQueueDisplayMode),
     );

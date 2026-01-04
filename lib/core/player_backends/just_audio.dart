@@ -17,7 +17,7 @@ import 'package:yampa/models/track.dart';
 import 'package:yampa/core/repositories/cached_tracks/cached_tracks.dart';
 import 'package:yampa/core/repositories/cached_tracks/factory.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
+import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:yampa/widgets/utils.dart';
 import 'interface.dart';
@@ -56,7 +56,7 @@ class JustAudioBackend implements PlayerBackend {
   @override
   Future<List<Track>> fetchTracks(
     List<GenericPath> paths,
-    TracksNotifier tracksNotifier,
+    PlayerControllerNotifier playerControllerNotifier,
     LoadedTracksCountProviderNotifier loadedTracksCountNotifier, {
     List<Track>? cachedTracks,
   }) async {
@@ -94,7 +94,7 @@ class JustAudioBackend implements PlayerBackend {
       } else {
         final track = await _getTrackMetadataFromGenericPath(path.filename!);
         if (track != null) {
-          tracksNotifier.addTracks([track]);
+          playerControllerNotifier.addTracks([track]);
           await cachedTracksRepository.addOrUpdate(track);
         }
         loadedTracksCountNotifier.incrementLoadedTrack();
@@ -106,7 +106,7 @@ class JustAudioBackend implements PlayerBackend {
       foundTracks,
       paths,
       cachedTracksRepository,
-      tracksNotifier,
+      playerControllerNotifier,
     );
 
     await cachedTracksRepository.close();
@@ -152,7 +152,7 @@ class JustAudioBackend implements PlayerBackend {
     Map<String, Track> foundTracks,
     List<GenericPath> rootPaths,
     CachedTracksRepository cachedTracksRepository,
-    TracksNotifier tracksNotifier,
+    PlayerControllerNotifier playerControllerNotifier,
   ) async {
     if (cachedTracks == null) return;
 
@@ -183,7 +183,7 @@ class JustAudioBackend implements PlayerBackend {
     }
 
     if (tracksToRemove.isNotEmpty) {
-      tracksNotifier.removeTracks(tracksToRemove);
+      playerControllerNotifier.removeTracks(tracksToRemove);
     }
   }
 

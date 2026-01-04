@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
@@ -22,7 +21,7 @@ class UpcomingTracksList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playerController = ref.watch(playerControllerProvider);
     final playlists = ref.watch(playlistsProvider);
-    final tracks = ref.watch(tracksProvider);
+    final tracks = playerController.tracks;
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,
     );
@@ -60,7 +59,9 @@ class UpcomingTracksList extends ConsumerWidget {
           child: Column(
             children: [
               Container(
-                decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
@@ -109,11 +110,7 @@ class UpcomingTracksList extends ConsumerWidget {
                         track: track,
                         isDraggable: false,
                         onTap: (track) async {
-                          await playTrack(
-                            track,
-                            tracks,
-                            playerControllerNotifier,
-                          );
+                          await playTrack(track, playerControllerNotifier);
                         },
                       );
                     },

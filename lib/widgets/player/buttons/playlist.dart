@@ -4,7 +4,6 @@ import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/providers/selected_tracks_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart';
 
 class PlaylistButton extends ConsumerWidget {
@@ -23,7 +22,7 @@ class PlaylistButton extends ConsumerWidget {
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,
     );
-    final tracks = ref.watch(tracksProvider);
+    final tracks = ref.watch(playerControllerProvider.select((p) => p.tracks));
     return IconButton(
       icon: const Icon(Icons.playlist_add),
       tooltip: 'Save to playlist',

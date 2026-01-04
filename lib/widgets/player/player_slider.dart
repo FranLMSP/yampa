@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
-import 'package:yampa/providers/tracks_provider.dart';
 
 class PlayerSlider extends ConsumerStatefulWidget {
   const PlayerSlider({super.key});
@@ -30,9 +29,8 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
     if (_changeStarted) {
       return;
     }
-    final tracks = ref.watch(tracksProvider);
     final player = ref.watch(playerControllerProvider);
-    final track = tracks[player.currentTrackId];
+    final track = player.tracks[player.currentTrackId];
     final totalDuration = player.getCurrentTrackDuration();
     if (track == null ||
         totalDuration == Duration.zero ||
@@ -55,16 +53,15 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
   }
 
   Future<void> _setPlayerCurrentPosition(
-    Map<String, Track> tracks,
     String? currentTrackId,
     double value,
   ) async {
-    Track? currentTrack = tracks[currentTrackId];
+    final playerController = ref.read(playerControllerProvider);
+    Track? currentTrack = playerController.tracks[currentTrackId];
 
     if (currentTrack == null || currentTrack.duration == Duration.zero) {
       return;
     }
-    final playerController = ref.read(playerControllerProvider);
     final totalDuration = playerController.getCurrentTrackDuration();
     final newPosition = Duration(
       milliseconds: (totalDuration.inMilliseconds * value).toInt(),
@@ -83,15 +80,13 @@ class _PlayerSliderState extends ConsumerState<PlayerSlider> {
 
   @override
   Widget build(BuildContext context) {
-    final tracks = ref.watch(tracksProvider);
     final currentTrackId = ref.watch(
       playerControllerProvider.select((p) => p.currentTrackId),
     );
     return Slider(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       value: _currentSliderValue,
-      onChanged: (value) =>
-          _setPlayerCurrentPosition(tracks, currentTrackId, value),
+      onChanged: (value) => _setPlayerCurrentPosition(currentTrackId, value),
       onChangeStart: (value) {
         setState(() {
           _changeStarted = true;
