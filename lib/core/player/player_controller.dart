@@ -436,12 +436,14 @@ class PlayerController {
       if (currentTrackIndex == 0) {
         prevTrackId = shuffledTrackQueueIds.last;
       } else {
-        if (currentTrackIndex >= 0 && shuffledTrackQueueIds.length - 1 >= currentTrackIndex) {
+        if (currentTrackIndex >= 0 &&
+            shuffledTrackQueueIds.length - 1 >= currentTrackIndex) {
           prevTrackId = shuffledTrackQueueIds[currentTrackIndex];
         }
       }
     } else if (loopMode == LoopMode.startToEnd) {
-      if (currentTrackIndex > 0 && shuffledTrackQueueIds.length - 1 >= currentTrackIndex) {
+      if (currentTrackIndex > 0 &&
+          shuffledTrackQueueIds.length - 1 >= currentTrackIndex) {
         prevTrackId = shuffledTrackQueueIds[currentTrackIndex];
       }
     }

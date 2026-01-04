@@ -402,7 +402,8 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                         if (isInSelectMode) {
                           _toggleSelectedTrack(track.id);
                         } else {
-                          if (playerController.currentPlaylistId != selectedPlaylist.id) {
+                          if (playerController.currentPlaylistId !=
+                              selectedPlaylist.id) {
                             await playerControllerNotifier.setPlaylist(
                               selectedPlaylist,
                             );
