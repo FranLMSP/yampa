@@ -17,6 +17,7 @@ abstract class PlayerBackend {
   Future<void> seek(Duration position);
   Future<void> setSpeed(double speed);
   Future<void> setVolume(double volume);
+  Future<void> setEqualizerGains(List<double> gains);
   Future<Duration> getCurrentPosition();
   bool hasTrackFinishedPlaying();
   Duration getCurrentTrackDuration();

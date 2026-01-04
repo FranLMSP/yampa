@@ -18,7 +18,9 @@ Future<void> _initializeDatabase(Database db) async {
           state TEXT NULL,
           loop_mode TEXT NULL,
           shuffle_mode TEXT NULL,
-          track_queue_display_mode TEXT NULL
+          track_queue_display_mode TEXT NULL,
+          volume REAL NULL,
+          equalizer_gains TEXT NULL
         )
       '''),
   ];
@@ -76,6 +78,16 @@ class PlayerControllerStateSqliteRepository
                 row["track_queue_display_mode"].toString(),
               )]
             : TrackQueueDisplayMode.image,
+        volume: row["volume"] != null
+            ? double.parse(row["volume"].toString())
+            : 1.0,
+        equalizerGains: row["equalizer_gains"] != null
+            ? row["equalizer_gains"]
+                .toString()
+                .split(",")
+                .map((e) => double.parse(e))
+                .toList()
+            : [],
       );
     }
     return LastPlayerControllerState(
@@ -88,6 +100,8 @@ class PlayerControllerStateSqliteRepository
       loopMode: LoopMode.infinite,
       shuffleMode: ShuffleMode.random,
       trackQueueDisplayMode: TrackQueueDisplayMode.image,
+      volume: 1.0,
+      equalizerGains: [],
     );
   }
 
@@ -109,6 +123,8 @@ class PlayerControllerStateSqliteRepository
       "shuffle_mode": playerControllerState.shuffleMode.index,
       "track_queue_display_mode":
           playerControllerState.trackQueueDisplayMode.index,
+      "volume": playerControllerState.volume,
+      "equalizer_gains": playerControllerState.equalizerGains.join(","),
     }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 

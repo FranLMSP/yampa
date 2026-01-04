@@ -10,6 +10,8 @@ class LastPlayerControllerState {
   final LoopMode loopMode;
   final ShuffleMode shuffleMode;
   final TrackQueueDisplayMode trackQueueDisplayMode;
+  final double volume;
+  final List<double> equalizerGains;
 
   LastPlayerControllerState({
     required this.currentTrackId,
@@ -21,5 +23,7 @@ class LastPlayerControllerState {
     required this.loopMode,
     required this.shuffleMode,
     required this.trackQueueDisplayMode,
+    required this.volume,
+    required this.equalizerGains,
   });
 }

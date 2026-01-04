@@ -338,6 +338,8 @@ Future<void> handlePersistPlayerControllerState(
       loopMode: playerController.loopMode,
       shuffleMode: playerController.shuffleMode,
       trackQueueDisplayMode: playerController.trackQueueDisplayMode,
+      volume: playerController.volume,
+      equalizerGains: playerController.equalizerGains,
     ),
   );
   await playerControllerStateRepository.close();

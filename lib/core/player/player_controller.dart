@@ -25,6 +25,8 @@ class PlayerController {
   TrackQueueDisplayMode trackQueueDisplayMode = TrackQueueDisplayMode.image;
   PlayerBackend? playerBackend;
   Duration lastTrackDuration = Duration.zero;
+  double volume = 1.0;
+  List<double> equalizerGains = [];
 
   DateTime? sessionStartTime;
   DateTime? lastPlayStartTime;
@@ -48,6 +50,8 @@ class PlayerController {
           await getPlayerBackend(), // TODO: store this in sqlite as well
       sessionStartTime: DateTime.now(),
       lastPlayStartTime: null,
+      volume: lastState.volume,
+      equalizerGains: lastState.equalizerGains,
     );
   }
 
@@ -65,6 +69,8 @@ class PlayerController {
     required this.lastTrackDuration,
     required this.sessionStartTime,
     required this.lastPlayStartTime,
+    required this.volume,
+    required this.equalizerGains,
   });
 
   Future<void> play() async {
@@ -284,6 +290,8 @@ class PlayerController {
       lastTrackDuration: lastTrackDuration,
       sessionStartTime: sessionStartTime,
       lastPlayStartTime: lastPlayStartTime,
+      volume: volume,
+      equalizerGains: List.from(equalizerGains),
     );
   }
 
@@ -549,5 +557,31 @@ class PlayerController {
     if (shuffledIdIndex != -1) {
       shuffledTrackQueueIds[shuffledIdIndex] = newId;
     }
+  }
+
+  Future<void> setVolume(double value) async {
+    volume = value;
+    if (playerBackend != null) {
+      await playerBackend!.setVolume(volume);
+    }
+    await handlePersistPlayerControllerState(this);
+  }
+
+  Future<void> setEqualizerGains(List<double> gains) async {
+    equalizerGains = gains;
+    if (playerBackend != null) {
+      await playerBackend!.setEqualizerGains(equalizerGains);
+    }
+    await handlePersistPlayerControllerState(this);
+  }
+
+  Future<void> restoreDefaults() async {
+    volume = 1.0;
+    equalizerGains = List.filled(equalizerGains.length, 0.0);
+    if (playerBackend != null) {
+      await playerBackend!.setVolume(volume);
+      await playerBackend!.setEqualizerGains(equalizerGains);
+    }
+    await handlePersistPlayerControllerState(this);
   }
 }
