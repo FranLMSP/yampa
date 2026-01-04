@@ -2,15 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 
-class VolumeControls extends ConsumerWidget {
+class VolumeControls extends ConsumerStatefulWidget {
   const VolumeControls({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final playerController = ref.watch(playerControllerProvider);
-    final volume = playerController.volume;
-    final equalizerGains = playerController.equalizerGains;
+  ConsumerState<VolumeControls> createState() => _VolumeControlsState();
+}
 
+class _VolumeControlsState extends ConsumerState<VolumeControls> {
+  double _volume = 1.0;
+  List<double> _equalizerGains = [];
+
+  @override
+  void initState() {
+    super.initState();
+    final playerController = ref.read(playerControllerProvider);
+    _volume = playerController.volume;
+    _equalizerGains = playerController.equalizerGains;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -25,14 +37,17 @@ class VolumeControls extends ConsumerWidget {
               const Icon(Icons.volume_mute),
               Expanded(
                 child: Slider(
-                  value: volume,
+                  value: _volume,
                   onChanged: (value) {
+                    setState(() {
+                      _volume = value;
+                    });
                     ref.read(playerControllerProvider.notifier).setVolume(value);
                   },
                 ),
               ),
               const Icon(Icons.volume_up),
-              Text("${(volume * 100).toInt()}%"),
+              Text("${(_volume * 100).toInt()}%"),
             ],
           ),
           const SizedBox(height: 24),
@@ -41,7 +56,7 @@ class VolumeControls extends ConsumerWidget {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 16),
-          if (equalizerGains.isEmpty)
+          if (_equalizerGains.isEmpty)
             const Expanded(
               child: Center(
                 child: Text("Equalizer not available for the current backend or platform."),
@@ -51,7 +66,7 @@ class VolumeControls extends ConsumerWidget {
             Expanded(
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: equalizerGains.length,
+                itemCount: _equalizerGains.length,
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -61,11 +76,14 @@ class VolumeControls extends ConsumerWidget {
                           child: RotatedBox(
                             quarterTurns: 3,
                             child: Slider(
-                              value: equalizerGains[index],
+                              value: _equalizerGains[index],
                               min: -10.0,
                               max: 10.0,
                               onChanged: (value) {
-                                final newGains = List<double>.from(equalizerGains);
+                                final newGains = List<double>.from(_equalizerGains);
+                                setState(() {
+                                  _equalizerGains = newGains;
+                                });
                                 newGains[index] = value;
                                 ref
                                     .read(playerControllerProvider.notifier)
@@ -74,7 +92,7 @@ class VolumeControls extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        Text("${equalizerGains[index].toStringAsFixed(1)} dB"),
+                        Text("${_equalizerGains[index].toStringAsFixed(1)} dB"),
                         Text("Band ${index + 1}"),
                       ],
                     ),
@@ -86,6 +104,9 @@ class VolumeControls extends ConsumerWidget {
           Center(
             child: ElevatedButton.icon(
               onPressed: () {
+                setState(() {
+                  _volume = 1.0;
+                });
                 ref.read(playerControllerProvider.notifier).restoreDefaults();
               },
               icon: const Icon(Icons.restore),
