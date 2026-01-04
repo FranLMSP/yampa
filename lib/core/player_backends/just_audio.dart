@@ -41,9 +41,12 @@ class JustAudioBackend implements PlayerBackend {
 
   void _ensurePlayerInitialized() {
     if (_player == null) {
-      if (Platform.isAndroid) {
+      if (Platform.isAndroid && false) {
+        // TODO: this doesn't seem to work yet
         _equalizer = AndroidEqualizer();
-        _player ??= AudioPlayer(audioPipeline: AudioPipeline(androidAudioEffects: [_equalizer!]));
+        _player ??= AudioPlayer(
+          audioPipeline: AudioPipeline(androidAudioEffects: [_equalizer!]),
+        );
       } else {
         _player ??= AudioPlayer();
       }
