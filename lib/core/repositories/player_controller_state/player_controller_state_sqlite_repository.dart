@@ -83,10 +83,11 @@ class PlayerControllerStateSqliteRepository
             : 1.0,
         equalizerGains: row["equalizer_gains"] != null
             ? row["equalizer_gains"]
-                .toString()
-                .split(",")
-                .map((e) => double.parse(e))
-                .toList()
+                  .toString()
+                  .split(",")
+                  .map((e) => double.tryParse(e))
+                  .whereType<double>()
+                  .toList()
             : [],
       );
     }
