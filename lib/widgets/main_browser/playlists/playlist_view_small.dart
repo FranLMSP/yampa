@@ -316,7 +316,16 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                   _showImageOptions(context, selectedPlaylist);
                 }
               },
-              child: PlaylistImage(playlist: selectedPlaylist),
+              child: ClipRRect(
+                borderRadius: BorderRadiusGeometry.circular(20),
+                child: SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: PlaylistImage(
+                    playlist: selectedPlaylist,
+                  )
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             TextField(

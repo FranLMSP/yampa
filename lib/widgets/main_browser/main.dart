@@ -4,6 +4,7 @@ import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
 import 'package:yampa/widgets/main_browser/local_path_picker/main.dart';
 import 'package:yampa/widgets/main_browser/playlists/main.dart';
 import 'package:yampa/widgets/main_browser/settings_page.dart';
+import 'package:yampa/widgets/main_browser/volume_controls.dart';
 import 'package:yampa/widgets/player/big_player.dart';
 import 'package:yampa/widgets/player/mini_player.dart';
 import 'package:yampa/widgets/utils.dart';
@@ -56,6 +57,7 @@ class _MainBrowserState extends ConsumerState<MainBrowser>
       Tab(icon: Icon(Icons.music_note), text: "All tracks"),
       Tab(icon: Icon(Icons.playlist_add), text: "Playlists"),
       Tab(icon: Icon(Icons.folder), text: "Added paths"),
+      Tab(icon: Icon(Icons.equalizer), text: "Volume controls"),
       Tab(icon: Icon(Icons.settings), text: "Settings"),
     ];
 
@@ -71,6 +73,7 @@ class _MainBrowserState extends ConsumerState<MainBrowser>
       AllTracksPicker(),
       Playlists(),
       LocalPathPicker(),
+      VolumeControls(),
       SettingsPage(),
     ];
 

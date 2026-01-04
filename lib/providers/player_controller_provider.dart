@@ -134,6 +134,8 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   ) async {
     final currentState = playerController.clone();
     await currentState.setSpeed(playerController.speed);
+    await currentState.setVolume(playerController.volume);
+    await currentState.setEqualizerGains(playerController.equalizerGains);
     final currentTrack = tracks[playerController.currentTrackId];
     if (currentTrack != null) {
       await currentState.setCurrentTrack(currentTrack, tracks);
@@ -165,6 +167,24 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   Future<void> handleTrackUpdated(String oldId, String newId) async {
     final currentState = state;
     await currentState.handleTrackUpdated(oldId, newId);
+    state = currentState.clone();
+  }
+
+  Future<void> setVolume(double value) async {
+    final currentState = state;
+    await currentState.setVolume(value);
+    state = currentState.clone();
+  }
+
+  Future<void> setEqualizerGains(List<double> gains) async {
+    final currentState = state;
+    await currentState.setEqualizerGains(gains);
+    state = currentState.clone();
+  }
+
+  Future<void> restoreDefaults() async {
+    final currentState = state;
+    await currentState.restoreDefaults();
     state = currentState.clone();
   }
 }

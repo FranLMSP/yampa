@@ -331,7 +331,6 @@ Future<void> handlePersistPlayerControllerState(
     LastPlayerControllerState(
       currentTrackId: playerController.currentTrackId ?? "",
       currentPlaylistId: playerController.currentPlaylistId ?? "",
-      currentTrackIndex: playerController.currentTrackIndex,
       speed: playerController.speed,
       trackQueueIds: playerController.trackQueueIds,
       shuffledTrackQueueIds: playerController.shuffledTrackQueueIds,
@@ -339,6 +338,8 @@ Future<void> handlePersistPlayerControllerState(
       loopMode: playerController.loopMode,
       shuffleMode: playerController.shuffleMode,
       trackQueueDisplayMode: playerController.trackQueueDisplayMode,
+      volume: playerController.volume,
+      equalizerGains: playerController.equalizerGains,
     ),
   );
   await playerControllerStateRepository.close();

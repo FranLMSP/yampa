@@ -12,14 +12,15 @@ Future<void> _initializeDatabase(Database db) async {
         CREATE TABLE IF NOT EXISTS $playerControllerStateTableName (
           current_track_id TEXT NULL,
           current_playlist_id TEXT NULL,
-          current_track_index TEXT NULL,
           speed REAL NULL,
           track_queue_ids TEXT NULL,
           shuffled_track_queue_ids TEXT NULL,
           state TEXT NULL,
           loop_mode TEXT NULL,
           shuffle_mode TEXT NULL,
-          track_queue_display_mode TEXT NULL
+          track_queue_display_mode TEXT NULL,
+          volume REAL NULL,
+          equalizer_gains TEXT NULL
         )
       '''),
   ];
@@ -56,9 +57,6 @@ class PlayerControllerStateSqliteRepository
       return LastPlayerControllerState(
         currentTrackId: row["current_track_id"]?.toString(),
         currentPlaylistId: row["current_playlist_id"]?.toString(),
-        currentTrackIndex: row["current_track_index"] != null
-            ? int.parse(row["current_track_index"].toString())
-            : 0,
         speed: row["speed"] != null ? double.parse(row["speed"].toString()) : 1,
         trackQueueIds: row["track_queue_ids"] != null
             ? row["track_queue_ids"].toString().split(",")
@@ -80,12 +78,22 @@ class PlayerControllerStateSqliteRepository
                 row["track_queue_display_mode"].toString(),
               )]
             : TrackQueueDisplayMode.image,
+        volume: row["volume"] != null
+            ? double.parse(row["volume"].toString())
+            : 1.0,
+        equalizerGains: row["equalizer_gains"] != null
+            ? row["equalizer_gains"]
+                  .toString()
+                  .split(",")
+                  .map((e) => double.tryParse(e))
+                  .whereType<double>()
+                  .toList()
+            : [],
       );
     }
     return LastPlayerControllerState(
       currentTrackId: null,
       currentPlaylistId: null,
-      currentTrackIndex: 0,
       speed: 1,
       trackQueueIds: [],
       shuffledTrackQueueIds: [],
@@ -93,6 +101,8 @@ class PlayerControllerStateSqliteRepository
       loopMode: LoopMode.infinite,
       shuffleMode: ShuffleMode.random,
       trackQueueDisplayMode: TrackQueueDisplayMode.image,
+      volume: 1.0,
+      equalizerGains: [],
     );
   }
 
@@ -105,7 +115,6 @@ class PlayerControllerStateSqliteRepository
     await db.insert(playerControllerStateTableName, {
       "current_track_id": playerControllerState.currentTrackId,
       "current_playlist_id": playerControllerState.currentPlaylistId,
-      "current_track_index": playerControllerState.currentTrackIndex,
       "speed": playerControllerState.speed,
       "track_queue_ids": playerControllerState.trackQueueIds.join(","),
       "shuffled_track_queue_ids": playerControllerState.shuffledTrackQueueIds
@@ -115,6 +124,8 @@ class PlayerControllerStateSqliteRepository
       "shuffle_mode": playerControllerState.shuffleMode.index,
       "track_queue_display_mode":
           playerControllerState.trackQueueDisplayMode.index,
+      "volume": playerControllerState.volume,
+      "equalizer_gains": playerControllerState.equalizerGains.join(","),
     }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 

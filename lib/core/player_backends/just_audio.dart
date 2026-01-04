@@ -26,10 +26,10 @@ AudioPlayer? _player;
 
 class JustAudioBackend implements PlayerBackend {
   Duration? _currentTrackDuration;
+  AndroidEqualizer? _equalizer;
 
   @override
   Future<void> init() async {
-    _player ??= AudioPlayer();
     if (isPlatformDesktop()) {
       JustAudioMediaKit.ensureInitialized(
         linux: Platform.isLinux,
@@ -40,7 +40,17 @@ class JustAudioBackend implements PlayerBackend {
   }
 
   void _ensurePlayerInitialized() {
-    _player ??= AudioPlayer();
+    if (_player == null) {
+      if (Platform.isAndroid && false) {
+        // TODO: this doesn't seem to work yet
+        _equalizer = AndroidEqualizer();
+        _player ??= AudioPlayer(
+          audioPipeline: AudioPipeline(androidAudioEffects: [_equalizer!]),
+        );
+      } else {
+        _player ??= AudioPlayer();
+      }
+    }
   }
 
   @override
@@ -277,6 +287,17 @@ class JustAudioBackend implements PlayerBackend {
   Future<void> setVolume(double volume) async {
     _ensurePlayerInitialized();
     await _player!.setVolume(volume);
+  }
+
+  @override
+  Future<void> setEqualizerGains(List<double> gains) async {
+    _ensurePlayerInitialized();
+    if (_equalizer != null) {
+      final bands = (await _equalizer!.parameters).bands;
+      for (var i = 0; i < bands.length && i < gains.length; i++) {
+        await bands[i].setGain(gains[i]);
+      }
+    }
   }
 
   @override
