@@ -44,7 +44,9 @@ class SortButton extends ConsumerWidget {
         ),
         PopupMenuItem<SortMode>(
           value: SortMode.leastRecentlyPlayed,
-          child: Text(notifier.translate(LocalizationKeys.sortLeastRecentlyPlayed)),
+          child: Text(
+            notifier.translate(LocalizationKeys.sortLeastRecentlyPlayed),
+          ),
         ),
         PopupMenuItem<SortMode>(
           value: SortMode.artistAtoZ,

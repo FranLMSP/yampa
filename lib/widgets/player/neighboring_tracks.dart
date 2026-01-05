@@ -29,7 +29,9 @@ class NeighboringTracks extends ConsumerWidget {
                 ? _buildTrackInfo(
                     context,
                     prevTrack,
-                    ref.read(localizationProvider.notifier).translate(LocalizationKeys.previous),
+                    ref
+                        .read(localizationProvider.notifier)
+                        .translate(LocalizationKeys.previous),
                     CrossAxisAlignment.start,
                   )
                 : const SizedBox.shrink(),
@@ -40,7 +42,9 @@ class NeighboringTracks extends ConsumerWidget {
                 ? _buildTrackInfo(
                     context,
                     nextTrack,
-                    ref.read(localizationProvider.notifier).translate(LocalizationKeys.next),
+                    ref
+                        .read(localizationProvider.notifier)
+                        .translate(LocalizationKeys.next),
                     CrossAxisAlignment.end,
                   )
                 : const SizedBox.shrink(),

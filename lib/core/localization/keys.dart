@@ -51,7 +51,8 @@ class LocalizationKeys {
   static const String play = 'play';
   static const String pause = 'pause';
   static const String removeFromFavorites = 'remove_from_favorites';
-  static const String trackRemovedFromFavorites = 'track_removed_from_favorites';
+  static const String trackRemovedFromFavorites =
+      'track_removed_from_favorites';
   static const String trackAddedFromFavorites = 'track_added_from_favorites';
   static const String allTracksTitle = 'all_tracks_title';
   static const String reloadTracksTooltip = 'reload_tracks_tooltip';
@@ -63,7 +64,8 @@ class LocalizationKeys {
   static const String newPlaylistTooltip = 'new_playlist_tooltip';
   static const String importPlaylistsTooltip = 'import_playlists_tooltip';
   static const String exportAllTooltip = 'export_all_tooltip';
-  static const String removeFromPlaylistQuestion = 'remove_from_playlist_question';
+  static const String removeFromPlaylistQuestion =
+      'remove_from_playlist_question';
   static const String delete = 'delete';
   static const String export = 'export';
   static const String newPlaylist = 'new_playlist';
@@ -75,8 +77,10 @@ class LocalizationKeys {
   static const String removeSelectedTracks = 'remove_selected_tracks';
   static const String selectAnotherImage = 'select_another_image';
   static const String removeFromPlaylist = 'remove_from_playlist';
-  static const String exportThisPlaylistTooltip = 'export_this_playlist_tooltip';
-  static const String deleteThisPlaylistTooltip = 'delete_this_playlist_tooltip';
+  static const String exportThisPlaylistTooltip =
+      'export_this_playlist_tooltip';
+  static const String deleteThisPlaylistTooltip =
+      'delete_this_playlist_tooltip';
   static const String playCount = 'play_count';
   static const String previous = 'previous';
   static const String next = 'next';
@@ -84,7 +88,8 @@ class LocalizationKeys {
 
   // Path Picker
   static const String addedPathsTitle = 'added_paths_title';
-  static const String deletePathsQuestion = 'delete_paths_question'; // Requires parameter
+  static const String deletePathsQuestion =
+      'delete_paths_question'; // Requires parameter
   static const String deletePathQuestion = 'delete_path_question';
   static const String deletePathsContent = 'delete_paths_content';
   static const String cancel = 'cancel';
@@ -121,7 +126,8 @@ class LocalizationKeys {
   static const String errorLoadingStats = 'error_loading_stats';
   static const String playbackSpeed = 'playback_speed';
   static const String forwardSeconds = 'forward_seconds'; // Requires parameter
-  static const String backwardSeconds = 'backward_seconds'; // Requires parameter
+  static const String backwardSeconds =
+      'backward_seconds'; // Requires parameter
   static const String createAudioClip = 'create_audio_clip';
   static const String close = 'close';
   static const String save = 'save';
@@ -132,11 +138,13 @@ class LocalizationKeys {
   static const String loopModePlaylist = 'loop_mode_playlist';
   static const String loopModeStartToEnd = 'loop_mode_start_to_end';
   static const String loopModeNone = 'loop_mode_none';
-  static const String loopModeChanged = 'loop_mode_changed'; // Requires parameter
+  static const String loopModeChanged =
+      'loop_mode_changed'; // Requires parameter
   static const String shuffleModeDisabled = 'shuffle_mode_disabled';
   static const String shuffleModeRandomized = 'shuffle_mode_randomized';
   static const String shuffleModeRecommended = 'shuffle_mode_recommended';
-  static const String shuffleModeChanged = 'shuffle_mode_changed'; // Requires parameter
+  static const String shuffleModeChanged =
+      'shuffle_mode_changed'; // Requires parameter
 
   // Sort Modes
   static const String sortTitleAZ = 'sort_title_az';

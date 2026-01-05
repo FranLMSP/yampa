@@ -23,7 +23,11 @@ class _ImageCropperScreenState extends ConsumerState<ImageCropperScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.cropImage)),
+        title: Text(
+          ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.cropImage),
+        ),
         actions: [
           if (_isCropping)
             const Center(

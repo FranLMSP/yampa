@@ -29,9 +29,9 @@ class SpeedButton extends ConsumerWidget {
     ];
 
     return PopupMenuButton<double>(
-      tooltip: ref.read(localizationProvider.notifier).translate(
-        LocalizationKeys.playbackSpeed,
-      ),
+      tooltip: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.playbackSpeed),
       icon: Chip(
         label: Text('x$formattedSpeed'),
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,

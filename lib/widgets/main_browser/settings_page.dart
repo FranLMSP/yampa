@@ -327,9 +327,7 @@ class LanguageSelectionPage extends ConsumerWidget {
         child: ListView(
           children: [
             ListTile(
-              leading: const Radio<String>(
-                value: LocalizationKeys.en,
-              ),
+              leading: const Radio<String>(value: LocalizationKeys.en),
               title: Text(
                 ref
                     .read(localizationProvider.notifier)
@@ -340,9 +338,7 @@ class LanguageSelectionPage extends ConsumerWidget {
                   .setLanguage(LocalizationKeys.en),
             ),
             ListTile(
-              leading: const Radio<String>(
-                value: LocalizationKeys.es,
-              ),
+              leading: const Radio<String>(value: LocalizationKeys.es),
               title: Text(
                 ref
                     .read(localizationProvider.notifier)

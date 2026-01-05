@@ -101,7 +101,9 @@ class _MyAppState extends ConsumerState<MyApp> {
     );
     final _ = ref.watch(localizationProvider); // Rebuild when language changes
     return MaterialApp(
-      title: ref.read(localizationProvider.notifier).translate(LocalizationKeys.appTitle),
+      title: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.appTitle),
       darkTheme: ThemeData.dark(),
       themeMode: themeMode,
       locale: Locale(ref.watch(localizationProvider)),

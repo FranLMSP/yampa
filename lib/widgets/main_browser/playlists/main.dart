@@ -41,7 +41,12 @@ class _PlaylistsState extends ConsumerState<Playlists> {
 
     if (isMultiSelecting) {
       return AppBar(
-        title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.selectedCount).replaceFirst('{}', _selectedPlaylistIds.length.toString())),
+        title: Text(
+          ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.selectedCount)
+              .replaceFirst('{}', _selectedPlaylistIds.length.toString()),
+        ),
         leading: IconButton(
           icon: Icon(Icons.close),
           onPressed: () => setState(() => _selectedPlaylistIds = []),
@@ -55,7 +60,9 @@ class _PlaylistsState extends ConsumerState<Playlists> {
                   .toList();
               handlePlaylistsExport(selectedPlaylists);
             },
-            tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.exportSelected),
+            tooltip: ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.exportSelected),
           ),
           IconButton(
             icon: Icon(Icons.delete),
@@ -70,7 +77,9 @@ class _PlaylistsState extends ConsumerState<Playlists> {
                 () => setState(() => _selectedPlaylistIds = []),
               );
             },
-            tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.deleteSelected),
+            tooltip: ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.deleteSelected),
           ),
         ],
       );
@@ -90,7 +99,11 @@ class _PlaylistsState extends ConsumerState<Playlists> {
     }
 
     return AppBar(
-      title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.playlistsTab)),
+      title: Text(
+        ref
+            .read(localizationProvider.notifier)
+            .translate(LocalizationKeys.playlistsTab),
+      ),
       actions: [
         IconButton(
           icon: Icon(Icons.add_circle_outline),
@@ -112,21 +125,27 @@ class _PlaylistsState extends ConsumerState<Playlists> {
               },
             );
           },
-          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.newPlaylistTooltip),
+          tooltip: ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.newPlaylistTooltip),
         ),
         IconButton(
           icon: Icon(Icons.file_download),
           onPressed: () async {
             await handlePlaylistsImport(playlistNotifier, allPlaylists);
           },
-          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.importPlaylistsTooltip),
+          tooltip: ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.importPlaylistsTooltip),
         ),
         IconButton(
           icon: Icon(Icons.file_upload),
           onPressed: () {
             handlePlaylistsExport(allPlaylists);
           },
-          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.exportAllTooltip),
+          tooltip: ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.exportAllTooltip),
         ),
       ],
     );
@@ -145,16 +164,28 @@ class _PlaylistsState extends ConsumerState<Playlists> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.removeFromPlaylistQuestion)),
+              title: Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.removeFromPlaylistQuestion),
+              ),
               actions: <Widget>[
                 TextButton(
-                  child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.no)),
+                  child: Text(
+                    ref
+                        .read(localizationProvider.notifier)
+                        .translate(LocalizationKeys.no),
+                  ),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 TextButton(
-                  child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.yes)),
+                  child: Text(
+                    ref
+                        .read(localizationProvider.notifier)
+                        .translate(LocalizationKeys.yes),
+                  ),
                   onPressed: () {
                     setState(() {
                       handleMultipleTrackRemovedFromPlaylist(
@@ -216,7 +247,11 @@ class _PlaylistsState extends ConsumerState<Playlists> {
               children: [
                 Icon(Icons.delete),
                 SizedBox(width: 12),
-                Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.delete)),
+                Text(
+                  ref
+                      .read(localizationProvider.notifier)
+                      .translate(LocalizationKeys.delete),
+                ),
               ],
             ),
           ),
@@ -226,7 +261,11 @@ class _PlaylistsState extends ConsumerState<Playlists> {
             children: [
               Icon(Icons.check_box),
               SizedBox(width: 12),
-              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.select)),
+              Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.select),
+              ),
             ],
           ),
         ),
@@ -236,7 +275,11 @@ class _PlaylistsState extends ConsumerState<Playlists> {
             children: [
               Icon(Icons.file_upload),
               SizedBox(width: 12),
-              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.export)),
+              Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.export),
+              ),
             ],
           ),
         ),

@@ -130,19 +130,32 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.deletePathsQuestion).replaceFirst('{}', count.toString())),
+        title: Text(
+          ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.deletePathsQuestion)
+              .replaceFirst('{}', count.toString()),
+        ),
         content: Text(
-          ref.read(localizationProvider.notifier).translate(LocalizationKeys.deletePathsContent),
+          ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.deletePathsContent),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.cancel)),
+            child: Text(
+              ref
+                  .read(localizationProvider.notifier)
+                  .translate(LocalizationKeys.cancel),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             child: Text(
-              ref.read(localizationProvider.notifier).translate(LocalizationKeys.delete),
+              ref
+                  .read(localizationProvider.notifier)
+                  .translate(LocalizationKeys.delete),
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
@@ -213,7 +226,11 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
   Widget _buildPathsList(List<GenericPath> paths) {
     if (paths.isEmpty) {
       return Center(
-        child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.noPathsFound)),
+        child: Text(
+          ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.noPathsFound),
+        ),
       );
     }
     return ListView(

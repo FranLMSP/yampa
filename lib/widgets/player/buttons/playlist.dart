@@ -27,9 +27,9 @@ class PlaylistButton extends ConsumerWidget {
     final tracks = ref.watch(playerControllerProvider.select((p) => p.tracks));
     return IconButton(
       icon: const Icon(Icons.playlist_add),
-      tooltip: ref.read(localizationProvider.notifier).translate(
-        LocalizationKeys.saveToPlaylist,
-      ),
+      tooltip: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.saveToPlaylist),
       onPressed: () async {
         if (currentTrackId == null) {
           return;

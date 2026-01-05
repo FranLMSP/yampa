@@ -35,10 +35,9 @@ class ShuffleButton extends ConsumerWidget {
     LocalizationNotifier notifier,
   ) {
     final label = _getShuffleModeLabel(shuffleMode, notifier);
-    return notifier.translate(LocalizationKeys.shuffleModeChanged).replaceFirst(
-      '{}',
-      label,
-    );
+    return notifier
+        .translate(LocalizationKeys.shuffleModeChanged)
+        .replaceFirst('{}', label);
   }
 
   Future<void> _toggleShuffleMode(

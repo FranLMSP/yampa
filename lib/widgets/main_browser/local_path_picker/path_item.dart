@@ -55,7 +55,9 @@ class _PathItemState extends ConsumerState<PathItem> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text(localizationNotifier.translate(LocalizationKeys.no)),
+                  child: Text(
+                    localizationNotifier.translate(LocalizationKeys.no),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -66,7 +68,9 @@ class _PathItemState extends ConsumerState<PathItem> {
                     );
                     Navigator.of(context).pop();
                   },
-                  child: Text(localizationNotifier.translate(LocalizationKeys.yes)),
+                  child: Text(
+                    localizationNotifier.translate(LocalizationKeys.yes),
+                  ),
                 ),
               ],
             );

@@ -31,9 +31,10 @@ class BackwardSecondsButton extends ConsumerWidget {
 
     return IconButton(
       icon: const Icon(Icons.replay_10),
-      tooltip: ref.read(localizationProvider.notifier).translate(
-        LocalizationKeys.backwardSeconds,
-      ).replaceFirst('{}', '10'),
+      tooltip: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.backwardSeconds)
+          .replaceFirst('{}', '10'),
       onPressed: () async {
         _backward(ref, currentTrackId);
       },

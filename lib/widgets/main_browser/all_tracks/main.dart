@@ -83,7 +83,11 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
             children: [
               Icon(Icons.check_box),
               SizedBox(width: 12),
-              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.select)),
+              Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.select),
+              ),
             ],
           ),
         ),
@@ -93,7 +97,11 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
             children: [
               Icon(Icons.playlist_add),
               SizedBox(width: 12),
-              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.addToPlaylists)),
+              Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.addToPlaylists),
+              ),
             ],
           ),
         ),
@@ -103,14 +111,26 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
             children: [
               Icon(Icons.favorite),
               SizedBox(width: 12),
-              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.addToFavorites)),
+              Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.addToFavorites),
+              ),
             ],
           ),
         ),
         PopupMenuItem<OptionSelected>(
           value: OptionSelected.info,
           child: Row(
-            children: [Icon(Icons.info), SizedBox(width: 12), Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.info))],
+            children: [
+              Icon(Icons.info),
+              SizedBox(width: 12),
+              Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.info),
+              ),
+            ],
           ),
         ),
       ],
@@ -129,13 +149,21 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
       context: context,
       builder: (BuildContext ctx) {
         return AlertDialog(
-          title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.addToFavoritesQuestion)),
+          title: Text(
+            ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.addToFavoritesQuestion),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.no)),
+              child: Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.no),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -151,7 +179,11 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                 selectedTracksNotifier.clear();
                 Navigator.of(context).pop();
               },
-              child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.yes)),
+              child: Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.yes),
+              ),
             ),
           ],
         );
@@ -235,7 +267,11 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
       title: TextField(
         autofocus: true,
         controller: _searchTextController,
-        decoration: InputDecoration(labelText: ref.read(localizationProvider.notifier).translate(LocalizationKeys.search)),
+        decoration: InputDecoration(
+          labelText: ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.search),
+        ),
         onChanged: (_) => setState(() => {}),
       ),
     );
@@ -261,11 +297,18 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
           selectedTracksNotifier.clear();
         },
       ),
-      title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.selectedCount).replaceFirst('{}', selectedTracks.length.toString())),
+      title: Text(
+        ref
+            .read(localizationProvider.notifier)
+            .translate(LocalizationKeys.selectedCount)
+            .replaceFirst('{}', selectedTracks.length.toString()),
+      ),
       actions: [
         IconButton(
           icon: const Icon(Icons.favorite),
-          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.addToFavorites),
+          tooltip: ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.addToFavorites),
           onPressed: () {
             _addToFavoritesModal(
               context,
@@ -279,7 +322,9 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         ),
         IconButton(
           icon: const Icon(Icons.playlist_add),
-          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.addToPlaylist),
+          tooltip: ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.addToPlaylist),
           onPressed: () {
             addToPlaylistsModal(
               context,
@@ -298,11 +343,15 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
   PreferredSizeWidget _buildDefaultAppBar(int tracksCount) {
     final sortMode = ref.watch(allTracksSortModeProvider);
     return AppBar(
-      title: Text('${ref.read(localizationProvider.notifier).translate(LocalizationKeys.allTracksTitle)} ${tracksCount > 0 ? "($tracksCount)" : ""}'),
+      title: Text(
+        '${ref.read(localizationProvider.notifier).translate(LocalizationKeys.allTracksTitle)} ${tracksCount > 0 ? "($tracksCount)" : ""}',
+      ),
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh),
-          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.reloadTracksTooltip),
+          tooltip: ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.reloadTracksTooltip),
           onPressed: () {
             reloadTracks(
               ref.read(playerControllerProvider.notifier),
@@ -372,7 +421,11 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
 
     if (tracks.isEmpty) {
       return Center(
-        child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.noTracksFound)),
+        child: Text(
+          ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.noTracksFound),
+        ),
       );
     }
     return Scaffold(

@@ -36,6 +36,7 @@ class JustAudioBackend implements PlayerBackend {
   static void setAudioHandler(YampaAudioHandler handler) {
     _audioHandler = handler;
   }
+
   Duration? _currentTrackDuration;
   AndroidEqualizer? _equalizer;
 
@@ -235,22 +236,22 @@ class JustAudioBackend implements PlayerBackend {
         : null;
     Duration? duration;
     try {
-      final audioSource = AudioSource.uri(
-        Uri.file(track.path),
-      );
+      final audioSource = AudioSource.uri(Uri.file(track.path));
       duration = await _player!.setAudioSource(audioSource);
-      
+
       final artUri = track.imageBytes != null
           ? bytesToDataUri(track.imageBytes!)
           : null;
-      await _audioHandler?.updateMediaItem(MediaItem(
-        id: track.id,
-        title: track.displayTitle(),
-        artist: track.artist,
-        album: track.album,
-        duration: duration,
-        artUri: artUri,
-      ));
+      await _audioHandler?.updateMediaItem(
+        MediaItem(
+          id: track.id,
+          title: track.displayTitle(),
+          artist: track.artist,
+          album: track.album,
+          duration: duration,
+          artUri: artUri,
+        ),
+      );
     } catch (e) {
       log("Unable to set audio source", error: e);
     }

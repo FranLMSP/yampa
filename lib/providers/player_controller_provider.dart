@@ -111,7 +111,9 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
     pc.currentPlaylistId = playerController.currentPlaylistId;
     pc.speed = playerController.speed;
     pc.trackQueueIds = List.from(playerController.trackQueueIds);
-    pc.shuffledTrackQueueIds = List.from(playerController.shuffledTrackQueueIds);
+    pc.shuffledTrackQueueIds = List.from(
+      playerController.shuffledTrackQueueIds,
+    );
     pc.state = playerController.state;
     pc.loopMode = playerController.loopMode;
     pc.shuffleMode = playerController.shuffleMode;

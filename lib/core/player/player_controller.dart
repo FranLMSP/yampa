@@ -68,6 +68,24 @@ class PlayerController {
     pc.notifyListeners();
   }
 
+  PlayerController._internal({
+    required this.currentTrackId,
+    required this.currentPlaylistId,
+    required this.speed,
+    required this.trackQueueIds,
+    required this.shuffledTrackQueueIds,
+    required this.state,
+    required this.loopMode,
+    required this.shuffleMode,
+    required this.trackQueueDisplayMode,
+    required this.playerBackend,
+    required this.lastTrackDuration,
+    required this.sessionStartTime,
+    required this.lastPlayStartTime,
+    required this.volume,
+    required this.equalizerGains,
+    required this.tracks,
+  });
 
   Future<void> play() async {
     state = PlayerState.playing;
@@ -280,7 +298,7 @@ class PlayerController {
   }
 
   PlayerController clone() {
-    return PlayerController._clone(
+    return PlayerController._internal(
       currentTrackId: currentTrackId,
       currentPlaylistId: currentPlaylistId,
       speed: speed,
