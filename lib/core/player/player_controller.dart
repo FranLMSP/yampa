@@ -353,6 +353,7 @@ class PlayerController {
         shuffledTrackQueueIds.add(trackId);
       }
     }
+    notifyListeners();
 
     await handlePersistPlayerControllerState(this);
   }
@@ -366,12 +367,13 @@ class PlayerController {
     }
     trackQueueIds.removeWhere((e) => trackIds.contains(e));
     shuffledTrackQueueIds.removeWhere((e) => trackIds.contains(e));
-
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   Future<void> setPlaylist(Playlist playlist) async {
     await reloadPlaylist(playlist);
+    notifyListeners();
   }
 
   Future<void> reloadPlaylist(Playlist playlist) async {
@@ -575,6 +577,7 @@ class PlayerController {
   }
 
   Future<void> handleTrackUpdated(String oldId, String newId) async {
+    // TODO: we have to update the statistics as well.
     currentTrackId = newId;
     final queueIdIndex = trackQueueIds.indexOf(oldId);
     if (queueIdIndex != -1) {

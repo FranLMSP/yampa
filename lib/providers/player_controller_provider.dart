@@ -26,82 +26,82 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> play() async {
-    await state.play();
+    await PlayerController.instance.play();
   }
 
   Future<void> pause() async {
-    await state.pause();
+    await PlayerController.instance.pause();
   }
 
   Future<void> next() async {
-    await state.next(true);
+    await PlayerController.instance.next(true);
   }
 
   Future<void> prev() async {
-    await state.prev();
+    await PlayerController.instance.prev();
   }
 
   Future<void> stop() async {
-    await state.stop();
+    await PlayerController.instance.stop();
   }
 
   Future<void> seek(Duration duration) async {
-    await state.seek(duration);
+    await PlayerController.instance.seek(duration);
   }
 
   Future<void> setPlayerBackend(PlayerBackend playerBackend) async {
-    await state.setPlayerBackend(playerBackend);
+    await PlayerController.instance.setPlayerBackend(playerBackend);
   }
 
   Future<void> setCurrentTrack(Track track) async {
-    await state.setCurrentTrack(track);
+    await PlayerController.instance.setCurrentTrack(track);
   }
 
   Future<void> setPlaylist(Playlist playlist) async {
-    await state.setPlaylist(playlist);
+    await PlayerController.instance.setPlaylist(playlist);
   }
 
   Future<void> handleTracksAddedToPlaylist(
     List<Map<String, String>> playlistTrackMapping,
   ) async {
-    await state.handleTracksAddedToPlaylist(playlistTrackMapping);
+    await PlayerController.instance.handleTracksAddedToPlaylist(playlistTrackMapping);
   }
 
   Future<void> handleTracksRemovedFromPlaylist(
     Playlist playlist,
     List<String> trackIds,
   ) async {
-    await state.handleTracksRemovedFromPlaylist(playlist, trackIds);
+    await PlayerController.instance.handleTracksRemovedFromPlaylist(playlist, trackIds);
   }
 
   Future<LoopMode> toggleLoopMode() async {
-    return await state.toggleLoopMode();
+    return await PlayerController.instance.toggleLoopMode();
   }
 
   Future<ShuffleMode> toggleShuffleMode() async {
-    return await state.toggleShuffleMode();
+    return await PlayerController.instance.toggleShuffleMode();
   }
 
   Future<void> handleNextAutomatically() async {
-    await state.handleNextAutomatically();
+    await PlayerController.instance.handleNextAutomatically();
   }
 
   PlayerController getPlayerController() {
-    return state.clone();
+    return PlayerController.instance.clone();
   }
 
   Future<void> setSpeed(double value) async {
-    await state.setSpeed(value);
+    await PlayerController.instance.setSpeed(value);
   }
 
   Future<void> playTrack(Track track) async {
-    final player = state;
-    if (player.playerBackend == null) {
-      await player.setPlayerBackend(await getPlayerBackend());
+    final pc = PlayerController.instance;
+    if (pc.playerBackend == null) {
+      await pc.setPlayerBackend(await getPlayerBackend());
     }
-    await player.stop();
-    await player.setCurrentTrack(track);
-    await player.play();
+    await pc.stop();
+    await pc.setCurrentTrack(track);
+    await pc.play();
   }
 
   Future<void> setPlayerController(PlayerController playerController) async {
@@ -127,47 +127,47 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   }
 
   Future<void> setTrackQueueDisplayMode(TrackQueueDisplayMode mode) async {
-    await state.setTrackQueueDisplayMode(mode);
+    await PlayerController.instance.setTrackQueueDisplayMode(mode);
   }
 
   Future<void> reloadPlaylist(Playlist playlist) async {
-    await state.reloadPlaylist(playlist);
+    await PlayerController.instance.reloadPlaylist(playlist);
   }
 
   Future<void> updatePlaybackStatistics() async {
-    await state.updatePlaybackStatistics();
+    await PlayerController.instance.updatePlaybackStatistics();
   }
 
   Future<void> handleTrackUpdated(String oldId, String newId) async {
-    await state.handleTrackUpdated(oldId, newId);
+    await PlayerController.instance.handleTrackUpdated(oldId, newId);
   }
 
   Future<void> setVolume(double value) async {
-    await state.setVolume(value);
+    await PlayerController.instance.setVolume(value);
   }
 
   Future<void> setEqualizerGains(List<double> gains) async {
-    await state.setEqualizerGains(gains);
+    await PlayerController.instance.setEqualizerGains(gains);
   }
 
   Future<void> restoreDefaults() async {
-    await state.restoreDefaults();
+    await PlayerController.instance.restoreDefaults();
   }
 
   void setTracks(List<Track> tracks) {
-    state.setTracks(tracks);
+    PlayerController.instance.setTracks(tracks);
   }
 
   List<Track> getTracks() {
-    return state.getTracks();
+    return PlayerController.instance.getTracks();
   }
 
   void addTracks(List<Track> tracks) {
-    state.addTracks(tracks);
+    PlayerController.instance.addTracks(tracks);
   }
 
   void removeTracks(List<String> trackIds) {
-    state.removeTracks(trackIds);
+    PlayerController.instance.removeTracks(trackIds);
   }
 
   void initAudioHandler() {
