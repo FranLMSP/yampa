@@ -21,7 +21,7 @@ select_language;Seleccionar Idioma
 en;Inglés
 es;Español
 all_tracks_tab;Pistas
-playlists_tab;Listas
+playlists_tab;Listas de reproducción
 added_paths_tab;Rutas
 volume_controls_tab;Volumen
 settings_tab;Ajustes
@@ -29,7 +29,7 @@ app_title;YAMPA - Yet Another Music Player App
 player_tab;Reproductor
 playing_all_tracks;Reproduciendo todas las pistas
 select;Seleccionar
-add_to_playlists;Añadir a listas
+add_to_playlists;Añadir a listas de reproducción
 add_to_favorites;Añadir a favoritos
 info;Información
 add_to_favorites_question;¿Añadir a favoritos?
@@ -37,19 +37,19 @@ no;No
 yes;Sí
 search;Buscar
 selected_count;{} seleccionados
-add_to_playlist;Añadir a lista
+add_to_playlist;Añadir a lista de reproducción
 all_tracks_title;Todas las pistas
 reload_tracks_tooltip;Recargar pistas
 no_tracks_found;No se encontraron pistas. ¡Ve a la pestaña de Rutas para añadir algunas!
 export_selected;Exportar seleccionadas
 delete_selected;Eliminar seleccionadas
-new_playlist_tooltip;Nueva Lista
-import_playlists_tooltip;Importar Listas
+new_playlist_tooltip;Nueva Lista de reproducción
+import_playlists_tooltip;Importar Listas de reproducción
 export_all_tooltip;Exportar Todo
-remove_from_playlist_question;¿Eliminar de la lista?
+remove_from_playlist_question;¿Eliminar de la lista de reproducción?
 delete;Eliminar
 export;Exportar
-new_playlist;Nueva lista
+new_playlist;Nueva lista de reproducción
 added_paths_title;Rutas Añadidas
 delete_paths_question;¿Eliminar {} ruta(s)?
 delete_paths_content;Esto dejará de rastrear las rutas seleccionadas. ¿Estás seguro?
@@ -59,7 +59,7 @@ title_label;Título
 description_label;Descripción
 title_empty_error;El título no puede estar vacío
 create;Crear
-master_volume;Volumen Maestro
+master_volume;Volumen Principal
 equalizer;Ecualizador
 equalizer_not_available;Ecualizador no disponible para el backend o plataforma actual.
 band;Banda
