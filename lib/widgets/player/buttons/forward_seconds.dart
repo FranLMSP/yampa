@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class ForwardSecondsButton extends ConsumerWidget {
   const ForwardSecondsButton({super.key});
@@ -33,7 +35,9 @@ class ForwardSecondsButton extends ConsumerWidget {
 
     return IconButton(
       icon: const Icon(Icons.forward_10),
-      tooltip: 'Forward 10 seconds',
+      tooltip: ref.read(localizationProvider.notifier).translate(
+        LocalizationKeys.forwardSeconds,
+      ).replaceFirst('{}', '10'),
       onPressed: () async {
         _forward(ref, currentTrackId);
       },

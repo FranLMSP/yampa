@@ -5,6 +5,8 @@ import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/utils.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class FavoriteButton extends ConsumerWidget {
   const FavoriteButton({super.key});
@@ -19,20 +21,27 @@ class FavoriteButton extends ConsumerWidget {
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,
     );
+    final localizationNotifier = ref.read(localizationProvider.notifier);
     final favoritesPlaylist = playlists.firstWhere(
       (e) => e.id == favoritePlaylistId,
     );
     final isFavorite = favoritesPlaylist.trackIds.contains(currentTrackId);
     return IconButton(
       icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
-      tooltip: isFavorite ? "Remove from favorites" : "Add to favorites",
+      tooltip: isFavorite
+          ? localizationNotifier.translate(LocalizationKeys.removeFromFavorites)
+          : localizationNotifier.translate(LocalizationKeys.addToFavorites),
       onPressed: () async {
         if (currentTrackId == null) {
           return;
         }
         if (isFavorite) {
           await Future.wait([
-            showButtonActionMessage("Track removed from favorites"),
+            showButtonActionMessage(
+              localizationNotifier.translate(
+                LocalizationKeys.trackRemovedFromFavorites,
+              ),
+            ),
             handleMultipleTrackRemovedFromPlaylist(
               favoritesPlaylist,
               [currentTrackId],
@@ -42,7 +51,11 @@ class FavoriteButton extends ConsumerWidget {
           ]);
         } else {
           await Future.wait([
-            showButtonActionMessage("Track added to favorites"),
+            showButtonActionMessage(
+              localizationNotifier.translate(
+                LocalizationKeys.trackAddedFromFavorites,
+              ),
+            ),
             handleTracksAddedToPlaylist(
               [currentTrackId],
               [favoritesPlaylist],

@@ -362,7 +362,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             const SizedBox(height: 24),
             if (selectedPlaylist.trackIds.isNotEmpty)
               SizedBox(
-                width: 150,
+                width: 160,
                 child: ElevatedButton(
                   onPressed: () async {
                     if (selectedPlaylist.trackIds.isNotEmpty) {

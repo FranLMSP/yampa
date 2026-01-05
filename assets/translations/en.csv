@@ -27,17 +27,26 @@ volume_controls_tab;Volume controls
 settings_tab;Settings
 app_title;YAMPA - Yet Another Music Player App
 player_tab;Player
+show_upcoming_tracks;Show upcoming tracks
+show_track_image;Hide upcoming tracks
 playing_all_tracks;Playing all tracks
 select;Select
 add_to_playlists;Add to playlists
 add_to_favorites;Add to favorites
 info;Info
+play;Play
+pause;Pause
+remove_from_favorites;Remove from favorites
+add_to_favorites;Add to favorites
+track_removed_from_favorites;Track removed from favorites
+track_added_from_favorites;Track added to favorites
 add_to_favorites_question;Add to favorites?
 no;No
 yes;Yes
 search;Search
 selected_count;{} selected
 add_to_playlist;Add to playlist
+save_to_playlist;Save to playlist
 all_tracks_title;All Tracks
 reload_tracks_tooltip;Re-load tracks
 no_tracks_found;No tracks found. Go to the Added Paths tab to add some!
@@ -50,6 +59,8 @@ remove_from_playlist_question;Remove from playlist?
 delete;Delete
 export;Export
 new_playlist;New playlist
+new_playlist_name;New Playlist
+add;Add
 added_paths_title;Added Paths
 delete_paths_question;Delete {} path(s)?
 delete_paths_content;This will stop tracking the selected path(s). Are you sure?
@@ -80,9 +91,22 @@ times_skipped;Times Skipped
 times_completed;Times Completed
 total_play_time;Total Play Time
 error_loading_stats;Error loading stats: {}
+playback_speed;Playback speed
+forward_seconds;Forward {} seconds
+backward_seconds;Back {} seconds
+create_audio_clip;Create audio clip
 close;Close
 save;Save
 remove_image;Remove Image
+loop_mode_single;Replaying a single song
+loop_mode_playlist;Replaying playlist
+loop_mode_start_to_end;Playing playlist from start to end
+loop_mode_none;Not replaying
+loop_mode_changed;Replay mode: {}
+shuffle_mode_disabled;Shuffle disabled
+shuffle_mode_randomized;Randomized
+shuffle_mode_recommended;Recommended
+shuffle_mode_changed;Shuffle mode: {}
 select_another_image;Select another image
 remove_from_playlist;Remove from playlist
 export_this_playlist_tooltip;Export this playlist

@@ -31,6 +31,10 @@ class LocalizationKeys {
   static const String appTitle = 'app_title';
   static const String playerTab = 'player_tab';
 
+  // Player Display Mode
+  static const String showUpcomingTracks = 'show_upcoming_tracks';
+  static const String showTrackImage = 'show_track_image';
+
   // Player & Tracks
   static const String playingAllTracks = 'playing_all_tracks';
   static const String select = 'select';
@@ -43,6 +47,12 @@ class LocalizationKeys {
   static const String search = 'search';
   static const String selectedCount = 'selected_count'; // Requires parameter
   static const String addToPlaylist = 'add_to_playlist';
+  static const String saveToPlaylist = 'save_to_playlist';
+  static const String play = 'play';
+  static const String pause = 'pause';
+  static const String removeFromFavorites = 'remove_from_favorites';
+  static const String trackRemovedFromFavorites = 'track_removed_from_favorites';
+  static const String trackAddedFromFavorites = 'track_added_from_favorites';
   static const String allTracksTitle = 'all_tracks_title';
   static const String reloadTracksTooltip = 'reload_tracks_tooltip';
   static const String noTracksFound = 'no_tracks_found';
@@ -57,6 +67,8 @@ class LocalizationKeys {
   static const String delete = 'delete';
   static const String export = 'export';
   static const String newPlaylist = 'new_playlist';
+  static const String newPlaylistName = 'new_playlist_name';
+  static const String add = 'add';
   static const String deleteSelectedPlaylists = 'delete_selected_playlists';
   static const String removeSelectedTracks = 'remove_selected_tracks';
   static const String selectAnotherImage = 'select_another_image';
@@ -104,9 +116,24 @@ class LocalizationKeys {
   static const String timesCompleted = 'times_completed';
   static const String totalPlayTime = 'total_play_time';
   static const String errorLoadingStats = 'error_loading_stats';
+  static const String playbackSpeed = 'playback_speed';
+  static const String forwardSeconds = 'forward_seconds'; // Requires parameter
+  static const String backwardSeconds = 'backward_seconds'; // Requires parameter
+  static const String createAudioClip = 'create_audio_clip';
   static const String close = 'close';
   static const String save = 'save';
   static const String removeImage = 'remove_image';
+
+  // Loop & Shuffle Modes
+  static const String loopModeSingle = 'loop_mode_single';
+  static const String loopModePlaylist = 'loop_mode_playlist';
+  static const String loopModeStartToEnd = 'loop_mode_start_to_end';
+  static const String loopModeNone = 'loop_mode_none';
+  static const String loopModeChanged = 'loop_mode_changed'; // Requires parameter
+  static const String shuffleModeDisabled = 'shuffle_mode_disabled';
+  static const String shuffleModeRandomized = 'shuffle_mode_randomized';
+  static const String shuffleModeRecommended = 'shuffle_mode_recommended';
+  static const String shuffleModeChanged = 'shuffle_mode_changed'; // Requires parameter
 
   // Sort Modes
   static const String sortTitleAZ = 'sort_title_az';

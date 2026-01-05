@@ -5,6 +5,8 @@ import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/providers/selected_tracks_provider.dart';
 import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class PlaylistButton extends ConsumerWidget {
   const PlaylistButton({super.key});
@@ -25,7 +27,9 @@ class PlaylistButton extends ConsumerWidget {
     final tracks = ref.watch(playerControllerProvider.select((p) => p.tracks));
     return IconButton(
       icon: const Icon(Icons.playlist_add),
-      tooltip: 'Save to playlist',
+      tooltip: ref.read(localizationProvider.notifier).translate(
+        LocalizationKeys.saveToPlaylist,
+      ),
       onPressed: () async {
         if (currentTrackId == null) {
           return;

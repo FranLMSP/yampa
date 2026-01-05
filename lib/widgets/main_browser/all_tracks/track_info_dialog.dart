@@ -380,7 +380,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                   },
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Text("${ref.read(localizationProvider.notifier).translate(LocalizationKeys.errorLoadingStats).replaceFirst('{}', e.toString())}"),
+                  error: (e, _) => Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.errorLoadingStats).replaceFirst('{}', e.toString())),
                 ),
               ],
             ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class NextButton extends ConsumerWidget {
   const NextButton({super.key});
@@ -16,6 +18,9 @@ class NextButton extends ConsumerWidget {
       },
       icon: const Icon(Icons.skip_next),
       iconSize: 32,
+      tooltip: ref.read(localizationProvider.notifier).translate(
+        LocalizationKeys.next,
+      ),
     );
   }
 }
