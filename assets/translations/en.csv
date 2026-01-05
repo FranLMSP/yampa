@@ -1,0 +1,22 @@
+settings;Settings
+statistics;Statistics
+statistics_subtitle;View player and track statistics
+theme;Theme
+theme_subtitle;Customize the look and feel of the app
+language;Language
+language_subtitle;Change the application language
+player_statistics;Player Statistics
+total_playback_time;Total Playback Time
+total_tracks_played;Total Tracks Played
+unique_tracks_played;Unique Tracks Played
+total_uptime;Total Uptime
+times_started;Times Started
+total_skips;Total Skips
+last_played;Last Played
+error_loading_statistics;Error loading statistics
+system;System
+light;Light
+dark;Dark
+select_language;Select Language
+en;English
+es;Spanish
