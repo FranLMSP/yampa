@@ -9,6 +9,8 @@ import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/providers/selected_tracks_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_item_list.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class AddToPlaylistDialog extends ConsumerStatefulWidget {
   const AddToPlaylistDialog({super.key});
@@ -24,7 +26,9 @@ class _AddToPlaylistDialogState extends ConsumerState<AddToPlaylistDialog> {
   Future<void> _createNewPlaylist(WidgetRef ref) async {
     final newPlaylist = Playlist(
       id: "temp",
-      name: 'New Playlist',
+      name: ref.read(localizationProvider.notifier).translate(
+        LocalizationKeys.newPlaylistName,
+      ),
       description: '',
       trackIds: [],
       sortMode: SortMode.titleAtoZ,
@@ -55,7 +59,11 @@ class _AddToPlaylistDialogState extends ConsumerState<AddToPlaylistDialog> {
 
     return AlertDialog(
       scrollable: true,
-      title: const Text('Playlists'),
+      title: Text(
+        ref.read(localizationProvider.notifier).translate(
+          LocalizationKeys.playlistsTab,
+        ),
+      ),
       content: Column(
         children: [
           ...playlists.map(
@@ -90,7 +98,11 @@ class _AddToPlaylistDialogState extends ConsumerState<AddToPlaylistDialog> {
           const SizedBox(height: 10),
           TextButton(
             onPressed: () => _createNewPlaylist(ref),
-            child: const Text('New playlist'),
+            child: Text(
+              ref.read(localizationProvider.notifier).translate(
+                LocalizationKeys.newPlaylist,
+              ),
+            ),
           ),
         ],
       ),
@@ -105,7 +117,11 @@ class _AddToPlaylistDialogState extends ConsumerState<AddToPlaylistDialog> {
               Navigator.of(context).pop();
             }
           },
-          child: const Text('Cancel'),
+          child: Text(
+            ref.read(localizationProvider.notifier).translate(
+              LocalizationKeys.cancel,
+            ),
+          ),
         ),
         TextButton(
           onPressed: () async {
@@ -127,7 +143,11 @@ class _AddToPlaylistDialogState extends ConsumerState<AddToPlaylistDialog> {
               Navigator.of(context).pop();
             }
           },
-          child: const Text('Add'),
+          child: Text(
+            ref.read(localizationProvider.notifier).translate(
+              LocalizationKeys.add,
+            ),
+          ),
         ),
       ],
     );

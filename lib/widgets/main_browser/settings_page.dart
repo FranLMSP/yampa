@@ -5,8 +5,10 @@ import 'package:yampa/core/utils/format_utils.dart';
 import 'package:yampa/models/user_settings.dart';
 import 'package:yampa/providers/statistics_provider.dart';
 import 'package:yampa/providers/theme_mode_provider.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   Widget _buildSettingsOption({
@@ -29,21 +31,27 @@ class SettingsPage extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: ListView(
         children: [
           Padding(
             padding: const EdgeInsets.all(10),
-            child: const Text(
-              'Settings',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            child: Text(
+              ref
+                  .read(localizationProvider.notifier)
+                  .translate(LocalizationKeys.settings),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
           _buildSettingsOption(
             context: context,
-            title: 'Statistics',
-            subtitle: 'View player and track statistics',
+            title: ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.statistics),
+            subtitle: ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.statisticsSubtitle),
             icon: Icons.bar_chart,
             onTap: () {
               Navigator.push(
@@ -56,13 +64,35 @@ class SettingsPage extends StatelessWidget {
           ),
           _buildSettingsOption(
             context: context,
-            title: 'Theme',
-            subtitle: 'Customize the look and feel of the app',
+            title: ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.theme),
+            subtitle: ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.themeSubtitle),
             icon: Icons.brush,
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const UserThemePage()),
+              );
+            },
+          ),
+          _buildSettingsOption(
+            context: context,
+            title: ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.language),
+            subtitle: ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.languageSubtitle),
+            icon: Icons.language,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LanguageSelectionPage(),
+                ),
               );
             },
           ),
@@ -91,45 +121,65 @@ class PlayerStatisticsPage extends ConsumerWidget {
     final playerStatsAsync = ref.watch(playerStatisticsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Player Statistics')),
+      appBar: AppBar(
+        title: Text(
+          ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.playerStatistics),
+        ),
+      ),
       body: playerStatsAsync.when(
         data: (stats) {
           return ListView(
             children: [
               _buildStatCard(
-                'Total Playback Time',
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.totalPlaybackTime),
                 formatDurationLong(
                   Duration(seconds: (stats.totalMinutesPlayed * 60).round()),
                 ),
                 Icons.access_time,
               ),
               _buildStatCard(
-                'Total Tracks Played',
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.totalTracksPlayed),
                 formatCount(stats.totalTracksPlayed),
                 Icons.music_note,
               ),
               _buildStatCard(
-                'Unique Tracks Played',
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.uniqueTracksPlayed),
                 formatCount(stats.totalUniqueTracksPlayed),
                 Icons.library_music,
               ),
               _buildStatCard(
-                'Total Uptime',
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.totalUptime),
                 formatDurationLong(stats.uptime),
                 Icons.timer,
               ),
               _buildStatCard(
-                'Times Started',
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.timesStarted),
                 formatCount(stats.timesStarted),
                 Icons.play_circle_outline,
               ),
               _buildStatCard(
-                'Total Skips',
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.totalSkips),
                 formatCount(stats.totalSkips),
                 Icons.skip_next,
               ),
               _buildStatCard(
-                'Last Played',
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.lastPlayed),
                 formatTimestamp(stats.lastPlayedAt),
                 Icons.schedule,
               ),
@@ -150,7 +200,9 @@ class PlayerStatisticsPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Error loading statistics',
+                  ref
+                      .read(localizationProvider.notifier)
+                      .translate(LocalizationKeys.errorLoadingStatistics),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
@@ -207,7 +259,13 @@ class _UserThemePageState extends ConsumerState<UserThemePage> {
   Widget build(BuildContext context) {
     _loadUserTheme();
     return Scaffold(
-      appBar: AppBar(title: const Text('Theme')),
+      appBar: AppBar(
+        title: Text(
+          ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.theme),
+        ),
+      ),
       body: RadioGroup(
         groupValue: _userThemeMode,
         onChanged: _setTheme,
@@ -215,18 +273,84 @@ class _UserThemePageState extends ConsumerState<UserThemePage> {
           children: [
             ListTile(
               leading: Radio(value: UserThemeMode.system),
-              title: Text("System"),
+              title: Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.system),
+              ),
               onTap: () => _setTheme(UserThemeMode.system),
             ),
             ListTile(
               leading: Radio(value: UserThemeMode.light),
-              title: Text("Light"),
+              title: Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.light),
+              ),
               onTap: () => _setTheme(UserThemeMode.light),
             ),
             ListTile(
               leading: Radio(value: UserThemeMode.dark),
-              title: Text("Dark"),
+              title: Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.dark),
+              ),
               onTap: () => _setTheme(UserThemeMode.dark),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LanguageSelectionPage extends ConsumerWidget {
+  const LanguageSelectionPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentLanguage = ref.watch(localizationProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.selectLanguage),
+        ),
+      ),
+      body: RadioGroup<String>(
+        groupValue: currentLanguage,
+        onChanged: (value) =>
+            ref.read(localizationProvider.notifier).setLanguage(value!),
+        child: ListView(
+          children: [
+            ListTile(
+              leading: const Radio<String>(
+                value: LocalizationKeys.en,
+              ),
+              title: Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.en),
+              ),
+              onTap: () => ref
+                  .read(localizationProvider.notifier)
+                  .setLanguage(LocalizationKeys.en),
+            ),
+            ListTile(
+              leading: const Radio<String>(
+                value: LocalizationKeys.es,
+              ),
+              title: Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.es),
+              ),
+              onTap: () => ref
+                  .read(localizationProvider.notifier)
+                  .setLanguage(LocalizationKeys.es),
             ),
           ],
         ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class VolumeControls extends ConsumerStatefulWidget {
   const VolumeControls({super.key});
@@ -28,7 +30,7 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Master Volume", style: Theme.of(context).textTheme.titleLarge),
+          Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.masterVolume), style: Theme.of(context).textTheme.titleLarge),
           Row(
             children: [
               const Icon(Icons.volume_mute),
@@ -50,13 +52,13 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
             ],
           ),
           const SizedBox(height: 24),
-          Text("Equalizer", style: Theme.of(context).textTheme.titleLarge),
+          Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.equalizer), style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
           if (_equalizerGains.isEmpty)
-            const Expanded(
+            Expanded(
               child: Center(
                 child: Text(
-                  "Equalizer not available for the current backend or platform.",
+                  ref.read(localizationProvider.notifier).translate(LocalizationKeys.equalizerNotAvailable),
                 ),
               ),
             )
@@ -93,7 +95,7 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
                           ),
                         ),
                         Text("${_equalizerGains[index].toStringAsFixed(1)} dB"),
-                        Text("Band ${index + 1}"),
+                        Text("${ref.read(localizationProvider.notifier).translate(LocalizationKeys.band)} ${index + 1}"),
                       ],
                     ),
                   );
@@ -110,7 +112,7 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
                 ref.read(playerControllerProvider.notifier).restoreDefaults();
               },
               icon: const Icon(Icons.restore),
-              label: const Text("Restore defaults"),
+              label: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.restoreDefaults)),
             ),
           ),
         ],

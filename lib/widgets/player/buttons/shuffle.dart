@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/widgets/utils.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class ShuffleButton extends ConsumerWidget {
   const ShuffleButton({super.key});
@@ -16,20 +18,37 @@ class ShuffleButton extends ConsumerWidget {
     return iconMap[shuffleMode]!;
   }
 
-  String _getTooltopMessage(ShuffleMode shuffleMode) {
+  String _getShuffleModeLabel(
+    ShuffleMode shuffleMode,
+    LocalizationNotifier notifier,
+  ) {
     final shuffleModeMap = {
-      ShuffleMode.sequential: "Shuffle disabled",
-      ShuffleMode.random: "Randomized",
-      ShuffleMode.randomBasedOnHistory: "Recommended",
+      ShuffleMode.sequential: LocalizationKeys.shuffleModeDisabled,
+      ShuffleMode.random: LocalizationKeys.shuffleModeRandomized,
+      ShuffleMode.randomBasedOnHistory: LocalizationKeys.shuffleModeRecommended,
     };
-    return "Shuffle mode: ${shuffleModeMap[shuffleMode]!}";
+    return notifier.translate(shuffleModeMap[shuffleMode]!);
+  }
+
+  String _getTooltipMessage(
+    ShuffleMode shuffleMode,
+    LocalizationNotifier notifier,
+  ) {
+    final label = _getShuffleModeLabel(shuffleMode, notifier);
+    return notifier.translate(LocalizationKeys.shuffleModeChanged).replaceFirst(
+      '{}',
+      label,
+    );
   }
 
   Future<void> _toggleShuffleMode(
     PlayerControllerNotifier playerControllerNotifier,
+    LocalizationNotifier localizationNotifier,
   ) async {
     final newShuffleMode = await playerControllerNotifier.toggleShuffleMode();
-    await showButtonActionMessage(_getTooltopMessage(newShuffleMode));
+    await showButtonActionMessage(
+      _getTooltipMessage(newShuffleMode, localizationNotifier),
+    );
   }
 
   @override
@@ -40,11 +59,15 @@ class ShuffleButton extends ConsumerWidget {
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,
     );
+    final localizationNotifier = ref.read(localizationProvider.notifier);
     return IconButton(
       icon: Icon(_getIcon(shuffleMode)),
-      tooltip: _getTooltopMessage(shuffleMode),
+      tooltip: _getTooltipMessage(shuffleMode, localizationNotifier),
       onPressed: () async {
-        await _toggleShuffleMode(playerControllerNotifier);
+        await _toggleShuffleMode(
+          playerControllerNotifier,
+          localizationNotifier,
+        );
       },
     );
   }

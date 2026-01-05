@@ -14,6 +14,8 @@ import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/theme_mode_provider.dart';
 import 'package:yampa/providers/sort_mode_provider.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 import 'package:yampa/widgets/main_browser/main.dart';
 import 'package:yampa/widgets/main_page_loader.dart';
 import 'package:yampa/widgets/player/big_player.dart';
@@ -74,6 +76,9 @@ class _MyAppState extends ConsumerState<MyApp> {
     ref
         .read(allTracksSortModeProvider.notifier)
         .setSortMode(userSettings.defaultSortMode);
+    await ref
+        .read(localizationProvider.notifier)
+        .init(userSettings.languageCode);
     await userSettingsRepo.close();
     _initialLoadDone = true;
   }
@@ -84,10 +89,12 @@ class _MyAppState extends ConsumerState<MyApp> {
     final themeMode = getMaterialThemeFromUserTheme(
       ref.watch(themeModeProvider),
     );
+    final _ = ref.watch(localizationProvider); // Rebuild when language changes
     return MaterialApp(
-      title: 'YAMPA - Yet Another Music Player App',
+      title: ref.read(localizationProvider.notifier).translate(LocalizationKeys.appTitle),
       darkTheme: ThemeData.dark(),
       themeMode: themeMode,
+      locale: Locale(ref.watch(localizationProvider)),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),

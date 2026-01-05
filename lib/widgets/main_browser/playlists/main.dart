@@ -4,6 +4,8 @@ import 'package:yampa/models/playlist.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 import 'package:yampa/widgets/main_browser/playlists/common.dart';
 import 'package:yampa/widgets/main_browser/playlists/new_playlist_dialog.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_list_big.dart';
@@ -39,7 +41,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
 
     if (isMultiSelecting) {
       return AppBar(
-        title: Text('${_selectedPlaylistIds.length} selected'),
+        title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.selectedCount).replaceFirst('{}', _selectedPlaylistIds.length.toString())),
         leading: IconButton(
           icon: Icon(Icons.close),
           onPressed: () => setState(() => _selectedPlaylistIds = []),
@@ -53,7 +55,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
                   .toList();
               handlePlaylistsExport(selectedPlaylists);
             },
-            tooltip: 'Export selected',
+            tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.exportSelected),
           ),
           IconButton(
             icon: Icon(Icons.delete),
@@ -68,7 +70,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
                 () => setState(() => _selectedPlaylistIds = []),
               );
             },
-            tooltip: 'Delete selected',
+            tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.deleteSelected),
           ),
         ],
       );
@@ -88,7 +90,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
     }
 
     return AppBar(
-      title: Text('Playlists'),
+      title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.playlistsTab)),
       actions: [
         IconButton(
           icon: Icon(Icons.add_circle_outline),
@@ -110,21 +112,21 @@ class _PlaylistsState extends ConsumerState<Playlists> {
               },
             );
           },
-          tooltip: 'New Playlist',
+          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.newPlaylistTooltip),
         ),
         IconButton(
           icon: Icon(Icons.file_download),
           onPressed: () async {
             await handlePlaylistsImport(playlistNotifier, allPlaylists);
           },
-          tooltip: 'Import Playlists',
+          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.importPlaylistsTooltip),
         ),
         IconButton(
           icon: Icon(Icons.file_upload),
           onPressed: () {
             handlePlaylistsExport(allPlaylists);
           },
-          tooltip: 'Export All',
+          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.exportAllTooltip),
         ),
       ],
     );
@@ -143,16 +145,16 @@ class _PlaylistsState extends ConsumerState<Playlists> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Remove from playlist?'),
+              title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.removeFromPlaylistQuestion)),
               actions: <Widget>[
                 TextButton(
-                  child: const Text('No'),
+                  child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.no)),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 TextButton(
-                  child: const Text('Yes'),
+                  child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.yes)),
                   onPressed: () {
                     setState(() {
                       handleMultipleTrackRemovedFromPlaylist(
@@ -214,7 +216,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
               children: [
                 Icon(Icons.delete),
                 SizedBox(width: 12),
-                Text('Delete'),
+                Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.delete)),
               ],
             ),
           ),
@@ -224,7 +226,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
             children: [
               Icon(Icons.check_box),
               SizedBox(width: 12),
-              Text('Select'),
+              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.select)),
             ],
           ),
         ),
@@ -234,7 +236,7 @@ class _PlaylistsState extends ConsumerState<Playlists> {
             children: [
               Icon(Icons.file_upload),
               SizedBox(width: 12),
-              Text('Export'),
+              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.export)),
             ],
           ),
         ),

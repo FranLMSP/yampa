@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class BackwardSecondsButton extends ConsumerWidget {
   const BackwardSecondsButton({super.key});
@@ -29,7 +31,9 @@ class BackwardSecondsButton extends ConsumerWidget {
 
     return IconButton(
       icon: const Icon(Icons.replay_10),
-      tooltip: 'Back 10 seconds',
+      tooltip: ref.read(localizationProvider.notifier).translate(
+        LocalizationKeys.backwardSeconds,
+      ).replaceFirst('{}', '10'),
       onPressed: () async {
         _backward(ref, currentTrackId);
       },

@@ -8,6 +8,7 @@ const defaultSortModeKey = "defaultSortMode";
 const lastWindowWidthKey = "lastWindowWidth";
 const lastWindowHeightKey = "lastWindowHeight";
 const userThemeModeKey = "userThemeModeKey";
+const userLanguageKey = "userLanguageKey";
 
 SharedPreferencesAsync _getPrefs() {
   // change preferences here if necessary
@@ -21,6 +22,7 @@ class UserSettingsDataSharedPreferences extends UserSettingsData {
       defaultSortMode: await getDefaultSortMode(),
       lastWindowSize: await getLastWindowSize(),
       themeMode: await getUserTheme(),
+      languageCode: await getUserLanguage(),
     );
   }
 
@@ -57,6 +59,17 @@ class UserSettingsDataSharedPreferences extends UserSettingsData {
   }
 
   @override
+  Future<void> saveUserLanguage(String? languageCode) async {
+    final prefs = _getPrefs();
+
+    if (languageCode != null) {
+      await prefs.setString(userLanguageKey, languageCode);
+    } else {
+      await prefs.remove(userLanguageKey);
+    }
+  }
+
+  @override
   Future<SortMode> getDefaultSortMode() async {
     final prefs = _getPrefs();
 
@@ -89,6 +102,13 @@ class UserSettingsDataSharedPreferences extends UserSettingsData {
       return WindowSize(width: lastWindowWidth, height: lastWindowHeight);
     }
     return null;
+  }
+
+  @override
+  Future<String?> getUserLanguage() async {
+    final prefs = _getPrefs();
+
+    return await prefs.getString(userLanguageKey);
   }
 
   @override

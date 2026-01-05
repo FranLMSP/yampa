@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class PlayerDisplayModeButton extends ConsumerWidget {
   const PlayerDisplayModeButton({super.key});
@@ -14,6 +16,7 @@ class PlayerDisplayModeButton extends ConsumerWidget {
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,
     );
+    final localizationNotifier = ref.read(localizationProvider.notifier);
 
     return IconButton(
       icon: Icon(
@@ -22,8 +25,8 @@ class PlayerDisplayModeButton extends ConsumerWidget {
             : Icons.image,
       ),
       tooltip: trackQueueDisplayMode == TrackQueueDisplayMode.image
-          ? "Show upcoming tracks"
-          : "Show track image",
+          ? localizationNotifier.translate(LocalizationKeys.showUpcomingTracks)
+          : localizationNotifier.translate(LocalizationKeys.showTrackImage),
       onPressed: () async {
         final newMode = trackQueueDisplayMode == TrackQueueDisplayMode.image
             ? TrackQueueDisplayMode.list

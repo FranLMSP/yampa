@@ -23,6 +23,8 @@ import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/core/utils/sort_utils.dart';
 import 'package:yampa/widgets/common/sort_button.dart';
 import 'package:yampa/widgets/utils.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 enum ImageTabOptions { changeImage, removeImage }
 
@@ -117,23 +119,23 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
         Offset.zero & overlay.size,
       ),
       items: <PopupMenuEntry<ImageTabOptions>>[
-        const PopupMenuItem<ImageTabOptions>(
+        PopupMenuItem<ImageTabOptions>(
           value: ImageTabOptions.changeImage,
           child: Row(
             children: [
               Icon(Icons.image),
               SizedBox(width: 12),
-              Text('Select another image'),
+              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.selectAnotherImage)),
             ],
           ),
         ),
-        const PopupMenuItem<ImageTabOptions>(
+        PopupMenuItem<ImageTabOptions>(
           value: ImageTabOptions.removeImage,
           child: Row(
             children: [
               Icon(Icons.delete),
               SizedBox(width: 12),
-              Text('Remove image'),
+              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.removeImage)),
             ],
           ),
         ),
@@ -167,30 +169,30 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
         );
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
-        const PopupMenuItem<OptionSelected>(
+        PopupMenuItem<OptionSelected>(
           value: OptionSelected.select,
           child: Row(
             children: [
               Icon(Icons.check_box),
               SizedBox(width: 12),
-              Text('Select'),
+              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.select)),
             ],
           ),
         ),
-        const PopupMenuItem<OptionSelected>(
+        PopupMenuItem<OptionSelected>(
           value: OptionSelected.removeFromPlaylist,
           child: Row(
             children: [
               Icon(Icons.playlist_remove),
               SizedBox(width: 12),
-              Text('Remove from playlist'),
+              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.removeFromPlaylist)),
             ],
           ),
         ),
-        const PopupMenuItem<OptionSelected>(
+        PopupMenuItem<OptionSelected>(
           value: OptionSelected.info,
           child: Row(
-            children: [Icon(Icons.info), SizedBox(width: 12), Text('Info')],
+            children: [Icon(Icons.info), SizedBox(width: 12), Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.info))],
           ),
         ),
       ],
@@ -287,7 +289,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                     onPressed: () {
                       handlePlaylistsExport([selectedPlaylist]);
                     },
-                    tooltip: "Export this playlist",
+                    tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.exportThisPlaylistTooltip),
                     icon: const Icon(Icons.file_upload),
                   ),
                   if (selectedPlaylist.id != favoritePlaylistId)
@@ -300,7 +302,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                           () => widget.onGoBack(),
                         );
                       },
-                      tooltip: "Delete this playlist",
+                      tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.deleteThisPlaylistTooltip),
                       icon: const Icon(Icons.delete),
                     ),
                 ],
@@ -328,7 +330,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             TextField(
               controller: _titleController,
               readOnly: selectedPlaylist.id == favoritePlaylistId,
-              decoration: const InputDecoration(labelText: 'Title'),
+              decoration: InputDecoration(labelText: ref.read(localizationProvider.notifier).translate(LocalizationKeys.titleLabel)),
               onTapOutside: (text) {
                 final editedPlaylist = Playlist(
                   id: selectedPlaylist.id,
@@ -344,7 +346,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             const SizedBox(height: 8),
             TextField(
               controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Description'),
+              decoration: InputDecoration(labelText: ref.read(localizationProvider.notifier).translate(LocalizationKeys.descriptionLabel)),
               onTapOutside: (text) {
                 final editedPlaylist = Playlist(
                   id: selectedPlaylist.id,
@@ -360,7 +362,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             const SizedBox(height: 24),
             if (selectedPlaylist.trackIds.isNotEmpty)
               SizedBox(
-                width: 150,
+                width: 160,
                 child: ElevatedButton(
                   onPressed: () async {
                     if (selectedPlaylist.trackIds.isNotEmpty) {
@@ -378,7 +380,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Icon(Icons.play_arrow),
-                      Text("Play (${selectedPlaylist.trackIds.length})"),
+                      Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.playCount).replaceFirst('{}', selectedPlaylist.trackIds.length.toString())),
                     ],
                   ),
                 ),

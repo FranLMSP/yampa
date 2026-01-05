@@ -18,10 +18,12 @@ class UserSettings {
   final SortMode defaultSortMode;
   final WindowSize? lastWindowSize;
   final UserThemeMode? themeMode;
+  final String? languageCode;
 
   UserSettings({
     this.defaultSortMode = SortMode.titleAtoZ,
     this.themeMode = UserThemeMode.system,
     this.lastWindowSize,
+    this.languageCode,
   });
 }

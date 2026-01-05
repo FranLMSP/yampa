@@ -10,6 +10,8 @@ import 'package:yampa/providers/statistics_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/widgets/common/display_track_title.dart';
 import 'package:yampa/widgets/utils.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class TrackInfoDialog extends ConsumerStatefulWidget {
   const TrackInfoDialog({super.key, required this.track});
@@ -71,7 +73,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           Text(
-            value.isEmpty ? "Unknown" : value,
+            value.isEmpty ? ref.read(localizationProvider.notifier).translate(LocalizationKeys.unknown) : value,
             textAlign: TextAlign.right,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -92,7 +94,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
           ),
           Expanded(
             child: Text(
-              value.isEmpty ? "Unknown" : value,
+              value.isEmpty ? ref.read(localizationProvider.notifier).translate(LocalizationKeys.unknown) : value,
               textAlign: TextAlign.right,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -264,7 +266,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                     child: TextButton(
                       onPressed: () => setState(() => _imageBytes = null),
                       child: Text(
-                        "Remove Image",
+                        ref.read(localizationProvider.notifier).translate(LocalizationKeys.removeImage),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.error,
                         ),
@@ -273,7 +275,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                   ),
                 const SizedBox(height: 24),
                 Text(
-                  "Metadata",
+                  ref.read(localizationProvider.notifier).translate(LocalizationKeys.metadata),
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -282,38 +284,38 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                 const SizedBox(height: 8),
 
                 if (_isEditing) ...[
-                  _buildEditableRow('Title', _titleCtrl, viewMode),
-                  _buildEditableRow('Artist', _artistCtrl, viewMode),
-                  _buildEditableRow('Album', _albumCtrl, viewMode),
-                  _buildEditableRow('Genre', _genreCtrl, viewMode),
+                  _buildEditableRow(ref.read(localizationProvider.notifier).translate(LocalizationKeys.title), _titleCtrl, viewMode),
+                  _buildEditableRow(ref.read(localizationProvider.notifier).translate(LocalizationKeys.artist), _artistCtrl, viewMode),
+                  _buildEditableRow(ref.read(localizationProvider.notifier).translate(LocalizationKeys.album), _albumCtrl, viewMode),
+                  _buildEditableRow(ref.read(localizationProvider.notifier).translate(LocalizationKeys.genre), _genreCtrl, viewMode),
                   _buildEditableRow(
-                    'Track #',
+                    ref.read(localizationProvider.notifier).translate(LocalizationKeys.trackNumber),
                     _trackNumCtrl,
                     keyboardType: TextInputType.number,
                     viewMode,
                   ),
                 ] else ...[
-                  _buildInfoRow('Title', widget.track.title, true, viewMode),
-                  _buildInfoRow('Artist', widget.track.artist, true, viewMode),
-                  _buildInfoRow('Album', widget.track.album, true, viewMode),
-                  _buildInfoRow('Genre', widget.track.genre, true, viewMode),
+                  _buildInfoRow(ref.read(localizationProvider.notifier).translate(LocalizationKeys.title), widget.track.title, true, viewMode),
+                  _buildInfoRow(ref.read(localizationProvider.notifier).translate(LocalizationKeys.artist), widget.track.artist, true, viewMode),
+                  _buildInfoRow(ref.read(localizationProvider.notifier).translate(LocalizationKeys.album), widget.track.album, true, viewMode),
+                  _buildInfoRow(ref.read(localizationProvider.notifier).translate(LocalizationKeys.genre), widget.track.genre, true, viewMode),
                   _buildInfoRow(
-                    'Duration',
+                    ref.read(localizationProvider.notifier).translate(LocalizationKeys.duration),
                     formatDuration(widget.track.duration),
                     true,
                     viewMode,
                   ),
                   _buildInfoRow(
-                    'Track Number',
+                    ref.read(localizationProvider.notifier).translate(LocalizationKeys.trackNumber),
                     widget.track.trackNumber.toString(),
                     true,
                     viewMode,
                   ),
                 ],
-                _buildInfoRow('Path', widget.track.path, true, viewMode),
+                _buildInfoRow(ref.read(localizationProvider.notifier).translate(LocalizationKeys.path), widget.track.path, true, viewMode),
                 const SizedBox(height: 24),
                 Text(
-                  "Statistics",
+                  ref.read(localizationProvider.notifier).translate(LocalizationKeys.statistics),
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -327,7 +329,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Text(
-                          'No statistics yet - play this track to start tracking!',
+                          ref.read(localizationProvider.notifier).translate(LocalizationKeys.noStatisticsYet),
                           style: TextStyle(
                             fontStyle: FontStyle.italic,
                             color: Theme.of(
@@ -340,25 +342,25 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                     return Column(
                       children: [
                         _buildInfoRow(
-                          'Times Played',
+                          ref.read(localizationProvider.notifier).translate(LocalizationKeys.timesPlayed),
                           formatCount(stats.timesPlayed),
                           false,
                           viewMode,
                         ),
                         _buildInfoRow(
-                          'Times Skipped',
+                          ref.read(localizationProvider.notifier).translate(LocalizationKeys.timesSkipped),
                           formatCount(stats.timesSkipped),
                           false,
                           viewMode,
                         ),
                         _buildInfoRow(
-                          'Times Completed',
+                          ref.read(localizationProvider.notifier).translate(LocalizationKeys.timesCompleted),
                           formatCount(stats.completionCount),
                           false,
                           viewMode,
                         ),
                         _buildInfoRow(
-                          'Total Play Time',
+                          ref.read(localizationProvider.notifier).translate(LocalizationKeys.totalPlayTime),
                           formatDurationLong(
                             Duration(
                               seconds: (stats.minutesPlayed * 60).round(),
@@ -368,7 +370,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                           viewMode,
                         ),
                         _buildInfoRow(
-                          'Last Played',
+                          ref.read(localizationProvider.notifier).translate(LocalizationKeys.lastPlayed),
                           formatTimestamp(stats.lastPlayedAt),
                           false,
                           viewMode,
@@ -378,7 +380,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
                   },
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Text("Error loading stats: $e"),
+                  error: (e, _) => Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.errorLoadingStats).replaceFirst('{}', e.toString())),
                 ),
               ],
             ),
@@ -386,10 +388,10 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
+              child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.close)),
             ),
             if (_isEditing)
-              ElevatedButton(onPressed: _handleSave, child: const Text("Save")),
+              ElevatedButton(onPressed: _handleSave, child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.save))),
           ],
         );
       },

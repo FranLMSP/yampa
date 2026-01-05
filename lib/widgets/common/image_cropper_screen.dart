@@ -2,17 +2,20 @@ import 'dart:typed_data';
 
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
-class ImageCropperScreen extends StatefulWidget {
+class ImageCropperScreen extends ConsumerStatefulWidget {
   final Uint8List imageData;
 
   const ImageCropperScreen({super.key, required this.imageData});
 
   @override
-  State<ImageCropperScreen> createState() => _ImageCropperScreenState();
+  ConsumerState<ImageCropperScreen> createState() => _ImageCropperScreenState();
 }
 
-class _ImageCropperScreenState extends State<ImageCropperScreen> {
+class _ImageCropperScreenState extends ConsumerState<ImageCropperScreen> {
   final _controller = CropController();
   bool _isCropping = false;
 
@@ -20,7 +23,7 @@ class _ImageCropperScreenState extends State<ImageCropperScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crop Image'),
+        title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.cropImage)),
         actions: [
           if (_isCropping)
             const Center(

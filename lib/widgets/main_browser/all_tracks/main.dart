@@ -19,6 +19,8 @@ import 'package:yampa/providers/sort_mode_provider.dart';
 import 'package:yampa/core/utils/sort_utils.dart';
 import 'package:yampa/widgets/common/sort_button.dart';
 import 'package:yampa/widgets/utils.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 enum OptionSelected {
   select,
@@ -75,40 +77,40 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         );
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<OptionSelected>>[
-        const PopupMenuItem<OptionSelected>(
+        PopupMenuItem<OptionSelected>(
           value: OptionSelected.select,
           child: Row(
             children: [
               Icon(Icons.check_box),
               SizedBox(width: 12),
-              Text('Select'),
+              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.select)),
             ],
           ),
         ),
-        const PopupMenuItem<OptionSelected>(
+        PopupMenuItem<OptionSelected>(
           value: OptionSelected.addToPlaylists,
           child: Row(
             children: [
               Icon(Icons.playlist_add),
               SizedBox(width: 12),
-              Text('Add to playlists'),
+              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.addToPlaylists)),
             ],
           ),
         ),
-        const PopupMenuItem<OptionSelected>(
+        PopupMenuItem<OptionSelected>(
           value: OptionSelected.addToFavorites,
           child: Row(
             children: [
               Icon(Icons.favorite),
               SizedBox(width: 12),
-              Text('Add to favorites'),
+              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.addToFavorites)),
             ],
           ),
         ),
-        const PopupMenuItem<OptionSelected>(
+        PopupMenuItem<OptionSelected>(
           value: OptionSelected.info,
           child: Row(
-            children: [Icon(Icons.info), SizedBox(width: 12), Text('Info')],
+            children: [Icon(Icons.info), SizedBox(width: 12), Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.info))],
           ),
         ),
       ],
@@ -127,13 +129,13 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
       context: context,
       builder: (BuildContext ctx) {
         return AlertDialog(
-          title: const Text('Add to favorites?'),
+          title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.addToFavoritesQuestion)),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No'),
+              child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.no)),
             ),
             TextButton(
               onPressed: () {
@@ -149,7 +151,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
                 selectedTracksNotifier.clear();
                 Navigator.of(context).pop();
               },
-              child: const Text('Yes'),
+              child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.yes)),
             ),
           ],
         );
@@ -233,7 +235,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
       title: TextField(
         autofocus: true,
         controller: _searchTextController,
-        decoration: const InputDecoration(labelText: 'Search'),
+        decoration: InputDecoration(labelText: ref.read(localizationProvider.notifier).translate(LocalizationKeys.search)),
         onChanged: (_) => setState(() => {}),
       ),
     );
@@ -259,11 +261,11 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
           selectedTracksNotifier.clear();
         },
       ),
-      title: Text('${selectedTracks.length} selected'),
+      title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.selectedCount).replaceFirst('{}', selectedTracks.length.toString())),
       actions: [
         IconButton(
           icon: const Icon(Icons.favorite),
-          tooltip: 'Add to favorites',
+          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.addToFavorites),
           onPressed: () {
             _addToFavoritesModal(
               context,
@@ -277,7 +279,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
         ),
         IconButton(
           icon: const Icon(Icons.playlist_add),
-          tooltip: 'Add to playlist',
+          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.addToPlaylist),
           onPressed: () {
             addToPlaylistsModal(
               context,
@@ -296,11 +298,11 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
   PreferredSizeWidget _buildDefaultAppBar(int tracksCount) {
     final sortMode = ref.watch(allTracksSortModeProvider);
     return AppBar(
-      title: Text('All Tracks ${tracksCount > 0 ? "($tracksCount)" : ""}'),
+      title: Text('${ref.read(localizationProvider.notifier).translate(LocalizationKeys.allTracksTitle)} ${tracksCount > 0 ? "($tracksCount)" : ""}'),
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh),
-          tooltip: "Re-load tracks",
+          tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.reloadTracksTooltip),
           onPressed: () {
             reloadTracks(
               ref.read(playerControllerProvider.notifier),
@@ -370,7 +372,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
 
     if (tracks.isEmpty) {
       return Center(
-        child: Text("No tracks found. Go to the Added Paths tab to add some!"),
+        child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.noTracksFound)),
       );
     }
     return Scaffold(

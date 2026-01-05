@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/playlist.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class NewPlaylistDialog extends ConsumerStatefulWidget {
   const NewPlaylistDialog({super.key, required this.onSaved});
@@ -19,14 +21,14 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: "New playlist");
+    _titleController = TextEditingController(text: ref.read(localizationProvider.notifier).translate(LocalizationKeys.newPlaylist));
     _descriptionController = TextEditingController(text: "");
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('New playlist'),
+      title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.newPlaylist)),
       scrollable: true,
       content: Column(
         children: [
@@ -34,14 +36,14 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
             autofocus: true,
             controller: _titleController,
             decoration: InputDecoration(
-              labelText: 'Title',
-              errorText: _isValid ? null : "Title can't be empty",
+              labelText: ref.read(localizationProvider.notifier).translate(LocalizationKeys.titleLabel),
+              errorText: _isValid ? null : ref.read(localizationProvider.notifier).translate(LocalizationKeys.titleEmptyError),
             ),
           ),
           const SizedBox(height: 8),
           TextField(
             controller: _descriptionController,
-            decoration: const InputDecoration(labelText: 'Description'),
+            decoration: InputDecoration(labelText: ref.read(localizationProvider.notifier).translate(LocalizationKeys.descriptionLabel)),
           ),
         ],
       ),
@@ -50,7 +52,7 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
           style: TextButton.styleFrom(
             textStyle: Theme.of(context).textTheme.labelLarge,
           ),
-          child: const Text('Cancel'),
+          child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.cancel)),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -59,7 +61,7 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
           style: TextButton.styleFrom(
             textStyle: Theme.of(context).textTheme.labelLarge,
           ),
-          child: const Text('Create'),
+          child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.create)),
           onPressed: () {
             setState(() {
               _isValid = _titleController.text.isNotEmpty;

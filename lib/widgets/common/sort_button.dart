@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/core/player/enums.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
-class SortButton extends StatelessWidget {
+class SortButton extends ConsumerWidget {
   final SortMode currentSortMode;
   final Function(SortMode) onSortModeChanged;
 
@@ -12,67 +15,68 @@ class SortButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(localizationProvider.notifier);
     return PopupMenuButton<SortMode>(
       initialValue: currentSortMode,
       icon: const Icon(Icons.sort),
       onSelected: onSortModeChanged,
       itemBuilder: (BuildContext context) => <PopupMenuEntry<SortMode>>[
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.titleAtoZ,
-          child: Text('Title (A-Z)'),
+          child: Text(notifier.translate(LocalizationKeys.sortTitleAZ)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.titleZtoA,
-          child: Text('Title (Z-A)'),
+          child: Text(notifier.translate(LocalizationKeys.sortTitleZA)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.mostPlayed,
-          child: Text('Most played to least played'),
+          child: Text(notifier.translate(LocalizationKeys.sortMostPlayed)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.leastPlayed,
-          child: Text('Least played to most played'),
+          child: Text(notifier.translate(LocalizationKeys.sortLeastPlayed)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.recentlyPlayed,
-          child: Text('Recently played (most recent first)'),
+          child: Text(notifier.translate(LocalizationKeys.sortRecentlyPlayed)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.leastRecentlyPlayed,
-          child: Text('Recently played (least recent first)'),
+          child: Text(notifier.translate(LocalizationKeys.sortLeastRecentlyPlayed)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.artistAtoZ,
-          child: Text('Artist (A-Z)'),
+          child: Text(notifier.translate(LocalizationKeys.sortArtistAZ)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.artistZtoA,
-          child: Text('Artist (Z-A)'),
+          child: Text(notifier.translate(LocalizationKeys.sortArtistZA)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.albumAtoZ,
-          child: Text('Album (A-Z)'),
+          child: Text(notifier.translate(LocalizationKeys.sortAlbumAZ)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.albumZtoA,
-          child: Text('Album (Z-A)'),
+          child: Text(notifier.translate(LocalizationKeys.sortAlbumZA)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.genreAtoZ,
-          child: Text('Genre (A-Z)'),
+          child: Text(notifier.translate(LocalizationKeys.sortGenreAZ)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.genreZtoA,
-          child: Text('Genre (Z-A)'),
+          child: Text(notifier.translate(LocalizationKeys.sortGenreZA)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.durationShortToLong,
-          child: Text('Duration (Shortest first)'),
+          child: Text(notifier.translate(LocalizationKeys.sortDurationShort)),
         ),
-        const PopupMenuItem<SortMode>(
+        PopupMenuItem<SortMode>(
           value: SortMode.durationLongToShort,
-          child: Text('Duration (Longest first)'),
+          child: Text(notifier.translate(LocalizationKeys.sortDurationLong)),
         ),
       ],
     );

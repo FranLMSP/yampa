@@ -1,0 +1,135 @@
+settings;Ajustes
+statistics;Estadísticas
+statistics_subtitle;Ver estadísticas del reproductor y pistas
+theme;Tema
+theme_subtitle;Personalizar la apariencia de la aplicación
+language;Idioma
+language_subtitle;Cambiar el idioma de la aplicación
+player_statistics;Estadísticas del Reproductor
+total_playback_time;Tiempo Total de Reproducción
+total_tracks_played;Total de Pistas Reproducidas
+unique_tracks_played;Pistas Únicas Reproducidas
+total_uptime;Tiempo Total de Actividad
+times_started;Veces Iniciado
+total_skips;Total de Saltos
+last_played;Última Vez Reproducido
+error_loading_statistics;Error al cargar las estadísticas
+system;Sistema
+light;Claro
+dark;Oscuro
+select_language;Seleccionar Idioma
+en;Inglés
+es;Español
+all_tracks_tab;Pistas
+playlists_tab;Listas de reproducción
+added_paths_tab;Rutas
+volume_controls_tab;Volumen
+settings_tab;Ajustes
+app_title;YAMPA - Yet Another Music Player App
+player_tab;Reproductor
+show_upcoming_tracks;Mostrar pistas siguientes
+show_track_image;Ocultar pistas siguientes
+playing_all_tracks;Reproduciendo todas las pistas
+select;Seleccionar
+add_to_playlists;Añadir a listas de reproducción
+add_to_favorites;Añadir a favoritos
+info;Información
+play;Reproducir
+pause;Pausar
+remove_from_favorites;Eliminar de favoritos
+add_to_favorites;Añadir a favoritos
+track_removed_from_favorites;Pista eliminada de favoritos
+track_added_from_favorites;Pista añadida a favoritos
+add_to_favorites_question;¿Añadir a favoritos?
+no;No
+yes;Sí
+search;Buscar
+selected_count;{} seleccionados
+add_to_playlist;Añadir a lista de reproducción
+save_to_playlist;Guardar en lista de reproducción
+all_tracks_title;Todas las pistas
+reload_tracks_tooltip;Recargar pistas
+no_tracks_found;No se encontraron pistas. ¡Ve a la pestaña de Rutas para añadir algunas!
+export_selected;Exportar seleccionadas
+delete_selected;Eliminar seleccionadas
+new_playlist_tooltip;Nueva Lista de reproducción
+import_playlists_tooltip;Importar Listas de reproducción
+export_all_tooltip;Exportar Todo
+remove_from_playlist_question;¿Eliminar de la lista de reproducción?
+delete;Eliminar
+export;Exportar
+new_playlist;Nueva lista de reproducción
+delete_playlist_question;¿Eliminar esta lista de reproducción?
+delete_playlists_question;¿Eliminar estas listas de reproducción?
+new_playlist_name;Nueva Lista de reproducción
+add;Añadir
+added_paths_title;Rutas Añadidas
+delete_paths_question;¿Eliminar {} ruta(s)?
+delete_path_question;¿Eliminar esta ruta?
+delete_paths_content;Esto dejará de rastrear las rutas seleccionadas. ¿Estás seguro?
+cancel;Cancelar
+no_paths_found;No hay rutas rastreadas. ¡Pulsa el botón + para añadir algunas!
+title_label;Título
+description_label;Descripción
+title_empty_error;El título no puede estar vacío
+create;Crear
+master_volume;Volumen Principal
+equalizer;Ecualizador
+equalizer_not_available;Ecualizador no disponible para el backend o plataforma actual.
+band;Banda
+restore_defaults;Restablecer valores
+unknown;Desconocido
+metadata;Metadatos
+title;Título
+artist;Artista
+album;Álbum
+genre;Género
+track_number;Número de pista
+duration;Duración
+path;Ruta
+statistics;Estadísticas
+no_statistics_yet;Sin estadísticas aún - ¡reproduce esta pista para empezar a trackear!
+times_played;Veces Reproducido
+times_skipped;Veces Saltado
+times_completed;Veces Completado
+total_play_time;Tiempo Total de Reproducción
+error_loading_stats;Error al cargar estadísticas: {}
+playback_speed;Velocidad de reproducción
+forward_seconds;Adelantar {} segundos
+backward_seconds;Atrasar {} segundos
+create_audio_clip;Crear clip de audio
+close;Cerrar
+save;Guardar
+remove_image;Eliminar Imagen
+loop_mode_single;Repitiendo una canción
+loop_mode_playlist;Repitiendo lista de reproducción
+loop_mode_start_to_end;Reproduciendo pistas de principio a fin
+loop_mode_none;Sin repetición
+loop_mode_changed;Modo de repetición: {}
+shuffle_mode_disabled;Aleatorio desactivado
+shuffle_mode_randomized;Aleatorio
+shuffle_mode_recommended;Recomendado
+shuffle_mode_changed;Modo aleatorio: {}
+select_another_image;Seleccionar otra imagen
+remove_from_playlist;Eliminar de la lista
+export_this_playlist_tooltip;Exportar esta lista de reproducción
+delete_this_playlist_tooltip;Eliminar esta lista de reproducción
+play_count;Reproducir ({})
+previous;Anterior
+next;Siguiente
+no_playlists_available;No hay listas de reproducción disponibles. ¡Pulsa el botón + para crear una nueva!
+sort_title_az;Título (A-Z)
+sort_title_za;Título (Z-A)
+sort_most_played;Más reproducidas a menos reproducidas
+sort_least_played;Menos reproducidas a más reproducidas
+sort_recently_played;Reproducidas recientemente (más recientes primero)
+sort_least_recently_played;Reproducidas recientemente (menos recientes primero)
+sort_artist_az;Artista (A-Z)
+sort_artist_za;Artista (Z-A)
+sort_album_az;Álbum (A-Z)
+sort_album_za;Álbum (Z-A)
+sort_genre_az;Género (A-Z)
+sort_genre_za;Género (Z-A)
+sort_duration_short;Duración (Más corta primero)
+sort_duration_long;Duración (Más larga primero)
+crop_image;Recortar Imagen
