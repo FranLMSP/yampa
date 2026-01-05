@@ -20,3 +20,89 @@ dark;Dark
 select_language;Select Language
 en;English
 es;Spanish
+all_tracks_tab;All tracks
+playlists_tab;Playlists
+added_paths_tab;Added paths
+volume_controls_tab;Volume controls
+settings_tab;Settings
+app_title;YAMPA - Yet Another Music Player App
+player_tab;Player
+playing_all_tracks;Playing all tracks
+select;Select
+add_to_playlists;Add to playlists
+add_to_favorites;Add to favorites
+info;Info
+add_to_favorites_question;Add to favorites?
+no;No
+yes;Yes
+search;Search
+selected_count;{} selected
+add_to_playlist;Add to playlist
+all_tracks_title;All Tracks
+reload_tracks_tooltip;Re-load tracks
+no_tracks_found;No tracks found. Go to the Added Paths tab to add some!
+export_selected;Export selected
+delete_selected;Delete selected
+new_playlist_tooltip;New Playlist
+import_playlists_tooltip;Import Playlists
+export_all_tooltip;Export All
+remove_from_playlist_question;Remove from playlist?
+delete;Delete
+export;Export
+new_playlist;New playlist
+added_paths_title;Added Paths
+delete_paths_question;Delete {} path(s)?
+delete_paths_content;This will stop tracking the selected path(s). Are you sure?
+cancel;Cancel
+no_paths_found;No paths being tracked. Hit the + button to add some!
+title_label;Title
+description_label;Description
+title_empty_error;Title can't be empty
+create;Create
+master_volume;Master Volume
+equalizer;Equalizer
+equalizer_not_available;Equalizer not available for the current backend or platform.
+band;Band
+restore_defaults;Restore defaults
+unknown;Unknown
+metadata;Metadata
+title;Title
+artist;Artist
+album;Album
+genre;Genre
+track_number;Track Number
+duration;Duration
+path;Path
+statistics;Statistics
+no_statistics_yet;No statistics yet - play this track to start tracking!
+times_played;Times Played
+times_skipped;Times Skipped
+times_completed;Times Completed
+total_play_time;Total Play Time
+error_loading_stats;Error loading stats: {}
+close;Close
+save;Save
+remove_image;Remove Image
+select_another_image;Select another image
+remove_from_playlist;Remove from playlist
+export_this_playlist_tooltip;Export this playlist
+delete_this_playlist_tooltip;Delete this playlist
+play_count;Play ({})
+previous;Previous
+next;Next
+no_playlists_available;No playlists available. Hit the + button to create a new one!
+sort_title_az;Title (A-Z)
+sort_title_za;Title (Z-A)
+sort_most_played;Most played to least played
+sort_least_played;Least played to most played
+sort_recently_played;Recently played (most recent first)
+sort_least_recently_played;Recently played (least recent first)
+sort_artist_az;Artist (A-Z)
+sort_artist_za;Artist (Z-A)
+sort_album_az;Album (A-Z)
+sort_album_za;Album (Z-A)
+sort_genre_az;Genre (A-Z)
+sort_genre_za;Genre (Z-A)
+sort_duration_short;Duration (Shortest first)
+sort_duration_long;Duration (Longest first)
+crop_image;Crop Image

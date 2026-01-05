@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_item_big.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class PlaylistListBig extends ConsumerWidget {
   const PlaylistListBig({
@@ -24,7 +26,7 @@ class PlaylistListBig extends ConsumerWidget {
     return (playlists.isEmpty)
         ? Center(
             child: Text(
-              "No playlists available. Hit the + button to create a new one!",
+              ref.read(localizationProvider.notifier).translate(LocalizationKeys.noPlaylistsAvailable),
             ),
           )
         : GridView.builder(

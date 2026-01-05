@@ -8,6 +8,8 @@ import 'package:yampa/providers/loaded_tracks_count_provider.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 import 'package:yampa/widgets/main_browser/local_path_picker/path_item.dart';
 import 'package:yampa/widgets/misc/loader.dart';
 
@@ -128,19 +130,19 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text("Delete $count path${count > 1 ? 's' : ''}?"),
+        title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.deletePathsQuestion).replaceFirst('{}', count.toString())),
         content: Text(
-          "This will stop tracking the selected path${count > 1 ? 's' : ''}. Are you sure?",
+          ref.read(localizationProvider.notifier).translate(LocalizationKeys.deletePathsContent),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text("Cancel"),
+            child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.cancel)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             child: Text(
-              "Delete",
+              ref.read(localizationProvider.notifier).translate(LocalizationKeys.delete),
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
@@ -211,7 +213,7 @@ class _LocalPathPickerState extends ConsumerState<LocalPathPicker> {
   Widget _buildPathsList(List<GenericPath> paths) {
     if (paths.isEmpty) {
       return Center(
-        child: Text("No paths being tracked. Hit the + button to add some!"),
+        child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.noPathsFound)),
       );
     }
     return ListView(

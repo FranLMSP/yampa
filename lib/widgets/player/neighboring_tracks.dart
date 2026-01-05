@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/widgets/player/player_image.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class NeighboringTracks extends ConsumerWidget {
   const NeighboringTracks({super.key});
@@ -27,7 +29,7 @@ class NeighboringTracks extends ConsumerWidget {
                 ? _buildTrackInfo(
                     context,
                     prevTrack,
-                    "Previous",
+                    ref.read(localizationProvider.notifier).translate(LocalizationKeys.previous),
                     CrossAxisAlignment.start,
                   )
                 : const SizedBox.shrink(),
@@ -38,7 +40,7 @@ class NeighboringTracks extends ConsumerWidget {
                 ? _buildTrackInfo(
                     context,
                     nextTrack,
-                    "Next",
+                    ref.read(localizationProvider.notifier).translate(LocalizationKeys.next),
                     CrossAxisAlignment.end,
                   )
                 : const SizedBox.shrink(),

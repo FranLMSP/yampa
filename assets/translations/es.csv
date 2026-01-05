@@ -20,3 +20,89 @@ dark;Oscuro
 select_language;Seleccionar Idioma
 en;Inglés
 es;Español
+all_tracks_tab;Pistas
+playlists_tab;Listas
+added_paths_tab;Rutas
+volume_controls_tab;Volumen
+settings_tab;Ajustes
+app_title;YAMPA - Yet Another Music Player App
+player_tab;Reproductor
+playing_all_tracks;Reproduciendo todas las pistas
+select;Seleccionar
+add_to_playlists;Añadir a listas
+add_to_favorites;Añadir a favoritos
+info;Información
+add_to_favorites_question;¿Añadir a favoritos?
+no;No
+yes;Sí
+search;Buscar
+selected_count;{} seleccionados
+add_to_playlist;Añadir a lista
+all_tracks_title;Todas las pistas
+reload_tracks_tooltip;Recargar pistas
+no_tracks_found;No se encontraron pistas. ¡Ve a la pestaña de Rutas para añadir algunas!
+export_selected;Exportar seleccionadas
+delete_selected;Eliminar seleccionadas
+new_playlist_tooltip;Nueva Lista
+import_playlists_tooltip;Importar Listas
+export_all_tooltip;Exportar Todo
+remove_from_playlist_question;¿Eliminar de la lista?
+delete;Eliminar
+export;Exportar
+new_playlist;Nueva lista
+added_paths_title;Rutas Añadidas
+delete_paths_question;¿Eliminar {} ruta(s)?
+delete_paths_content;Esto dejará de rastrear las rutas seleccionadas. ¿Estás seguro?
+cancel;Cancelar
+no_paths_found;No hay rutas rastreadas. ¡Pulsa el botón + para añadir algunas!
+title_label;Título
+description_label;Descripción
+title_empty_error;El título no puede estar vacío
+create;Crear
+master_volume;Volumen Maestro
+equalizer;Ecualizador
+equalizer_not_available;Ecualizador no disponible para el backend o plataforma actual.
+band;Banda
+restore_defaults;Restablecer valores
+unknown;Desconocido
+metadata;Metadatos
+title;Título
+artist;Artista
+album;Álbum
+genre;Género
+track_number;Número de pista
+duration;Duración
+path;Ruta
+statistics;Estadísticas
+no_statistics_yet;Sin estadísticas aún - ¡reproduce esta pista para empezar a trackear!
+times_played;Veces Reproducida
+times_skipped;Veces Saltada
+times_completed;Veces Completada
+total_play_time;Tiempo Total de Reproducción
+error_loading_stats;Error al cargar estadísticas: {}
+close;Cerrar
+save;Guardar
+remove_image;Eliminar Imagen
+select_another_image;Seleccionar otra imagen
+remove_from_playlist;Eliminar de la lista
+export_this_playlist_tooltip;Exportar esta lista
+delete_this_playlist_tooltip;Eliminar esta lista
+play_count;Reproducir ({})
+previous;Anterior
+next;Siguiente
+no_playlists_available;No hay listas disponibles. ¡Pulsa el botón + para crear una nueva!
+sort_title_az;Título (A-Z)
+sort_title_za;Título (Z-A)
+sort_most_played;Más reproducidas a menos reproducidas
+sort_least_played;Menos reproducidas a más reproducidas
+sort_recently_played;Reproducidas recientemente (más recientes primero)
+sort_least_recently_played;Reproducidas recientemente (menos recientes primero)
+sort_artist_az;Artista (A-Z)
+sort_artist_za;Artista (Z-A)
+sort_album_az;Álbum (A-Z)
+sort_album_za;Álbum (Z-A)
+sort_genre_az;Género (A-Z)
+sort_genre_za;Género (Z-A)
+sort_duration_short;Duración (Más corta primero)
+sort_duration_long;Duración (Más larga primero)
+crop_image;Recortar Imagen

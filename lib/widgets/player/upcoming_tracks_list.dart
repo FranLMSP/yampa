@@ -10,6 +10,8 @@ import 'package:yampa/models/track.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 import 'package:yampa/widgets/utils.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 File getFile(String path) => File(path);
 
@@ -79,7 +81,7 @@ class UpcomingTracksList extends ConsumerWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          currentPlaylist?.name ?? "Playing all tracks",
+                          currentPlaylist?.name ?? ref.read(localizationProvider.notifier).translate(LocalizationKeys.playingAllTracks),
                           style: Theme.of(context).textTheme.titleMedium,
                           overflow: TextOverflow.ellipsis,
                         ),
