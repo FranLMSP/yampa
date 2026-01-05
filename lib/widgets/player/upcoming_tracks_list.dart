@@ -81,7 +81,10 @@ class UpcomingTracksList extends ConsumerWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          currentPlaylist?.name ?? ref.read(localizationProvider.notifier).translate(LocalizationKeys.playingAllTracks),
+                          currentPlaylist?.name ??
+                              ref
+                                  .read(localizationProvider.notifier)
+                                  .translate(LocalizationKeys.playingAllTracks),
                           style: Theme.of(context).textTheme.titleMedium,
                           overflow: TextOverflow.ellipsis,
                         ),

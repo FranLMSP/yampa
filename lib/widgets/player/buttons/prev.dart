@@ -18,9 +18,9 @@ class PrevButton extends ConsumerWidget {
       },
       icon: const Icon(Icons.skip_previous),
       iconSize: 32,
-      tooltip: ref.read(localizationProvider.notifier).translate(
-        LocalizationKeys.previous,
-      ),
+      tooltip: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.previous),
     );
   }
 }

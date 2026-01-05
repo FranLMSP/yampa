@@ -35,9 +35,10 @@ class ForwardSecondsButton extends ConsumerWidget {
 
     return IconButton(
       icon: const Icon(Icons.forward_10),
-      tooltip: ref.read(localizationProvider.notifier).translate(
-        LocalizationKeys.forwardSeconds,
-      ).replaceFirst('{}', '10'),
+      tooltip: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.forwardSeconds)
+          .replaceFirst('{}', '10'),
       onPressed: () async {
         _forward(ref, currentTrackId);
       },

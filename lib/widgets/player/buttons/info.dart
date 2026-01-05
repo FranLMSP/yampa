@@ -22,9 +22,9 @@ class InfoButton extends ConsumerWidget {
     }
     return IconButton(
       icon: const Icon(Icons.info),
-      tooltip: ref.read(localizationProvider.notifier).translate(
-        LocalizationKeys.info,
-      ),
+      tooltip: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.info),
       onPressed: () async {
         showDialog(
           context: context,

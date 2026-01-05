@@ -18,9 +18,9 @@ class NextButton extends ConsumerWidget {
       },
       icon: const Icon(Icons.skip_next),
       iconSize: 32,
-      tooltip: ref.read(localizationProvider.notifier).translate(
-        LocalizationKeys.next,
-      ),
+      tooltip: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.next),
     );
   }
 }

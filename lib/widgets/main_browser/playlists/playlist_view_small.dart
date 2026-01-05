@@ -125,7 +125,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             children: [
               Icon(Icons.image),
               SizedBox(width: 12),
-              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.selectAnotherImage)),
+              Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.selectAnotherImage),
+              ),
             ],
           ),
         ),
@@ -135,7 +139,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             children: [
               Icon(Icons.delete),
               SizedBox(width: 12),
-              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.removeImage)),
+              Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.removeImage),
+              ),
             ],
           ),
         ),
@@ -175,7 +183,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             children: [
               Icon(Icons.check_box),
               SizedBox(width: 12),
-              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.select)),
+              Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.select),
+              ),
             ],
           ),
         ),
@@ -185,14 +197,26 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             children: [
               Icon(Icons.playlist_remove),
               SizedBox(width: 12),
-              Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.removeFromPlaylist)),
+              Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.removeFromPlaylist),
+              ),
             ],
           ),
         ),
         PopupMenuItem<OptionSelected>(
           value: OptionSelected.info,
           child: Row(
-            children: [Icon(Icons.info), SizedBox(width: 12), Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.info))],
+            children: [
+              Icon(Icons.info),
+              SizedBox(width: 12),
+              Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.info),
+              ),
+            ],
           ),
         ),
       ],
@@ -289,7 +313,9 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                     onPressed: () {
                       handlePlaylistsExport([selectedPlaylist]);
                     },
-                    tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.exportThisPlaylistTooltip),
+                    tooltip: ref
+                        .read(localizationProvider.notifier)
+                        .translate(LocalizationKeys.exportThisPlaylistTooltip),
                     icon: const Icon(Icons.file_upload),
                   ),
                   if (selectedPlaylist.id != favoritePlaylistId)
@@ -302,7 +328,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                           () => widget.onGoBack(),
                         );
                       },
-                      tooltip: ref.read(localizationProvider.notifier).translate(LocalizationKeys.deleteThisPlaylistTooltip),
+                      tooltip: ref
+                          .read(localizationProvider.notifier)
+                          .translate(
+                            LocalizationKeys.deleteThisPlaylistTooltip,
+                          ),
                       icon: const Icon(Icons.delete),
                     ),
                 ],
@@ -330,7 +360,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             TextField(
               controller: _titleController,
               readOnly: selectedPlaylist.id == favoritePlaylistId,
-              decoration: InputDecoration(labelText: ref.read(localizationProvider.notifier).translate(LocalizationKeys.titleLabel)),
+              decoration: InputDecoration(
+                labelText: ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.titleLabel),
+              ),
               onTapOutside: (text) {
                 final editedPlaylist = Playlist(
                   id: selectedPlaylist.id,
@@ -346,7 +380,11 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
             const SizedBox(height: 8),
             TextField(
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: ref.read(localizationProvider.notifier).translate(LocalizationKeys.descriptionLabel)),
+              decoration: InputDecoration(
+                labelText: ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.descriptionLabel),
+              ),
               onTapOutside: (text) {
                 final editedPlaylist = Playlist(
                   id: selectedPlaylist.id,
@@ -380,7 +418,15 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Icon(Icons.play_arrow),
-                      Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.playCount).replaceFirst('{}', selectedPlaylist.trackIds.length.toString())),
+                      Text(
+                        ref
+                            .read(localizationProvider.notifier)
+                            .translate(LocalizationKeys.playCount)
+                            .replaceFirst(
+                              '{}',
+                              selectedPlaylist.trackIds.length.toString(),
+                            ),
+                      ),
                     ],
                   ),
                 ),

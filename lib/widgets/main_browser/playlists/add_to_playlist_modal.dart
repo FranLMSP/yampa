@@ -26,9 +26,9 @@ class _AddToPlaylistDialogState extends ConsumerState<AddToPlaylistDialog> {
   Future<void> _createNewPlaylist(WidgetRef ref) async {
     final newPlaylist = Playlist(
       id: "temp",
-      name: ref.read(localizationProvider.notifier).translate(
-        LocalizationKeys.newPlaylistName,
-      ),
+      name: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.newPlaylistName),
       description: '',
       trackIds: [],
       sortMode: SortMode.titleAtoZ,
@@ -60,9 +60,9 @@ class _AddToPlaylistDialogState extends ConsumerState<AddToPlaylistDialog> {
     return AlertDialog(
       scrollable: true,
       title: Text(
-        ref.read(localizationProvider.notifier).translate(
-          LocalizationKeys.playlistsTab,
-        ),
+        ref
+            .read(localizationProvider.notifier)
+            .translate(LocalizationKeys.playlistsTab),
       ),
       content: Column(
         children: [
@@ -99,9 +99,9 @@ class _AddToPlaylistDialogState extends ConsumerState<AddToPlaylistDialog> {
           TextButton(
             onPressed: () => _createNewPlaylist(ref),
             child: Text(
-              ref.read(localizationProvider.notifier).translate(
-                LocalizationKeys.newPlaylist,
-              ),
+              ref
+                  .read(localizationProvider.notifier)
+                  .translate(LocalizationKeys.newPlaylist),
             ),
           ),
         ],
@@ -118,9 +118,9 @@ class _AddToPlaylistDialogState extends ConsumerState<AddToPlaylistDialog> {
             }
           },
           child: Text(
-            ref.read(localizationProvider.notifier).translate(
-              LocalizationKeys.cancel,
-            ),
+            ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.cancel),
           ),
         ),
         TextButton(
@@ -144,9 +144,9 @@ class _AddToPlaylistDialogState extends ConsumerState<AddToPlaylistDialog> {
             }
           },
           child: Text(
-            ref.read(localizationProvider.notifier).translate(
-              LocalizationKeys.add,
-            ),
+            ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.add),
           ),
         ),
       ],

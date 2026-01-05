@@ -31,10 +31,9 @@ class LoopButton extends ConsumerWidget {
 
   String _getTooltipMessage(LoopMode loopMode, LocalizationNotifier notifier) {
     final label = _getLoopModeLabel(loopMode, notifier);
-    return notifier.translate(LocalizationKeys.loopModeChanged).replaceFirst(
-      '{}',
-      label,
-    );
+    return notifier
+        .translate(LocalizationKeys.loopModeChanged)
+        .replaceFirst('{}', label);
   }
 
   Future<void> _toggleLoopMode(

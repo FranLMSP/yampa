@@ -26,7 +26,9 @@ class PlaylistListBig extends ConsumerWidget {
     return (playlists.isEmpty)
         ? Center(
             child: Text(
-              ref.read(localizationProvider.notifier).translate(LocalizationKeys.noPlaylistsAvailable),
+              ref
+                  .read(localizationProvider.notifier)
+                  .translate(LocalizationKeys.noPlaylistsAvailable),
             ),
           )
         : GridView.builder(

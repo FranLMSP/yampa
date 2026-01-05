@@ -21,14 +21,22 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: ref.read(localizationProvider.notifier).translate(LocalizationKeys.newPlaylist));
+    _titleController = TextEditingController(
+      text: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.newPlaylist),
+    );
     _descriptionController = TextEditingController(text: "");
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.newPlaylist)),
+      title: Text(
+        ref
+            .read(localizationProvider.notifier)
+            .translate(LocalizationKeys.newPlaylist),
+      ),
       scrollable: true,
       content: Column(
         children: [
@@ -36,14 +44,24 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
             autofocus: true,
             controller: _titleController,
             decoration: InputDecoration(
-              labelText: ref.read(localizationProvider.notifier).translate(LocalizationKeys.titleLabel),
-              errorText: _isValid ? null : ref.read(localizationProvider.notifier).translate(LocalizationKeys.titleEmptyError),
+              labelText: ref
+                  .read(localizationProvider.notifier)
+                  .translate(LocalizationKeys.titleLabel),
+              errorText: _isValid
+                  ? null
+                  : ref
+                        .read(localizationProvider.notifier)
+                        .translate(LocalizationKeys.titleEmptyError),
             ),
           ),
           const SizedBox(height: 8),
           TextField(
             controller: _descriptionController,
-            decoration: InputDecoration(labelText: ref.read(localizationProvider.notifier).translate(LocalizationKeys.descriptionLabel)),
+            decoration: InputDecoration(
+              labelText: ref
+                  .read(localizationProvider.notifier)
+                  .translate(LocalizationKeys.descriptionLabel),
+            ),
           ),
         ],
       ),
@@ -52,7 +70,11 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
           style: TextButton.styleFrom(
             textStyle: Theme.of(context).textTheme.labelLarge,
           ),
-          child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.cancel)),
+          child: Text(
+            ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.cancel),
+          ),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -61,7 +83,11 @@ class _NewPlaylistDialogState extends ConsumerState<NewPlaylistDialog> {
           style: TextButton.styleFrom(
             textStyle: Theme.of(context).textTheme.labelLarge,
           ),
-          child: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.create)),
+          child: Text(
+            ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.create),
+          ),
           onPressed: () {
             setState(() {
               _isValid = _titleController.text.isNotEmpty;

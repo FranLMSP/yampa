@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio_background/just_audio_background.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:yampa/core/player_backends/audio_handler.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:yampa/core/player_backends/just_audio.dart';
 import 'package:yampa/core/repositories/user_settings_data/factory.dart';
 import 'package:yampa/models/user_settings.dart';
 import 'package:yampa/providers/initial_load_provider.dart';
@@ -45,11 +48,18 @@ void main() async {
     });
   }
 
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-    androidNotificationChannelName: 'Audio playback',
-    androidNotificationOngoing: true,
+  final player = AudioPlayer();
+  final handler = await AudioService.init(
+    builder: () => YampaAudioHandler(player),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+      androidNotificationChannelName: 'Audio playback',
+      androidNotificationOngoing: true,
+      androidNotificationIcon: 'mipmap/launcher_icon',
+    ),
   );
+  JustAudioBackend.setPlayer(player);
+  JustAudioBackend.setAudioHandler(handler);
 
   runApp(ProviderScope(child: MyApp()));
 }
@@ -91,7 +101,9 @@ class _MyAppState extends ConsumerState<MyApp> {
     );
     final _ = ref.watch(localizationProvider); // Rebuild when language changes
     return MaterialApp(
-      title: ref.read(localizationProvider.notifier).translate(LocalizationKeys.appTitle),
+      title: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.appTitle),
       darkTheme: ThemeData.dark(),
       themeMode: themeMode,
       locale: Locale(ref.watch(localizationProvider)),

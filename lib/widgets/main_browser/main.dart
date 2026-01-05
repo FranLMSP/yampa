@@ -56,15 +56,48 @@ class _MainBrowserState extends ConsumerState<MainBrowser>
 
   List<Widget> _getTabs() {
     final tabs = [
-      Tab(icon: Icon(Icons.music_note), text: ref.read(localizationProvider.notifier).translate(LocalizationKeys.allTracksTab)),
-      Tab(icon: Icon(Icons.playlist_add), text: ref.read(localizationProvider.notifier).translate(LocalizationKeys.playlistsTab)),
-      Tab(icon: Icon(Icons.folder), text: ref.read(localizationProvider.notifier).translate(LocalizationKeys.addedPathsTab)),
-      Tab(icon: Icon(Icons.equalizer), text: ref.read(localizationProvider.notifier).translate(LocalizationKeys.volumeControlsTab)),
-      Tab(icon: Icon(Icons.settings), text: ref.read(localizationProvider.notifier).translate(LocalizationKeys.settingsTab)),
+      Tab(
+        icon: Icon(Icons.music_note),
+        text: ref
+            .read(localizationProvider.notifier)
+            .translate(LocalizationKeys.allTracksTab),
+      ),
+      Tab(
+        icon: Icon(Icons.playlist_add),
+        text: ref
+            .read(localizationProvider.notifier)
+            .translate(LocalizationKeys.playlistsTab),
+      ),
+      Tab(
+        icon: Icon(Icons.folder),
+        text: ref
+            .read(localizationProvider.notifier)
+            .translate(LocalizationKeys.addedPathsTab),
+      ),
+      Tab(
+        icon: Icon(Icons.equalizer),
+        text: ref
+            .read(localizationProvider.notifier)
+            .translate(LocalizationKeys.volumeControlsTab),
+      ),
+      Tab(
+        icon: Icon(Icons.settings),
+        text: ref
+            .read(localizationProvider.notifier)
+            .translate(LocalizationKeys.settingsTab),
+      ),
     ];
 
     if (widget.viewMode == ViewMode.portrait) {
-      tabs.insert(0, Tab(icon: Icon(Icons.play_arrow), text: ref.read(localizationProvider.notifier).translate(LocalizationKeys.playerTab)));
+      tabs.insert(
+        0,
+        Tab(
+          icon: Icon(Icons.play_arrow),
+          text: ref
+              .read(localizationProvider.notifier)
+              .translate(LocalizationKeys.playerTab),
+        ),
+      );
     }
 
     return tabs;

@@ -18,9 +18,9 @@ class PlayButton extends ConsumerWidget {
       },
       icon: const Icon(Icons.play_arrow),
       iconSize: 48,
-      tooltip: ref.read(localizationProvider.notifier).translate(
-        LocalizationKeys.play,
-      ),
+      tooltip: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.play),
     );
   }
 }

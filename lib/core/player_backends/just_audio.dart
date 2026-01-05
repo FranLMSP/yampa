@@ -5,10 +5,11 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audiotags/audiotags.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:yampa/core/player_backends/audio_handler.dart';
 import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/core/utils/id_utils.dart';
 import 'package:yampa/core/utils/player_utils.dart';
@@ -22,9 +23,20 @@ import 'package:path/path.dart' as p;
 import 'package:yampa/widgets/utils.dart';
 import 'interface.dart';
 
-AudioPlayer? _player;
-
 class JustAudioBackend implements PlayerBackend {
+  static AudioPlayer? _player;
+  static YampaAudioHandler? _audioHandler;
+
+  static YampaAudioHandler? get audioHandler => _audioHandler;
+
+  static void setPlayer(AudioPlayer player) {
+    _player = player;
+  }
+
+  static void setAudioHandler(YampaAudioHandler handler) {
+    _audioHandler = handler;
+  }
+
   Duration? _currentTrackDuration;
   AndroidEqualizer? _equalizer;
 
@@ -44,12 +56,13 @@ class JustAudioBackend implements PlayerBackend {
       if (Platform.isAndroid && false) {
         // TODO: this doesn't seem to work yet
         _equalizer = AndroidEqualizer();
-        _player ??= AudioPlayer(
+        _player = AudioPlayer(
           audioPipeline: AudioPipeline(androidAudioEffects: [_equalizer!]),
         );
       } else {
-        _player ??= AudioPlayer();
+        _player = AudioPlayer();
       }
+      _audioHandler = YampaAudioHandler(_player!);
     }
   }
 
@@ -223,16 +236,22 @@ class JustAudioBackend implements PlayerBackend {
         : null;
     Duration? duration;
     try {
-      final audioSource = AudioSource.uri(
-        Uri.file(track.path),
-        tag: MediaItem(
+      final audioSource = AudioSource.uri(Uri.file(track.path));
+      duration = await _player!.setAudioSource(audioSource);
+
+      final artUri = track.imageBytes != null
+          ? bytesToDataUri(track.imageBytes!)
+          : null;
+      await _audioHandler?.updateMediaItem(
+        MediaItem(
           id: track.id,
           title: track.displayTitle(),
           artist: track.artist,
+          album: track.album,
+          duration: duration,
           artUri: artUri,
         ),
       );
-      duration = await _player!.setAudioSource(audioSource);
     } catch (e) {
       log("Unable to set audio source", error: e);
     }

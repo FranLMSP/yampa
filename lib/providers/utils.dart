@@ -80,6 +80,7 @@ Future<void> doInitialLoad(
 
   // TODO: the player state has to be loaded before fetching the tracks to prevent a bug where the user clicks on a track before all of them have finished loading
   await loadPlayerControllerState(playerControllerNotifier);
+  playerControllerNotifier.initAudioHandler();
 
   // Load cached tracks first for immediate UI feedback
   final cachedTracksRepository = getCachedTracksRepository();
@@ -349,11 +350,8 @@ Future<void> loadPlayerControllerState(
   final playerControllerStateRepository = getPlayerControllerStateRepository();
   final lastPlayerControllerState = await playerControllerStateRepository
       .getPlayerControllerState();
-  // TODO: set the current track after they are all loaded
-  await playerControllerNotifier.setPlayerController(
-    await PlayerController.fromLastState(lastPlayerControllerState),
-  );
-  await playerControllerStateRepository.close();
+  await PlayerController.initFromLastState(lastPlayerControllerState);
+  playerControllerStateRepository.close();
 }
 
 Future<void> handleTrackMetadataEdited(

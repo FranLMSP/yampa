@@ -30,7 +30,12 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.masterVolume), style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.masterVolume),
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           Row(
             children: [
               const Icon(Icons.volume_mute),
@@ -52,13 +57,20 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
             ],
           ),
           const SizedBox(height: 24),
-          Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.equalizer), style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            ref
+                .read(localizationProvider.notifier)
+                .translate(LocalizationKeys.equalizer),
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 16),
           if (_equalizerGains.isEmpty)
             Expanded(
               child: Center(
                 child: Text(
-                  ref.read(localizationProvider.notifier).translate(LocalizationKeys.equalizerNotAvailable),
+                  ref
+                      .read(localizationProvider.notifier)
+                      .translate(LocalizationKeys.equalizerNotAvailable),
                 ),
               ),
             )
@@ -95,7 +107,9 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
                           ),
                         ),
                         Text("${_equalizerGains[index].toStringAsFixed(1)} dB"),
-                        Text("${ref.read(localizationProvider.notifier).translate(LocalizationKeys.band)} ${index + 1}"),
+                        Text(
+                          "${ref.read(localizationProvider.notifier).translate(LocalizationKeys.band)} ${index + 1}",
+                        ),
                       ],
                     ),
                   );
@@ -112,7 +126,11 @@ class _VolumeControlsState extends ConsumerState<VolumeControls> {
                 ref.read(playerControllerProvider.notifier).restoreDefaults();
               },
               icon: const Icon(Icons.restore),
-              label: Text(ref.read(localizationProvider.notifier).translate(LocalizationKeys.restoreDefaults)),
+              label: Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.restoreDefaults),
+              ),
             ),
           ),
         ],

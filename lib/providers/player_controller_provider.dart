@@ -5,6 +5,7 @@ import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/core/player_backends/interface.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/core/player_backends/just_audio.dart';
 
 final playerControllerProvider =
     NotifierProvider<PlayerControllerNotifier, PlayerController>(
@@ -13,194 +14,163 @@ final playerControllerProvider =
 
 class PlayerControllerNotifier extends Notifier<PlayerController> {
   @override
-  PlayerController build() => PlayerController();
+  PlayerController build() {
+    final pc = PlayerController.instance;
+    final subscription = pc.onUpdate.listen((_) {
+      state = pc.clone();
+    });
+    ref.onDispose(() {
+      subscription.cancel();
+    });
+    return pc.clone();
+  }
 
   Future<void> play() async {
-    final currentState = state;
-    await currentState.play();
-    state = currentState.clone();
+    await PlayerController.instance.play();
   }
 
   Future<void> pause() async {
-    final currentState = state;
-    await currentState.pause();
-    state = currentState.clone();
+    await PlayerController.instance.pause();
   }
 
   Future<void> next() async {
-    final currentState = state;
-    await currentState.next(true);
-    state = currentState.clone();
+    await PlayerController.instance.next(true);
   }
 
   Future<void> prev() async {
-    final currentState = state;
-    await currentState.prev();
-    state = currentState.clone();
+    await PlayerController.instance.prev();
   }
 
   Future<void> stop() async {
-    final currentState = state;
-    await currentState.stop();
-    state = currentState.clone();
+    await PlayerController.instance.stop();
   }
 
   Future<void> seek(Duration duration) async {
-    final currentState = state;
-    await currentState.seek(duration);
-    state = currentState.clone();
+    await PlayerController.instance.seek(duration);
   }
 
   Future<void> setPlayerBackend(PlayerBackend playerBackend) async {
-    final currentState = state;
-    await currentState.setPlayerBackend(playerBackend);
-    state = currentState.clone();
+    await PlayerController.instance.setPlayerBackend(playerBackend);
   }
 
   Future<void> setCurrentTrack(Track track) async {
-    final currentState = state;
-    await currentState.setCurrentTrack(track);
-    state = currentState.clone();
+    await PlayerController.instance.setCurrentTrack(track);
   }
 
   Future<void> setPlaylist(Playlist playlist) async {
-    final currentState = state;
-    await currentState.setPlaylist(playlist);
-    state = currentState.clone();
+    await PlayerController.instance.setPlaylist(playlist);
   }
 
   Future<void> handleTracksAddedToPlaylist(
     List<Map<String, String>> playlistTrackMapping,
   ) async {
-    final currentState = state;
-    await currentState.handleTracksAddedToPlaylist(playlistTrackMapping);
-    state = currentState.clone();
+    await PlayerController.instance.handleTracksAddedToPlaylist(playlistTrackMapping);
   }
 
   Future<void> handleTracksRemovedFromPlaylist(
     Playlist playlist,
     List<String> trackIds,
   ) async {
-    final currentState = state;
-    await currentState.handleTracksRemovedFromPlaylist(playlist, trackIds);
-    state = currentState.clone();
+    await PlayerController.instance.handleTracksRemovedFromPlaylist(playlist, trackIds);
   }
 
   Future<LoopMode> toggleLoopMode() async {
-    final currentState = state;
-    await currentState.toggleLoopMode();
-    state = currentState.clone();
-    return currentState.loopMode;
+    return await PlayerController.instance.toggleLoopMode();
   }
 
   Future<ShuffleMode> toggleShuffleMode() async {
-    final currentState = state;
-    await currentState.toggleShuffleMode();
-    state = currentState.clone();
-    return currentState.shuffleMode;
+    return await PlayerController.instance.toggleShuffleMode();
   }
 
   Future<void> handleNextAutomatically() async {
-    final currentState = state;
-    await currentState.handleNextAutomatically();
-    state = currentState.clone();
+    await PlayerController.instance.handleNextAutomatically();
   }
 
   PlayerController getPlayerController() {
-    return state.clone();
+    return PlayerController.instance.clone();
   }
 
   Future<void> setSpeed(double value) async {
-    final currentState = state;
-    await currentState.setSpeed(value);
-    state = currentState.clone();
+    await PlayerController.instance.setSpeed(value);
   }
 
   Future<void> playTrack(Track track) async {
-    final player = state;
-    if (player.playerBackend == null) {
-      // TODO: here we want to set the track player type depending on the source type of the track
-      await player.setPlayerBackend(await getPlayerBackend());
+    final pc = PlayerController.instance;
+    if (pc.playerBackend == null) {
+      await pc.setPlayerBackend(await getPlayerBackend());
     }
-    await player.stop();
-    await player.setCurrentTrack(track);
-    await player.play();
-    state = player.clone();
+    await pc.stop();
+    await pc.setCurrentTrack(track);
+    await pc.play();
   }
 
   Future<void> setPlayerController(PlayerController playerController) async {
-    final currentState = playerController.clone();
-    await currentState.setSpeed(playerController.speed);
-    await currentState.setVolume(playerController.volume);
-    await currentState.setEqualizerGains(playerController.equalizerGains);
-    final currentTrack = currentState.tracks[playerController.currentTrackId];
-    if (currentTrack != null) {
-      await currentState.setCurrentTrack(currentTrack);
-    }
-    state = currentState.clone();
+    // This is essentially initializing the singleton state
+    final pc = PlayerController.instance;
+    pc.currentTrackId = playerController.currentTrackId;
+    pc.currentPlaylistId = playerController.currentPlaylistId;
+    pc.speed = playerController.speed;
+    pc.trackQueueIds = List.from(playerController.trackQueueIds);
+    pc.shuffledTrackQueueIds = List.from(
+      playerController.shuffledTrackQueueIds,
+    );
+    pc.state = playerController.state;
+    pc.loopMode = playerController.loopMode;
+    pc.shuffleMode = playerController.shuffleMode;
+    pc.trackQueueDisplayMode = playerController.trackQueueDisplayMode;
+    pc.playerBackend = playerController.playerBackend;
+    pc.lastTrackDuration = playerController.lastTrackDuration;
+    pc.volume = playerController.volume;
+    pc.equalizerGains = List.from(playerController.equalizerGains);
+    pc.tracks = Map.from(playerController.tracks);
+    pc.notifyListeners();
   }
 
   Future<void> setTrackQueueDisplayMode(TrackQueueDisplayMode mode) async {
-    final currentState = state;
-    await currentState.setTrackQueueDisplayMode(mode);
-    state = currentState.clone();
+    await PlayerController.instance.setTrackQueueDisplayMode(mode);
   }
 
   Future<void> reloadPlaylist(Playlist playlist) async {
-    final currentState = state;
-    await currentState.reloadPlaylist(playlist);
-    state = currentState.clone();
+    await PlayerController.instance.reloadPlaylist(playlist);
   }
 
   Future<void> updatePlaybackStatistics() async {
-    final currentState = state;
-    await currentState.updatePlaybackStatistics();
-    state = currentState.clone();
+    await PlayerController.instance.updatePlaybackStatistics();
   }
 
   Future<void> handleTrackUpdated(String oldId, String newId) async {
-    final currentState = state;
-    await currentState.handleTrackUpdated(oldId, newId);
-    state = currentState.clone();
+    await PlayerController.instance.handleTrackUpdated(oldId, newId);
   }
 
   Future<void> setVolume(double value) async {
-    final currentState = state;
-    await currentState.setVolume(value);
-    state = currentState.clone();
+    await PlayerController.instance.setVolume(value);
   }
 
   Future<void> setEqualizerGains(List<double> gains) async {
-    final currentState = state;
-    await currentState.setEqualizerGains(gains);
-    state = currentState.clone();
+    await PlayerController.instance.setEqualizerGains(gains);
   }
 
   Future<void> restoreDefaults() async {
-    final currentState = state;
-    await currentState.restoreDefaults();
-    state = currentState.clone();
+    await PlayerController.instance.restoreDefaults();
   }
 
   void setTracks(List<Track> tracks) {
-    final currentState = state;
-    currentState.setTracks(tracks);
-    state = currentState.clone();
+    PlayerController.instance.setTracks(tracks);
   }
 
   List<Track> getTracks() {
-    return state.getTracks();
+    return PlayerController.instance.getTracks();
   }
 
   void addTracks(List<Track> tracks) {
-    final currentState = state;
-    currentState.addTracks(tracks);
-    state = currentState.clone();
+    PlayerController.instance.addTracks(tracks);
   }
 
   void removeTracks(List<String> trackIds) {
-    final currentState = state;
-    currentState.removeTracks(trackIds);
-    state = currentState.clone();
+    PlayerController.instance.removeTracks(trackIds);
+  }
+
+  void initAudioHandler() {
+    // No longer needed as handler uses singleton directly
   }
 }

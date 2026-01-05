@@ -10,9 +10,9 @@ class ClipButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       icon: const Icon(Icons.cut),
-      tooltip: ref.read(localizationProvider.notifier).translate(
-        LocalizationKeys.createAudioClip,
-      ),
+      tooltip: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.createAudioClip),
       onPressed: () async {
         debugPrint("clicked on clip");
       },

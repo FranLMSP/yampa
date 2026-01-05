@@ -18,9 +18,9 @@ class PauseButton extends ConsumerWidget {
       },
       icon: const Icon(Icons.pause),
       iconSize: 48,
-      tooltip: ref.read(localizationProvider.notifier).translate(
-        LocalizationKeys.pause,
-      ),
+      tooltip: ref
+          .read(localizationProvider.notifier)
+          .translate(LocalizationKeys.pause),
     );
   }
 }

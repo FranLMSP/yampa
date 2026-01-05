@@ -35,7 +35,9 @@ void removePlaylistsModal(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text(localizationNotifier.translate(LocalizationKeys.no)),
+                child: Text(
+                  localizationNotifier.translate(LocalizationKeys.no),
+                ),
               ),
               TextButton(
                 onPressed: () async {
@@ -48,7 +50,9 @@ void removePlaylistsModal(
                   }
                   // TODO: show snackbar with "undo" button
                 },
-                child: Text(localizationNotifier.translate(LocalizationKeys.yes)),
+                child: Text(
+                  localizationNotifier.translate(LocalizationKeys.yes),
+                ),
               ),
             ],
           );
