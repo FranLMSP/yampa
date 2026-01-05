@@ -263,6 +263,7 @@ class PlayerController {
     if (playerBackend != null && currentTrackId != null) {
       await playerBackend!.seek(position);
     }
+    notifyListeners();
   }
 
   Future<void> setPlayerBackend(PlayerBackend playerBackend) async {

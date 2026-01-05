@@ -11,16 +11,16 @@ class YampaAudioHandler extends BaseAudioHandler {
   }
 
   @override
-  Future<void> play() => _player.play();
+  Future<void> play() => PlayerController.instance.play();
 
   @override
-  Future<void> pause() => _player.pause();
+  Future<void> pause() => PlayerController.instance.pause();
 
   @override
-  Future<void> seek(Duration position) => _player.seek(position);
+  Future<void> seek(Duration position) => PlayerController.instance.seek(position);
 
   @override
-  Future<void> stop() => _player.stop();
+  Future<void> stop() => PlayerController.instance.stop();
 
   @override
   Future<void> skipToNext() async {
@@ -33,8 +33,8 @@ class YampaAudioHandler extends BaseAudioHandler {
   }
 
   @override
-  Future<void> updateMediaItem(MediaItem item) async {
-    mediaItem.add(item);
+  Future<void> updateMediaItem(MediaItem mediaItem) async {
+    this.mediaItem.add(mediaItem);
   }
 
   PlaybackState _transformEvent(PlaybackEvent event) {
