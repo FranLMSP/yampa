@@ -59,10 +59,13 @@ remove_from_playlist_question;Remove from playlist?
 delete;Delete
 export;Export
 new_playlist;New playlist
+delete_playlist_question;Delete this playlist?
+delete_playlists_question;Delete these playlists?
 new_playlist_name;New Playlist
 add;Add
 added_paths_title;Added Paths
 delete_paths_question;Delete {} path(s)?
+delete_path_question;Remove this path?
 delete_paths_content;This will stop tracking the selected path(s). Are you sure?
 cancel;Cancel
 no_paths_found;No paths being tracked. Hit the + button to add some!

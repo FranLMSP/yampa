@@ -67,6 +67,8 @@ class LocalizationKeys {
   static const String delete = 'delete';
   static const String export = 'export';
   static const String newPlaylist = 'new_playlist';
+  static const String deletePlaylistQuestion = 'delete_playlist_question';
+  static const String deletePlaylistsQuestion = 'delete_playlists_question';
   static const String newPlaylistName = 'new_playlist_name';
   static const String add = 'add';
   static const String deleteSelectedPlaylists = 'delete_selected_playlists';
@@ -83,6 +85,7 @@ class LocalizationKeys {
   // Path Picker
   static const String addedPathsTitle = 'added_paths_title';
   static const String deletePathsQuestion = 'delete_paths_question'; // Requires parameter
+  static const String deletePathQuestion = 'delete_path_question';
   static const String deletePathsContent = 'delete_paths_content';
   static const String cancel = 'cancel';
   static const String noPathsFound = 'no_paths_found';

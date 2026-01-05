@@ -59,10 +59,13 @@ remove_from_playlist_question;¿Eliminar de la lista de reproducción?
 delete;Eliminar
 export;Exportar
 new_playlist;Nueva lista de reproducción
+delete_playlist_question;¿Eliminar esta lista de reproducción?
+delete_playlists_question;¿Eliminar estas listas de reproducción?
 new_playlist_name;Nueva Lista de reproducción
 add;Añadir
 added_paths_title;Rutas Añadidas
 delete_paths_question;¿Eliminar {} ruta(s)?
+delete_path_question;¿Eliminar esta ruta?
 delete_paths_content;Esto dejará de rastrear las rutas seleccionadas. ¿Estás seguro?
 cancel;Cancelar
 no_paths_found;No hay rutas rastreadas. ¡Pulsa el botón + para añadir algunas!

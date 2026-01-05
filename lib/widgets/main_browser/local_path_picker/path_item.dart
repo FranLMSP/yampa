@@ -5,6 +5,8 @@ import 'package:yampa/models/path.dart';
 import 'package:yampa/providers/local_paths_provider.dart';
 import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/providers/localization_provider.dart';
+import 'package:yampa/core/localization/keys.dart';
 
 class PathItem extends ConsumerStatefulWidget {
   const PathItem({
@@ -31,13 +33,18 @@ class _PathItemState extends ConsumerState<PathItem> {
     LocalPathsNotifier localPathsNotifier,
     PlayerControllerNotifier playerControllerNotifier,
   ) {
+    final localizationNotifier = ref.read(localizationProvider.notifier);
     return IconButton(
       onPressed: () async {
         showDialog(
           context: context,
           builder: (BuildContext ctx) {
             return AlertDialog(
-              title: const Text('Remove this path?'),
+              title: Text(
+                localizationNotifier.translate(
+                  LocalizationKeys.deletePathQuestion,
+                ),
+              ),
               content: Text(
                 widget.path.filename != null
                     ? widget.path.filename!
@@ -48,7 +55,7 @@ class _PathItemState extends ConsumerState<PathItem> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('No'),
+                  child: Text(localizationNotifier.translate(LocalizationKeys.no)),
                 ),
                 TextButton(
                   onPressed: () {
@@ -59,7 +66,7 @@ class _PathItemState extends ConsumerState<PathItem> {
                     );
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Yes'),
+                  child: Text(localizationNotifier.translate(LocalizationKeys.yes)),
                 ),
               ],
             );

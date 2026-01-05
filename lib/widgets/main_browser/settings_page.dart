@@ -320,41 +320,40 @@ class LanguageSelectionPage extends ConsumerWidget {
               .translate(LocalizationKeys.selectLanguage),
         ),
       ),
-      body: ListView(
-        children: [
-          ListTile(
-            leading: Radio<String>(
-              value: LocalizationKeys.en,
-              groupValue: currentLanguage,
-              onChanged: (value) =>
-                  ref.read(localizationProvider.notifier).setLanguage(value!),
-            ),
-            title: Text(
-              ref
+      body: RadioGroup<String>(
+        groupValue: currentLanguage,
+        onChanged: (value) =>
+            ref.read(localizationProvider.notifier).setLanguage(value!),
+        child: ListView(
+          children: [
+            ListTile(
+              leading: const Radio<String>(
+                value: LocalizationKeys.en,
+              ),
+              title: Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.en),
+              ),
+              onTap: () => ref
                   .read(localizationProvider.notifier)
-                  .translate(LocalizationKeys.en),
+                  .setLanguage(LocalizationKeys.en),
             ),
-            onTap: () => ref
-                .read(localizationProvider.notifier)
-                .setLanguage(LocalizationKeys.en),
-          ),
-          ListTile(
-            leading: Radio<String>(
-              value: LocalizationKeys.es,
-              groupValue: currentLanguage,
-              onChanged: (value) =>
-                  ref.read(localizationProvider.notifier).setLanguage(value!),
-            ),
-            title: Text(
-              ref
+            ListTile(
+              leading: const Radio<String>(
+                value: LocalizationKeys.es,
+              ),
+              title: Text(
+                ref
+                    .read(localizationProvider.notifier)
+                    .translate(LocalizationKeys.es),
+              ),
+              onTap: () => ref
                   .read(localizationProvider.notifier)
-                  .translate(LocalizationKeys.es),
+                  .setLanguage(LocalizationKeys.es),
             ),
-            onTap: () => ref
-                .read(localizationProvider.notifier)
-                .setLanguage(LocalizationKeys.es),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
