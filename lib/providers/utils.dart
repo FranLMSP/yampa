@@ -350,11 +350,8 @@ Future<void> loadPlayerControllerState(
   final playerControllerStateRepository = getPlayerControllerStateRepository();
   final lastPlayerControllerState = await playerControllerStateRepository
       .getPlayerControllerState();
-  // TODO: set the current track after they are all loaded
-  await playerControllerNotifier.setPlayerController(
-    await PlayerController.fromLastState(lastPlayerControllerState),
-  );
-  await playerControllerStateRepository.close();
+  await PlayerController.initFromLastState(lastPlayerControllerState);
+  playerControllerStateRepository.close();
 }
 
 Future<void> handleTrackMetadataEdited(

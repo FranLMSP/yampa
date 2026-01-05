@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:developer';
 import 'dart:math' hide log;
@@ -14,6 +15,16 @@ import 'package:yampa/providers/utils.dart';
 import 'package:yampa/core/utils/sort_utils.dart';
 
 class PlayerController {
+  static final PlayerController _instance = PlayerController._();
+  static PlayerController get instance => _instance;
+
+  final _updateController = StreamController<void>.broadcast();
+  Stream<void> get onUpdate => _updateController.stream;
+
+  void notifyListeners() {
+    _updateController.add(null);
+  }
+
   String? currentTrackId;
   String? currentPlaylistId;
   double speed = 1;
@@ -32,49 +43,31 @@ class PlayerController {
   DateTime? sessionStartTime;
   DateTime? lastPlayStartTime;
 
-  PlayerController();
-  static Future<PlayerController> fromLastState(
+  PlayerController._();
+
+  static Future<void> initFromLastState(
     LastPlayerControllerState lastState,
   ) async {
-    return PlayerController._clone(
-      currentTrackId: lastState.currentTrackId,
-      currentPlaylistId: lastState.currentPlaylistId,
-      speed: lastState.speed,
-      trackQueueIds: lastState.trackQueueIds,
-      shuffledTrackQueueIds: lastState.shuffledTrackQueueIds,
-      state: PlayerState.stopped,
-      loopMode: lastState.loopMode,
-      shuffleMode: lastState.shuffleMode,
-      trackQueueDisplayMode: lastState.trackQueueDisplayMode,
-      lastTrackDuration: Duration.zero,
-      playerBackend:
-          await getPlayerBackend(), // TODO: store this in sqlite as well
-      sessionStartTime: DateTime.now(),
-      lastPlayStartTime: null,
-      volume: lastState.volume,
-      equalizerGains: lastState.equalizerGains,
-      tracks: {},
-    );
+    final pc = instance;
+    pc.currentTrackId = lastState.currentTrackId;
+    pc.currentPlaylistId = lastState.currentPlaylistId;
+    pc.speed = lastState.speed;
+    pc.trackQueueIds = lastState.trackQueueIds;
+    pc.shuffledTrackQueueIds = lastState.shuffledTrackQueueIds;
+    pc.state = PlayerState.stopped;
+    pc.loopMode = lastState.loopMode;
+    pc.shuffleMode = lastState.shuffleMode;
+    pc.trackQueueDisplayMode = lastState.trackQueueDisplayMode;
+    pc.lastTrackDuration = Duration.zero;
+    pc.playerBackend = await getPlayerBackend();
+    pc.sessionStartTime = DateTime.now();
+    pc.lastPlayStartTime = null;
+    pc.volume = lastState.volume;
+    pc.equalizerGains = lastState.equalizerGains;
+    pc.tracks = {};
+    pc.notifyListeners();
   }
 
-  PlayerController._clone({
-    required this.currentTrackId,
-    required this.currentPlaylistId,
-    required this.speed,
-    required this.trackQueueIds,
-    required this.shuffledTrackQueueIds,
-    required this.state,
-    required this.loopMode,
-    required this.shuffleMode,
-    required this.trackQueueDisplayMode,
-    required this.playerBackend,
-    required this.lastTrackDuration,
-    required this.sessionStartTime,
-    required this.lastPlayStartTime,
-    required this.volume,
-    required this.equalizerGains,
-    required this.tracks,
-  });
 
   Future<void> play() async {
     state = PlayerState.playing;
@@ -86,6 +79,7 @@ class PlayerController {
         log("Couldn't play track", error: e);
       }
     }
+    notifyListeners();
   }
 
   Future<void> pause() async {
@@ -94,6 +88,7 @@ class PlayerController {
     if (playerBackend != null) {
       await playerBackend!.pause();
     }
+    notifyListeners();
   }
 
   Future<void> stop() async {
@@ -103,6 +98,7 @@ class PlayerController {
       await playerBackend!.seek(Duration.zero);
       await playerBackend!.stop();
     }
+    notifyListeners();
   }
 
   int _getCurrentTraxIndex() {
@@ -159,6 +155,7 @@ class PlayerController {
     await _setCurrentTrackFromIndex(currentTrackIndex);
     await play();
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   Future<void> prev() async {
@@ -180,6 +177,7 @@ class PlayerController {
     await _setCurrentTrackFromIndex(currentTrackIndex);
     await play();
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   Future<void> shuffleTrackQueue() async {
@@ -200,6 +198,7 @@ class PlayerController {
     await handler();
 
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   List<String> _weightedShuffle(
@@ -252,6 +251,7 @@ class PlayerController {
     await stop();
     this.playerBackend = playerBackend;
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   Future<void> setCurrentTrack(Track track) async {
@@ -276,6 +276,7 @@ class PlayerController {
       log("Couldn't set the current track", error: e);
     }
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   PlayerController clone() {
@@ -368,6 +369,7 @@ class PlayerController {
 
     shuffledTrackQueueIds = trackQueueIds;
     await shuffleTrackQueue();
+    notifyListeners();
   }
 
   Future<void> setSpeed(double value) async {
@@ -376,6 +378,7 @@ class PlayerController {
       await playerBackend!.setSpeed(speed);
     }
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   Future<LoopMode> toggleLoopMode() async {
@@ -387,6 +390,7 @@ class PlayerController {
     };
     loopMode = nextLoopModeMap[loopMode]!;
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
     return loopMode;
   }
 
@@ -398,6 +402,7 @@ class PlayerController {
     };
     shuffleMode = shuffleModeMap[shuffleMode]!;
     await shuffleTrackQueue();
+    notifyListeners();
     return shuffleMode;
   }
 
@@ -423,6 +428,7 @@ class PlayerController {
     final nextHandler = nextHandlerMap[loopMode]!;
     await nextHandler();
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   Track? getPreviousTrack() {
@@ -480,6 +486,7 @@ class PlayerController {
   Future<void> setTrackQueueDisplayMode(TrackQueueDisplayMode mode) async {
     trackQueueDisplayMode = mode;
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   Future<Map<String, TrackStatistics>> _getAllTrackStatistics() async {
@@ -558,6 +565,7 @@ class PlayerController {
     if (shuffledIdIndex != -1) {
       shuffledTrackQueueIds[shuffledIdIndex] = newId;
     }
+    notifyListeners();
   }
 
   Future<void> setVolume(double value) async {
@@ -566,6 +574,7 @@ class PlayerController {
       await playerBackend!.setVolume(volume);
     }
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   Future<void> setEqualizerGains(List<double> gains) async {
@@ -574,6 +583,7 @@ class PlayerController {
       await playerBackend!.setEqualizerGains(equalizerGains);
     }
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   Future<void> restoreDefaults() async {
@@ -584,6 +594,7 @@ class PlayerController {
       await playerBackend!.setEqualizerGains(equalizerGains);
     }
     await handlePersistPlayerControllerState(this);
+    notifyListeners();
   }
 
   void setTracks(List<Track> tracks) {
@@ -592,6 +603,7 @@ class PlayerController {
       newState[track.id] = track;
     }
     this.tracks = newState;
+    notifyListeners();
   }
 
   List<Track> getTracks() {
@@ -604,6 +616,7 @@ class PlayerController {
       newState[track.id] = track;
     }
     this.tracks = newState;
+    notifyListeners();
   }
 
   void removeTracks(List<String> trackIds) {
@@ -612,5 +625,6 @@ class PlayerController {
       newState.remove(id);
     }
     tracks = newState;
+    notifyListeners();
   }
 }

@@ -1,11 +1,10 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 
+import 'package:yampa/core/player/player_controller.dart';
+
 class YampaAudioHandler extends BaseAudioHandler {
   final AudioPlayer _player;
-  
-  Future<void> Function()? onNext;
-  Future<void> Function()? onPrev;
 
   YampaAudioHandler(this._player) {
     _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
@@ -25,16 +24,12 @@ class YampaAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> skipToNext() async {
-    if (onNext != null) {
-      await onNext!();
-    }
+    await PlayerController.instance.next(true);
   }
 
   @override
   Future<void> skipToPrevious() async {
-    if (onPrev != null) {
-      await onPrev!();
-    }
+    await PlayerController.instance.prev();
   }
 
   @override
