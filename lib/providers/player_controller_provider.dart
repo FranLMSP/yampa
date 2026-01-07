@@ -5,7 +5,6 @@ import 'package:yampa/core/player_backends/factory.dart';
 import 'package:yampa/core/player_backends/interface.dart';
 import 'package:yampa/models/playlist.dart';
 import 'package:yampa/models/track.dart';
-import 'package:yampa/core/player_backends/just_audio.dart';
 
 final playerControllerProvider =
     NotifierProvider<PlayerControllerNotifier, PlayerController>(
