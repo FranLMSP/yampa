@@ -159,7 +159,6 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
         ],
       );
     }
-    // TODO: make this responsive
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: row,
