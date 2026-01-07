@@ -197,7 +197,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
       playerControllerProvider.notifier,
     );
 
-    await handleTrackMetadataEdited(
+    final updatedTrackResult = await handleTrackMetadataEdited(
       updatedTrack,
       allPlaylists,
       playlistNotifier,
@@ -208,7 +208,7 @@ class _TrackInfoDialogState extends ConsumerState<TrackInfoDialog> {
       Navigator.of(context).pop();
       showDialog(
         context: context,
-        builder: (_) => TrackInfoDialog(track: updatedTrack),
+        builder: (_) => TrackInfoDialog(track: updatedTrackResult),
       );
     }
   }

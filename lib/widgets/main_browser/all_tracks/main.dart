@@ -384,7 +384,9 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     final playerControllerNotifier = ref.read(
       playerControllerProvider.notifier,
     );
-    final tracks = playerControllerNotifier.getPlayerController().tracks;
+    final tracks = ref.watch(
+      playerControllerProvider.select((p) => p.tracks),
+    );
     final loadedTracksCount = ref.watch(loadedTracksCountProvider);
     debugPrint(loadedTracksCount.toString());
     final playlists = ref.watch(playlistsProvider);

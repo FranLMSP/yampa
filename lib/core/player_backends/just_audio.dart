@@ -101,6 +101,7 @@ class JustAudioBackend implements PlayerBackend {
         if (track != null) {
           playerControllerNotifier.addTracks([track]);
           await cachedTracksRepository.addOrUpdate(track);
+          foundTracks[track.id] = track; // Add newly found track to the map
         }
         loadedTracksCountNotifier.incrementLoadedTrack();
       }
@@ -335,9 +336,14 @@ class JustAudioBackend implements PlayerBackend {
 
     // Stop playback if the track being edited is the currently active one
     // to avoid file locking issues on some platforms.
-    if (_player?.playing == true &&
-        PlayerController.instance.currentTrackId == track.id) {
-      await stop();
+    bool wasPlaying = false;
+    Duration? position;
+    if (PlayerController.instance.currentTrackId == track.id) {
+      wasPlaying = _player?.playing ?? false;
+      position = _player?.position;
+      if (wasPlaying) {
+        await stop();
+      }
     }
 
     Tag? existingTag = await AudioTags.read(track.path);
@@ -367,6 +373,15 @@ class JustAudioBackend implements PlayerBackend {
     await AudioTags.write(track.path, tag);
 
     final updatedTrack = await _getTrackMetadataFromGenericPath(track.path);
+
+    if (wasPlaying) {
+      await setTrack(updatedTrack!);
+      if (position != null) {
+        await seek(position);
+      }
+      await play();
+    }
+
     return updatedTrack!;
   }
 }
