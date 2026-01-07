@@ -310,6 +310,17 @@ class StatisticsSqlite extends StatisticsRepository {
   }
 
   @override
+  Future<void> updateTrackId(String oldId, String newId) async {
+    final db = await _getdb();
+    await db.update(
+      trackStatisticsTableName,
+      {'trackId': newId},
+      where: 'trackId = ?',
+      whereArgs: [oldId],
+    );
+  }
+
+  @override
   Future<void> close() async {
     if (_db != null) {
       await _db!.close();

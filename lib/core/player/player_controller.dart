@@ -577,7 +577,14 @@ class PlayerController {
   }
 
   Future<void> handleTrackUpdated(String oldId, String newId) async {
-    // TODO: we have to update the statistics as well.
+    try {
+      final statsRepo = getStatisticsRepository();
+      await statsRepo.updateTrackId(oldId, newId);
+      await statsRepo.close();
+    } catch (e) {
+      log('Error updating track ID in statistics', error: e);
+    }
+
     currentTrackId = newId;
     final queueIdIndex = trackQueueIds.indexOf(oldId);
     if (queueIdIndex != -1) {

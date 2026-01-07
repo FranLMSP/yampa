@@ -18,6 +18,7 @@ abstract class StatisticsRepository {
   Future<void> incrementTrackSkipCount(String trackId);
   Future<void> incrementTrackCompletionCount(String trackId);
   Future<void> addTrackPlaybackTime(String trackId, Duration duration);
+  Future<void> updateTrackId(String oldId, String newId);
 
   Future<void> close();
 }

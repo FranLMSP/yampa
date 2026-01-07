@@ -7,8 +7,8 @@ import 'dart:typed_data';
 import 'package:audiotags/audiotags.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/player_backends/audio_handler.dart';
 import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/core/utils/id_utils.dart';
@@ -41,15 +41,7 @@ class JustAudioBackend implements PlayerBackend {
   AndroidEqualizer? _equalizer;
 
   @override
-  Future<void> init() async {
-    if (isPlatformDesktop()) {
-      JustAudioMediaKit.ensureInitialized(
-        linux: Platform.isLinux,
-        windows: Platform.isWindows,
-        macOS: Platform.isMacOS,
-      );
-    }
-  }
+  Future<void> init() async {}
 
   void _ensurePlayerInitialized() {
     if (_player == null) {
@@ -109,6 +101,7 @@ class JustAudioBackend implements PlayerBackend {
         if (track != null) {
           playerControllerNotifier.addTracks([track]);
           await cachedTracksRepository.addOrUpdate(track);
+          foundTracks[track.id] = track; // Add newly found track to the map
         }
         loadedTracksCountNotifier.incrementLoadedTrack();
       }
@@ -231,9 +224,6 @@ class JustAudioBackend implements PlayerBackend {
   Future<Duration> setTrack(Track track) async {
     _ensurePlayerInitialized();
     // TODO: maybe detect here if the path is an URL or not, and call setUrl if that's the case
-    final artUri = track.imageBytes != null
-        ? bytesToDataUri(track.imageBytes!)
-        : null;
     Duration? duration;
     try {
       final audioSource = AudioSource.uri(Uri.file(track.path));
@@ -293,7 +283,11 @@ class JustAudioBackend implements PlayerBackend {
   @override
   Future<void> seek(Duration position) async {
     _ensurePlayerInitialized();
-    await _player!.seek(position);
+    try {
+      await _player!.seek(position);
+    } catch (e) {
+      log("Error seeking", error: e);
+    }
   }
 
   @override
@@ -339,6 +333,19 @@ class JustAudioBackend implements PlayerBackend {
     if (!hasStorageAccess) {
       await Permission.storage.request();
     }
+
+    // Stop playback if the track being edited is the currently active one
+    // to avoid file locking issues on some platforms.
+    bool wasPlaying = false;
+    Duration? position;
+    if (PlayerController.instance.currentTrackId == track.id) {
+      wasPlaying = _player?.playing ?? false;
+      position = _player?.position;
+      if (wasPlaying) {
+        await stop();
+      }
+    }
+
     Tag? existingTag = await AudioTags.read(track.path);
 
     Tag tag = Tag(
@@ -366,6 +373,15 @@ class JustAudioBackend implements PlayerBackend {
     await AudioTags.write(track.path, tag);
 
     final updatedTrack = await _getTrackMetadataFromGenericPath(track.path);
+
+    if (wasPlaying) {
+      await setTrack(updatedTrack!);
+      if (position != null) {
+        await seek(position);
+      }
+      await play();
+    }
+
     return updatedTrack!;
   }
 }

@@ -354,7 +354,7 @@ Future<void> loadPlayerControllerState(
   playerControllerStateRepository.close();
 }
 
-Future<void> handleTrackMetadataEdited(
+Future<Track> handleTrackMetadataEdited(
   Track newTrackInfo,
   List<Playlist> allPlaylists,
   PlaylistNotifier playlistNotifier,
@@ -383,6 +383,8 @@ Future<void> handleTrackMetadataEdited(
   playerControllerNotifier.addTracks([updatedTrack]);
 
   playerControllerNotifier.handleTrackUpdated(existingId, updatedTrack.id);
+
+  return updatedTrack;
 }
 
 Future<void> handleAppWindowSizeChanged(WindowSize windowSize) async {
