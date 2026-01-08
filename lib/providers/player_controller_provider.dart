@@ -63,14 +63,19 @@ class PlayerControllerNotifier extends Notifier<PlayerController> {
   Future<void> handleTracksAddedToPlaylist(
     List<Map<String, String>> playlistTrackMapping,
   ) async {
-    await PlayerController.instance.handleTracksAddedToPlaylist(playlistTrackMapping);
+    await PlayerController.instance.handleTracksAddedToPlaylist(
+      playlistTrackMapping,
+    );
   }
 
   Future<void> handleTracksRemovedFromPlaylist(
     Playlist playlist,
     List<String> trackIds,
   ) async {
-    await PlayerController.instance.handleTracksRemovedFromPlaylist(playlist, trackIds);
+    await PlayerController.instance.handleTracksRemovedFromPlaylist(
+      playlist,
+      trackIds,
+    );
   }
 
   Future<LoopMode> toggleLoopMode() async {
