@@ -17,7 +17,8 @@ class YampaAudioHandler extends BaseAudioHandler {
   Future<void> pause() => PlayerController.instance.pause();
 
   @override
-  Future<void> seek(Duration position) => PlayerController.instance.seek(position);
+  Future<void> seek(Duration position) =>
+      PlayerController.instance.seek(position);
 
   @override
   Future<void> stop() => PlayerController.instance.stop();

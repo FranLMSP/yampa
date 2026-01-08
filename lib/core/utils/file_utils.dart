@@ -62,7 +62,8 @@ bool isValidImagePath(String path) {
 
   // Fallback for common extensions
   final lowerPath = path.toLowerCase();
-  final hasImageExtension = (lowerPath.endsWith(".gif") ||
+  final hasImageExtension =
+      (lowerPath.endsWith(".gif") ||
       lowerPath.endsWith(".jpg") ||
       lowerPath.endsWith(".jpeg") ||
       lowerPath.endsWith(".webp") ||
