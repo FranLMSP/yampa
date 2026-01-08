@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:ulid/ulid.dart';
 import 'package:image/image.dart' as img;
+import 'package:mime/mime.dart';
 
 const String kUserImagesFolder = "user_images";
 
@@ -35,26 +36,39 @@ String getParentFolder(String folder) {
 }
 
 bool isValidMusicPath(String path) {
-  // TODO: maybe check for mimetype here as well?
+  final mimeType = lookupMimeType(path);
+  if (mimeType != null && mimeType.startsWith('audio/')) {
+    return true;
+  }
 
-  return (path.endsWith(".mp4") ||
-      path.endsWith(".m4a") ||
-      path.endsWith(".mp3") ||
-      path.endsWith(".ogg") ||
-      path.endsWith(".ogg") ||
-      path.endsWith(".opus") ||
-      path.endsWith(".wav") ||
-      path.endsWith(".flac"));
+  // Fallback for common extensions if mime check fails or for video containers often used for audio
+  final lowerPath = path.toLowerCase();
+  return (lowerPath.endsWith(".mp4") ||
+      lowerPath.endsWith(".m4a") ||
+      lowerPath.endsWith(".mp3") ||
+      lowerPath.endsWith(".ogg") ||
+      lowerPath.endsWith(".opus") ||
+      lowerPath.endsWith(".wav") ||
+      lowerPath.endsWith(".flac"));
 }
 
 bool isValidImagePath(String path) {
-  // TODO: maybe check for mimetype here as well?
+  final mimeType = lookupMimeType(path);
+  final isImageMime = mimeType != null && mimeType.startsWith('image/');
 
-  return (path.endsWith(".gif") ||
-      path.endsWith(".jpg") ||
-      path.endsWith(".jpeg") ||
-      path.endsWith(".webp") ||
-      path.endsWith(".png") && io.File(path).existsSync());
+  if (isImageMime) {
+    return io.File(path).existsSync();
+  }
+
+  // Fallback for common extensions
+  final lowerPath = path.toLowerCase();
+  final hasImageExtension = (lowerPath.endsWith(".gif") ||
+      lowerPath.endsWith(".jpg") ||
+      lowerPath.endsWith(".jpeg") ||
+      lowerPath.endsWith(".webp") ||
+      lowerPath.endsWith(".png"));
+
+  return hasImageExtension && io.File(path).existsSync();
 }
 
 Future<String> getBasePath() async {
