@@ -39,8 +39,8 @@ if [[ "$dry_run" -ne 0 ]]; then
 else
   git add pubspec.yaml
   # TODO: we want to sign this commit with GPG
-  git commit -m "Bump version to $new_version"
-  git tag "$new_version"
+  git commit -S -m "Bump version to $new_version"
+  git -s tag "$new_version"
   git push origin main
   git push origin "$new_version"
 fi
