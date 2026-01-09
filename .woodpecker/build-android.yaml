@@ -15,9 +15,14 @@ steps:
 
   - name: build-android-apk
     image: docker
+    secrets: [ ANDROID_KEYSTORE_BASE64, KEY_PROPERTIES ]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
+      - echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > /tmp/upload-keystore.jks
+      - echo "$KEY_PROPERTIES" > /tmp/key.properties
+      - docker cp /tmp/upload-keystore.jks yampa_android_builder:/app/upload-keystore.jks
+      - docker cp /tmp/key.properties yampa_android_builder:/app/android/key.properties
       - docker run -v android_sdks:/opt/android/sdks/ --name yampa_android_builder yampa_android_builder "flutter build apk --release"
       - mkdir -p dist
       - docker cp yampa_android_builder:/app/build/app/outputs/flutter-apk/app-release.apk dist/yampa-android-${CI_COMMIT_TAG}.apk
