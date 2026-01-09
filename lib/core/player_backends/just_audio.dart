@@ -58,10 +58,6 @@ class JustAudioBackend implements PlayerBackend {
     }
   }
 
-  /// Saves album art bytes to a temporary file and returns the file URI.
-  /// Returns null if imageBytes is null.
-  /// This is needed because some platforms (like Linux) don't support data URIs
-  /// for album art in media notifications.
   Future<Uri?> _saveAlbumArtToTempFile(Uint8List? imageBytes) async {
     if (imageBytes == null) return null;
 
@@ -247,8 +243,6 @@ class JustAudioBackend implements PlayerBackend {
       final audioSource = AudioSource.uri(Uri.file(track.path));
       duration = await _player!.setAudioSource(audioSource);
 
-      // Save album art to a temporary file to get a file URI
-      // (data URIs are not supported on some platforms like Linux)
       final artUri = await _saveAlbumArtToTempFile(track.imageBytes);
       await _audioHandler?.updateMediaItem(
         MediaItem(
