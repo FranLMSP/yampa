@@ -40,7 +40,7 @@ else
   git add pubspec.yaml
   # TODO: we want to sign this commit with GPG
   git commit -S -m "Bump version to $new_version"
-  git -s tag "$new_version"
+  git tag -s "$new_version"
   git push origin main
   git push origin "$new_version"
 fi
