@@ -7,12 +7,12 @@ import 'dart:typed_data';
 import 'package:audiotags/audiotags.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:yampa/core/player/player_controller.dart';
 import 'package:yampa/core/player_backends/audio_handler.dart';
 import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/core/utils/id_utils.dart';
-import 'package:yampa/core/utils/player_utils.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/core/repositories/cached_tracks/cached_tracks.dart';
@@ -57,6 +57,25 @@ class JustAudioBackend implements PlayerBackend {
       _audioHandler = YampaAudioHandler(_player!);
     }
   }
+
+  /// Saves album art bytes to a temporary file and returns the file URI.
+  /// Returns null if imageBytes is null.
+  /// This is needed because some platforms (like Linux) don't support data URIs
+  /// for album art in media notifications.
+  Future<Uri?> _saveAlbumArtToTempFile(Uint8List? imageBytes) async {
+    if (imageBytes == null) return null;
+
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final tempFile = File('${tempDir.path}/current_album_art.png');
+      await tempFile.writeAsBytes(imageBytes);
+      return Uri.file(tempFile.path);
+    } catch (e) {
+      log('Error saving album art to temp file', error: e);
+      return null;
+    }
+  }
+
 
   @override
   Future<List<Track>> fetchTracks(
@@ -229,9 +248,9 @@ class JustAudioBackend implements PlayerBackend {
       final audioSource = AudioSource.uri(Uri.file(track.path));
       duration = await _player!.setAudioSource(audioSource);
 
-      final artUri = track.imageBytes != null
-          ? bytesToDataUri(track.imageBytes!)
-          : null;
+      // Save album art to a temporary file to get a file URI
+      // (data URIs are not supported on some platforms like Linux)
+      final artUri = await _saveAlbumArtToTempFile(track.imageBytes);
       await _audioHandler?.updateMediaItem(
         MediaItem(
           id: track.id,

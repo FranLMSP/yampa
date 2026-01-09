@@ -40,6 +40,7 @@ class PlayerController {
   List<double> equalizerGains = [];
   Map<String, Track> tracks = {};
 
+  Track? lastLoadedTrack;
   DateTime? sessionStartTime;
   DateTime? lastPlayStartTime;
 
@@ -88,10 +89,16 @@ class PlayerController {
   });
 
   Future<void> play() async {
-    state = PlayerState.playing;
     lastPlayStartTime = DateTime.now();
     if (playerBackend != null) {
       try {
+        if (lastLoadedTrack == null) {
+          final trackIndex = _getCurrentTrackIndex();
+          if (trackIndex != -1) {
+            await _setCurrentTrackFromIndex(trackIndex);
+          }
+        }
+        state = PlayerState.playing;
         await playerBackend!.play();
       } catch (e) {
         log("Couldn't play track", error: e);
@@ -119,7 +126,7 @@ class PlayerController {
     notifyListeners();
   }
 
-  int _getCurrentTraxIndex() {
+  int _getCurrentTrackIndex() {
     return shuffledTrackQueueIds.indexWhere((e) => e == currentTrackId);
   }
 
@@ -150,7 +157,7 @@ class PlayerController {
   Future<void> next(bool forceNext) async {
     await _trackSkipAndCompletionEvents(forceNext);
     await stop();
-    int currentTrackIndex = _getCurrentTraxIndex();
+    int currentTrackIndex = _getCurrentTrackIndex();
     if (currentTrackIndex <= -1) {
       currentTrackIndex = 0;
     }
@@ -180,7 +187,7 @@ class PlayerController {
     if (currentTrackId != null) {
       await _trackSkipEvent(currentTrackId!);
     }
-    int currentTrackIndex = _getCurrentTraxIndex();
+    int currentTrackIndex = _getCurrentTrackIndex();
 
     await stop();
     if (currentTrackIndex > 0) {
@@ -281,7 +288,7 @@ class PlayerController {
     await _trackPlayEvent(track.id);
     currentTrackId = track.id;
     // Most likely the user clicked on a track in the "all tracks" list and not a playlist
-    if (_getCurrentTraxIndex() <= -1) {
+    if (_getCurrentTrackIndex() <= -1) {
       final allTrackIds = tracks.values.map((e) => e.id).toList();
       trackQueueIds = allTrackIds;
       shuffledTrackQueueIds = allTrackIds;
@@ -291,6 +298,7 @@ class PlayerController {
     lastTrackDuration = Duration.zero;
     try {
       lastTrackDuration = await playerBackend!.setTrack(track);
+      lastLoadedTrack = track;
     } catch (e) {
       log("Couldn't set the current track", error: e);
     }
@@ -458,7 +466,7 @@ class PlayerController {
     }
 
     String? prevTrackId;
-    int currentTrackIndex = _getCurrentTraxIndex();
+    int currentTrackIndex = _getCurrentTrackIndex();
     if (loopMode == LoopMode.infinite) {
       if (currentTrackIndex == 0) {
         prevTrackId = shuffledTrackQueueIds.last;
@@ -484,7 +492,7 @@ class PlayerController {
     }
 
     String? nextTrackId;
-    int currentTrackIndex = _getCurrentTraxIndex();
+    int currentTrackIndex = _getCurrentTrackIndex();
     if (loopMode == LoopMode.infinite) {
       if (currentTrackIndex == shuffledTrackQueueIds.length - 1) {
         nextTrackId = shuffledTrackQueueIds.first;
