@@ -12,7 +12,7 @@ DOCKER_IMAGE_WINDOWS ?= yampa_windows_builder
 format:
 	dart format $(FILE)
 
-.PHONY: docker/clean-images build/linux build/windows build/android build/all
+.PHONY: docker/clean-images build/linux build/flatpak build/windows build/android build/all
 
 docker/clean-images:
 	docker image rm $(DOCKER_IMAGE_LINUX) || true
@@ -30,16 +30,20 @@ docker/build-image/windows:
 
 build/linux:
 	make docker/build-image/linux \
-	&& docker run --rm --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined -v ./:/app $(DOCKER_IMAGE_LINUX) "flutter clean && flutter doctor && ./scripts/build-linux-appimage.sh"
+	&& docker run --rm --privileged -v ./:/workspace $(DOCKER_IMAGE_LINUX) "flutter clean && flutter doctor && ./scripts/build-linux-appimage.sh"
+
+build/flatpak:
+	make docker/build-image/linux \
+	&& docker run --rm --privileged -v ./:/workspace $(DOCKER_IMAGE_LINUX) "flutter clean && flutter doctor && ./scripts/build-linux-flatpak.sh"
 
 build/android:
 	make docker/build-image/android \
-	&& docker run --rm -v ./:/app $(DOCKER_IMAGE_ANDROID) "flutter clean && flutter doctor && flutter build apk --release"
+	&& docker run --rm -v ./:/workspace $(DOCKER_IMAGE_ANDROID) "flutter clean && flutter doctor && flutter build apk --release"
 
 build/windows:
 	echo "There is no cross compilation from Linux at the moment"
 
-build/all: build/linux build/windows build/android
+build/all: build/linux build/flatpak build/windows build/android
 
 .PHONY: release/get-latest-tag release/new-tag
 

@@ -1,0 +1,78 @@
+app-id: com.francoacg.Yampa
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+command: yampa
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  - --device=dri
+  - --filesystem=xdg-music
+  - --filesystem=xdg-run/pipewire-0
+  - --env=LD_LIBRARY_PATH=/app/lib
+
+modules:
+  - name: libass
+    config-opts:
+      - --disable-static
+    sources:
+      - type: archive
+        url: https://github.com/libass/libass/releases/download/0.17.3/libass-0.17.3.tar.gz
+        sha256: da7c348deb6fa6c24507afab2dee7545ba5dd5bbf90a137bfe9e738f7df68537
+
+  - name: libplacebo
+    buildsystem: meson
+    config-opts:
+      - -Dopengl=enabled
+      - -Dvulkan=enabled
+      - -Dshaderc=disabled
+      - -Ddemos=false
+    sources:
+      - type: git
+        url: https://code.videolan.org/videolan/libplacebo.git
+        tag: v7.349.0
+        commit: 1fd3c7bde7b943fe8985c893310b5269a09b46c5
+
+  - name: libmpv
+    buildsystem: meson
+    config-opts:
+      - -Dlibmpv=true
+      - -Dcplayer=false
+      - -Dlua=disabled
+      - -Djavascript=disabled
+      - -Dvaapi=enabled
+    sources:
+      - type: archive
+        url: https://github.com/mpv-player/mpv/archive/refs/tags/v0.39.0.tar.gz
+        sha256: 2ca92437affb62c2b559b4419ea4785c70d023590500e8a52e95ea3ab4554683
+
+  - name: sqlite3
+    buildsystem: autotools
+    config-opts:
+      - --disable-static
+      - --enable-fts5
+      - --enable-json1
+    sources:
+      - type: archive
+        url: https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz
+        sha256: 67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071
+
+  - name: yampa
+    buildsystem: simple
+    build-commands:
+      - install -D yampa /app/bin/yampa
+      - cp -r data /app/bin/
+      - cp -r lib /app/bin/
+      - install -D com.francoacg.Yampa.desktop /app/share/applications/com.francoacg.Yampa.desktop
+      - install -D com.francoacg.Yampa.png /app/share/icons/hicolor/512x512/apps/com.francoacg.Yampa.png
+    sources:
+      - type: dir
+        path: build/linux/x64/release/bundle
+      - type: file
+        path: com.francoacg.Yampa.desktop
+      - type: file
+        path: assets/icon/icon.png
+        dest-filename: com.francoacg.Yampa.png
