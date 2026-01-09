@@ -15,7 +15,11 @@ steps:
 
   - name: build-android-apk
     image: docker
-    secrets: [ ANDROID_KEYSTORE_BASE64, KEY_PROPERTIES ]
+    environment:
+      ANDROID_KEYSTORE_BASE64:
+        from_secret: ANDROID_KEYSTORE_BASE64
+      KEY_PROPERTIES:
+        from_secret: KEY_PROPERTIES
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
