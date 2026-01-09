@@ -13,17 +13,36 @@ steps:
       - docker rm -f yampa_linux_builder || true
       - docker build -t yampa_linux_builder -f docker/linux.Dockerfile ./
 
-  - name: build-linux-binaries
+  - name: build-linux-tarball
     image: docker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - docker run -v appimage_binaries:/app/scripts/bin --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined --name yampa_linux_builder yampa_linux_builder "./scripts/build-linux-appimage.sh"
+      - docker run --name yampa_tarball_builder yampa_linux_builder "flutter build linux --release"
       - mkdir -p dist
-      - docker cp yampa_linux_builder:/app/build/linux/x64/release/bundle dist/yampa-linux-release
+      - docker cp yampa_tarball_builder:/app/build/linux/x64/release/bundle dist/yampa-linux-release
       - tar -czvf dist/yampa-linux-x64-${CI_COMMIT_TAG}.tar.gz -C dist yampa-linux-release
-      - docker cp yampa_linux_builder:/app/outputs/yampa-x64.AppImage dist/yampa-linux-x64-${CI_COMMIT_TAG}.AppImage
-      - docker rm yampa_linux_builder
+      - docker rm yampa_tarball_builder
+      - ls -lh dist/
+
+  - name: build-linux-appimage
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - docker run -v appimage_binaries:/app/scripts/bin --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined --name yampa_appimage_builder yampa_linux_builder "./scripts/build-linux-appimage.sh"
+      - docker cp yampa_appimage_builder:/app/outputs/yampa-x64.AppImage dist/yampa-linux-x64-${CI_COMMIT_TAG}.AppImage
+      - docker rm yampa_appimage_builder
+      - ls -lh dist/
+
+  - name: build-linux-flatpak
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - docker run --privileged --name yampa_flatpak_builder yampa_linux_builder "./scripts/build-linux-flatpak.sh"
+      - docker cp yampa_flatpak_builder:/app/outputs/yampa.flatpak dist/yampa-linux-x64-${CI_COMMIT_TAG}.flatpak
+      - docker rm yampa_flatpak_builder
       - ls -lh dist/
 
   - name: publish-release
@@ -34,4 +53,5 @@ steps:
       files:
         - dist/yampa-linux-x64-${CI_COMMIT_TAG}.tar.gz
         - dist/yampa-linux-x64-${CI_COMMIT_TAG}.AppImage
+        - dist/yampa-linux-x64-${CI_COMMIT_TAG}.flatpak
       overwrite: true

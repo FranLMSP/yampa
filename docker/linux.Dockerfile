@@ -24,6 +24,10 @@ RUN apt-get update \
     libmpv-dev \
     ca-certificates \
     unzip \
+    flatpak \
+    flatpak-builder \
+    elfutils \
+    patchelf \
     && rm -rf /var/lib/apt/lists/*
 
 ENV TAR_OPTIONS="--no-same-owner --no-same-permissions"
@@ -31,7 +35,7 @@ RUN git clone https://github.com/flutter/flutter.git -b stable /opt/flutter
 ENV PATH="$PATH:/opt/flutter/bin"
 RUN flutter config --enable-linux-desktop --no-enable-android --no-enable-ios --no-enable-web && flutter doctor && flutter precache --linux
 
-WORKDIR /app
+WORKDIR /workspace
 
 COPY . .
 

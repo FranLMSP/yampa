@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Yampa
+Comment=Simple Open Source music player app
+Exec=yampa
+Icon=com.francoacg.Yampa
+Categories=AudioVideo;Audio;Player;
+Terminal=false
+StartupWMClass=yampa
