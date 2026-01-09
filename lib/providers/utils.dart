@@ -351,6 +351,10 @@ Future<void> loadPlayerControllerState(
   final lastPlayerControllerState = await playerControllerStateRepository
       .getPlayerControllerState();
   await PlayerController.initFromLastState(lastPlayerControllerState);
+  await PlayerController.instance.setVolume(lastPlayerControllerState.volume);
+  await PlayerController.instance.setEqualizerGains(
+    lastPlayerControllerState.equalizerGains,
+  );
   playerControllerStateRepository.close();
 }
 

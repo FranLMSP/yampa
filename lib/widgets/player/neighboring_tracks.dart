@@ -25,29 +25,45 @@ class NeighboringTracks extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: prevTrack != null
-                ? _buildTrackInfo(
-                    context,
-                    prevTrack,
-                    ref
-                        .read(localizationProvider.notifier)
-                        .translate(LocalizationKeys.previous),
-                    CrossAxisAlignment.start,
-                  )
-                : const SizedBox.shrink(),
+            child: InkWell(
+              onTap: () async {
+                final playerNotifierController = ref.read(
+                  playerControllerProvider.notifier,
+                );
+                await playerNotifierController.prev();
+              },
+              child: prevTrack != null
+                  ? _buildTrackInfo(
+                      context,
+                      prevTrack,
+                      ref
+                          .read(localizationProvider.notifier)
+                          .translate(LocalizationKeys.previous),
+                      CrossAxisAlignment.start,
+                    )
+                  : const SizedBox.shrink(),
+            ),
           ),
           const SizedBox(width: 5),
           Expanded(
-            child: nextTrack != null
-                ? _buildTrackInfo(
-                    context,
-                    nextTrack,
-                    ref
-                        .read(localizationProvider.notifier)
-                        .translate(LocalizationKeys.next),
-                    CrossAxisAlignment.end,
-                  )
-                : const SizedBox.shrink(),
+            child: InkWell(
+              onTap: () async {
+                final playerNotifierController = ref.read(
+                  playerControllerProvider.notifier,
+                );
+                await playerNotifierController.next();
+              },
+              child: nextTrack != null
+                  ? _buildTrackInfo(
+                      context,
+                      nextTrack,
+                      ref
+                          .read(localizationProvider.notifier)
+                          .translate(LocalizationKeys.next),
+                      CrossAxisAlignment.end,
+                    )
+                  : const SizedBox.shrink(),
+            ),
           ),
         ],
       ),

@@ -50,7 +50,7 @@ class MiniPlayer extends ConsumerWidget {
                     ],
                   ),
                 ),
-                Row(children: [PlayerTotalMinutes(), PlayAndPauseButton()]),
+                Row(children: [PlayAndPauseButton()]),
               ],
             ),
           ],
