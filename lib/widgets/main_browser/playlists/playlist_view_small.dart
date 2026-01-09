@@ -13,6 +13,7 @@ import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/statistics_provider.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/widgets/common/constants.dart';
 import 'package:yampa/widgets/common/image_cropper_screen.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/main.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_info_dialog.dart';
@@ -277,7 +278,7 @@ class _PlaylistViewSmallState extends ConsumerState<PlaylistViewSmall> {
 
     return Scrollbar(
       controller: _scrollController,
-      thickness: isMobile ? 20 : null,
+      thickness: isMobile ? scrollbarThickness : null,
       radius: isMobile ? const Radius.circular(8) : null,
       thumbVisibility: isMobile ? true : null,
       interactive: isMobile ? true : null,

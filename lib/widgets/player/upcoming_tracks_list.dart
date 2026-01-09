@@ -7,6 +7,7 @@ import 'package:yampa/providers/player_controller_provider.dart';
 import 'package:yampa/providers/playlists_provider.dart';
 import 'package:yampa/providers/utils.dart';
 import 'package:yampa/models/track.dart';
+import 'package:yampa/widgets/common/constants.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/playlists/playlist_image.dart';
 import 'package:yampa/widgets/utils.dart';
@@ -97,7 +98,7 @@ class UpcomingTracksList extends ConsumerWidget {
               Expanded(
                 child: Scrollbar(
                   controller: scrollController,
-                  thickness: isMobile ? 20 : null,
+                  thickness: isMobile ? scrollbarThickness : null,
                   radius: isMobile ? const Radius.circular(8) : null,
                   thumbVisibility: isMobile ? true : null,
                   interactive: isMobile ? true : null,

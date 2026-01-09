@@ -11,6 +11,7 @@ import 'package:yampa/providers/selected_playlists_provider.dart';
 import 'package:yampa/providers/selected_tracks_provider.dart';
 import 'package:yampa/providers/statistics_provider.dart';
 import 'package:yampa/providers/utils.dart';
+import 'package:yampa/widgets/common/constants.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_list/track_item.dart';
 import 'package:yampa/widgets/main_browser/all_tracks/track_info_dialog.dart';
 import 'package:yampa/widgets/main_browser/playlists/add_to_playlist_modal.dart';
@@ -455,7 +456,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
           Expanded(
             child: Scrollbar(
               controller: _scrollController,
-              thickness: isMobile ? 20 : null,
+              thickness: isMobile ? scrollbarThickness : null,
               radius: isMobile ? const Radius.circular(8) : null,
               thumbVisibility: isMobile ? true : null,
               interactive: isMobile ? true : null,
