@@ -76,7 +76,6 @@ class JustAudioBackend implements PlayerBackend {
     }
   }
 
-
   @override
   Future<List<Track>> fetchTracks(
     List<GenericPath> paths,
