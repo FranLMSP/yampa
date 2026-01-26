@@ -5,7 +5,6 @@ import 'package:yampa/widgets/common/display_track_title.dart';
 import 'package:yampa/widgets/player/buttons/play_and_pause.dart';
 import 'package:yampa/widgets/player/mini_slider.dart';
 import 'package:yampa/widgets/player/player_image.dart';
-import 'package:yampa/widgets/player/player_total_minutes.dart';
 
 class MiniPlayer extends ConsumerWidget {
   const MiniPlayer({super.key, this.onTap});

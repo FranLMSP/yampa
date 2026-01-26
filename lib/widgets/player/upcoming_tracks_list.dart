@@ -16,12 +16,56 @@ import 'package:yampa/core/localization/keys.dart';
 
 File getFile(String path) => File(path);
 
-class UpcomingTracksList extends ConsumerWidget {
-  UpcomingTracksList({super.key});
-  final ScrollController scrollController = ScrollController();
+class UpcomingTracksList extends ConsumerStatefulWidget {
+  const UpcomingTracksList({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UpcomingTracksList> createState() => _UpcomingTracksListState();
+}
+
+class _UpcomingTracksListState extends ConsumerState<UpcomingTracksList> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentTrack(animated: false);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToCurrentTrack({bool animated = true}) {
+    if (!_scrollController.hasClients) return;
+
+    final playerController = ref.read(playerControllerProvider);
+    final shuffledTrackIds = playerController.shuffledTrackQueueIds;
+    final currentTrackId = playerController.currentTrackId;
+    if (currentTrackId == null) return;
+
+    final index = shuffledTrackIds.indexOf(currentTrackId);
+    if (index != -1) {
+      final offset = index * 72.0; // itemExtent
+      if (animated) {
+        _scrollController.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        _scrollController.jumpTo(offset);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final playerController = ref.watch(playerControllerProvider);
     final playlists = ref.watch(playlistsProvider);
     final tracks = playerController.tracks;
@@ -90,6 +134,11 @@ class UpcomingTracksList extends ConsumerWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      IconButton(
+                        icon: const Icon(Icons.my_location),
+                        onPressed: () => _scrollToCurrentTrack(),
+                        tooltip: "Scroll to currently playing track",
+                      ),
                     ],
                   ),
                 ),
@@ -97,13 +146,14 @@ class UpcomingTracksList extends ConsumerWidget {
               const Divider(height: 1),
               Expanded(
                 child: Scrollbar(
-                  controller: scrollController,
+                  controller: _scrollController,
                   thickness: isMobile ? scrollbarThickness : null,
                   radius: isMobile ? const Radius.circular(8) : null,
                   thumbVisibility: isMobile ? true : null,
                   interactive: isMobile ? true : null,
                   child: ListView.builder(
-                    controller: scrollController,
+                    controller: _scrollController,
+                    itemExtent: 72.0,
                     itemCount: shuffledTrackIds.length,
                     itemBuilder: (context, index) {
                       final trackId = shuffledTrackIds[index];
