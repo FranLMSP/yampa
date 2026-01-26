@@ -49,6 +49,53 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
     _searchTextController = TextEditingController();
     _isSearchingEnabled = false;
     _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentTrack(animated: false);
+    });
+  }
+
+  void _scrollToCurrentTrack({bool animated = true}) {
+    if (!_scrollController.hasClients) return;
+
+    final playerController = ref.read(playerControllerProvider);
+    final currentTrackId = playerController.currentTrackId;
+    if (currentTrackId == null) return;
+
+    final tracks = ref.read(playerControllerProvider.select((p) => p.tracks));
+    final sortMode = ref.read(allTracksSortModeProvider);
+    final allTrackStatistics = ref.read(allTrackStatisticsProvider).value ?? {};
+
+    final filteredTracks = _isSearchingEnabled
+        ? tracks.values
+              .toList()
+              .where(
+                (e) => checkSearchMatch(
+                  _searchTextController.text,
+                  stringifyTrackProperties(e),
+                ),
+              )
+              .toList()
+        : tracks.values.toList();
+
+    final sortedTracks = sortTracks(
+      filteredTracks,
+      sortMode,
+      allTrackStatistics,
+    );
+
+    final index = sortedTracks.indexWhere((t) => t.id == currentTrackId);
+    if (index != -1) {
+      final offset = index * 72.0; // itemExtent
+      if (animated) {
+        _scrollController.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        _scrollController.jumpTo(offset);
+      }
+    }
   }
 
   Widget _buildItemPopupMenuButton(
@@ -369,6 +416,12 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
             });
           },
         ),
+        if (ref.read(playerControllerProvider).currentTrackId != null)
+          IconButton(
+            icon: const Icon(Icons.my_location),
+            onPressed: () => _scrollToCurrentTrack(),
+            tooltip: "Scroll to currently playing track",
+          ),
         SortButton(
           currentSortMode: sortMode,
           onSortModeChanged: (SortMode item) {
@@ -462,6 +515,7 @@ class _AllTracksPickerState extends ConsumerState<AllTracksPicker> {
               interactive: isMobile ? true : null,
               child: ListView(
                 controller: _scrollController,
+                itemExtent: 72.0,
                 children: sortedTracks.map((track) {
                   Function(Track track)? onTap;
                   Function(Track track)? onLongPress;
