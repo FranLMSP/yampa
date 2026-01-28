@@ -23,7 +23,6 @@ steps:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - docker create --name yampa_android_builder yampa_android_builder
       - echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > /tmp/upload-keystore.jks
       - echo "$KEY_PROPERTIES" > /tmp/key.properties
       - docker cp /tmp/upload-keystore.jks yampa_android_builder:/app/upload-keystore.jks
