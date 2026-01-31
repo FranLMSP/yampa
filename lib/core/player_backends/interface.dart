@@ -1,3 +1,4 @@
+import 'package:yampa/core/player/enums.dart';
 import 'package:yampa/models/path.dart';
 import 'package:yampa/models/track.dart';
 import 'package:yampa/providers/loaded_tracks_count_provider.dart';
@@ -18,6 +19,8 @@ abstract class PlayerBackend {
   Future<void> setSpeed(double speed);
   Future<void> setVolume(double volume);
   Future<void> setEqualizerGains(List<double> gains);
+  Future<void> setLoopMode(LoopMode mode);
+  Stream<void> get onTrackFinished;
   Future<Duration> getCurrentPosition();
   bool hasTrackFinishedPlaying();
   Duration getCurrentTrackDuration();

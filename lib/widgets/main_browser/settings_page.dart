@@ -7,6 +7,7 @@ import 'package:yampa/providers/statistics_provider.dart';
 import 'package:yampa/providers/theme_mode_provider.dart';
 import 'package:yampa/providers/localization_provider.dart';
 import 'package:yampa/core/localization/keys.dart';
+import 'package:yampa/widgets/utils.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -96,6 +97,33 @@ class SettingsPage extends ConsumerWidget {
               );
             },
           ),
+          if (isPlatformMobile())
+            ...[
+              const Divider(),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Text(
+                  ref
+                      .read(localizationProvider.notifier)
+                      .translate(LocalizationKeys.backgroundPlayback),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.battery_alert, size: 32),
+                title: Text(
+                  ref
+                      .read(localizationProvider.notifier)
+                      .translate(LocalizationKeys.batteryOptimizationTitle),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  ref
+                      .read(localizationProvider.notifier)
+                      .translate(LocalizationKeys.batteryOptimizationSubtitle),
+                ),
+              ),
+            ]
         ],
       ),
     );

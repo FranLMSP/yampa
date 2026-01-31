@@ -44,6 +44,8 @@ class PlayerController {
   DateTime? sessionStartTime;
   DateTime? lastPlayStartTime;
 
+  StreamSubscription? _backendSubscription;
+
   PlayerController._();
 
   static Future<void> initFromLastState(
@@ -275,7 +277,12 @@ class PlayerController {
 
   Future<void> setPlayerBackend(PlayerBackend playerBackend) async {
     await stop();
+    await _backendSubscription?.cancel();
     this.playerBackend = playerBackend;
+    _backendSubscription = playerBackend.onTrackFinished.listen((_) {
+      handleNextAutomatically();
+    });
+    await playerBackend.setLoopMode(loopMode);
     await handlePersistPlayerControllerState(this);
     notifyListeners();
   }
@@ -418,6 +425,9 @@ class PlayerController {
       LoopMode.none: LoopMode.singleTrack,
     };
     loopMode = nextLoopModeMap[loopMode]!;
+    if (playerBackend != null) {
+      await playerBackend!.setLoopMode(loopMode);
+    }
     await handlePersistPlayerControllerState(this);
     notifyListeners();
     return loopMode;
