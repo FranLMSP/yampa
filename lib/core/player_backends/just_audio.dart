@@ -331,7 +331,7 @@ class JustAudioBackend implements PlayerBackend {
     _ensurePlayerInitialized();
     final justAudioLoopMode = {
       yampa_loop.LoopMode.singleTrack: LoopMode.one,
-      yampa_loop.LoopMode.infinite: LoopMode.all,
+      yampa_loop.LoopMode.infinite: LoopMode.off,
       yampa_loop.LoopMode.startToEnd: LoopMode.off,
       yampa_loop.LoopMode.none: LoopMode.off,
     }[mode];
