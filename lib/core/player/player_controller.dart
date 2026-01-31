@@ -62,7 +62,7 @@ class PlayerController {
     pc.shuffleMode = lastState.shuffleMode;
     pc.trackQueueDisplayMode = lastState.trackQueueDisplayMode;
     pc.lastTrackDuration = Duration.zero;
-    pc.playerBackend = await getPlayerBackend();
+    await pc.setPlayerBackend(await getPlayerBackend());
     pc.sessionStartTime = DateTime.now();
     pc.lastPlayStartTime = null;
     pc.volume = lastState.volume;
@@ -283,6 +283,8 @@ class PlayerController {
       handleNextAutomatically();
     });
     await playerBackend.setLoopMode(loopMode);
+    await playerBackend.setVolume(volume);
+    await playerBackend.setSpeed(speed);
     await handlePersistPlayerControllerState(this);
     notifyListeners();
   }
