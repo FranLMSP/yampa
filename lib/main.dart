@@ -133,8 +133,6 @@ class MyHomePage extends ConsumerStatefulWidget {
 }
 
 class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
-  Timer? _timer;
-
   @override
   void initState() {
     super.initState();
@@ -174,21 +172,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
     }
   }
 
-  void _setTimer() {
-    if (_timer != null) {
-      return;
-    }
-
-    _timer = Timer.periodic(const Duration(milliseconds: 2000), (timer) async {
-      final playerNotifier = ref.watch(playerControllerProvider.notifier);
-      final player = playerNotifier.getPlayerController();
-
-      if (player.hasTrackFinishedPlaying()) {
-        await playerNotifier.handleNextAutomatically();
-      }
-      await playerNotifier.updatePlaybackStatistics();
-    });
-  }
 
   Future<void> _load(
     bool initialLoadDone,
@@ -269,7 +252,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
         loadedTracksCountNotifier,
       );
     }
-    _setTimer();
     return initialLoadDone ? _buildMainContent() : _buildMainPageLoader();
   }
 }

@@ -164,4 +164,10 @@ class LocalizationKeys {
 
   // Crop
   static const String cropImage = 'crop_image';
+
+  // Background Playback
+  static const String backgroundPlayback = 'background_playback';
+  static const String batteryOptimizationTitle = 'battery_optimization_title';
+  static const String batteryOptimizationSubtitle =
+      'battery_optimization_subtitle';
 }

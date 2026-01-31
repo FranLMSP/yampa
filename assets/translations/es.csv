@@ -133,3 +133,6 @@ sort_genre_za;Género (Z-A)
 sort_duration_short;Duración (Más corta primero)
 sort_duration_long;Duración (Más larga primero)
 crop_image;Recortar Imagen
+background_playback;Reproducción en segundo plano
+battery_optimization_title;Desactivar optimización de batería
+battery_optimization_subtitle;Para una mejor estabilidad de la reproducción en segundo plano, se recomienda desactivar la optimización de batería para esta aplicación en los ajustes de su sistema.

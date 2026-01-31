@@ -133,3 +133,6 @@ sort_genre_za;Genre (Z-A)
 sort_duration_short;Duration (Shortest first)
 sort_duration_long;Duration (Longest first)
 crop_image;Crop Image
+background_playback;Background Playback
+battery_optimization_title;Disable battery optimization
+battery_optimization_subtitle;For better background playback stability, it is recommended to disable battery optimization for this app in your system settings.

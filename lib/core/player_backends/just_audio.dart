@@ -10,6 +10,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:yampa/core/player/player_controller.dart';
+import 'package:yampa/core/player/enums.dart' as yampa_loop;
 import 'package:yampa/core/player_backends/audio_handler.dart';
 import 'package:yampa/core/utils/file_utils.dart';
 import 'package:yampa/core/utils/id_utils.dart';
@@ -323,6 +324,29 @@ class JustAudioBackend implements PlayerBackend {
         await bands[i].setGain(gains[i]);
       }
     }
+  }
+
+  @override
+  Future<void> setLoopMode(yampa_loop.LoopMode mode) async {
+    _ensurePlayerInitialized();
+    final justAudioLoopMode = {
+      yampa_loop.LoopMode.singleTrack: LoopMode.one,
+      yampa_loop.LoopMode.infinite: LoopMode.off,
+      yampa_loop.LoopMode.startToEnd: LoopMode.off,
+      yampa_loop.LoopMode.none: LoopMode.off,
+    }[mode];
+
+    if (justAudioLoopMode != null) {
+      await _player!.setLoopMode(justAudioLoopMode);
+    }
+  }
+
+  @override
+  Stream<void> get onTrackFinished {
+    _ensurePlayerInitialized();
+    return _player!.processingStateStream
+        .where((state) => state == ProcessingState.completed)
+        .map((_) => null);
   }
 
   @override
