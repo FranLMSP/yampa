@@ -1,23 +1,20 @@
 # YAMPA - Yet Another Music player App
 
-Simple music player app that respects your privacy.
+Simple music player app.
 
-## Getting Started
+## Screenshots
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![1](./screenshots/1.png)
+![2](./screenshots/2.png)
+![3](./screenshots/3.png)
+![4](./screenshots/4.png)
 
 
-### Dependencies
+## Dependencies
 ```
 apt install libmpv-dev libsqlite3-0 libsqlite3-dev
 ```
-for Windows, the executable has to be packed with `sqlite3.dll`.
+
+## Building
+
+You can either build the app with Docker by running the `make build/all` command (you can also target a specific platform, see the `Makefile` file), or install Flutter manually and run `flutter build --release`.
