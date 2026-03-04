@@ -182,8 +182,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with WindowListener {
     LoadedTracksCountProviderNotifier loadedTracksCountNotifier,
   ) async {
     if (isPlatformMobile()) {
-      await Permission.audio.request();
-      await Permission.notification.request();
+      await [
+        Permission.storage,
+        Permission.audio,
+        Permission.notification,
+      ].request();
     }
     await doInitialLoad(
       initialLoadDone,
