@@ -136,3 +136,7 @@ crop_image;Recortar Imagen
 background_playback;Reproducción en segundo plano
 battery_optimization_title;Desactivar optimización de batería
 battery_optimization_subtitle;Para una mejor estabilidad de la reproducción en segundo plano, se recomienda desactivar la optimización de batería para esta aplicación en los ajustes de su sistema.
+about;Acerca de
+version;Versión
+github_repo;Repositorio de GitHub
+support_project;Apoyar este proyecto

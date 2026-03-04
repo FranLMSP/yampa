@@ -136,3 +136,7 @@ crop_image;Crop Image
 background_playback;Background Playback
 battery_optimization_title;Disable battery optimization
 battery_optimization_subtitle;For better background playback stability, it is recommended to disable battery optimization for this app in your system settings.
+about;About
+version;Version
+github_repo;GitHub Repository
+support_project;Support this project

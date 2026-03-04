@@ -170,4 +170,10 @@ class LocalizationKeys {
   static const String batteryOptimizationTitle = 'battery_optimization_title';
   static const String batteryOptimizationSubtitle =
       'battery_optimization_subtitle';
+
+  // About
+  static const String about = 'about';
+  static const String version = 'version';
+  static const String githubRepo = 'github_repo';
+  static const String supportProject = 'support_project';
 }
