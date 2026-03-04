@@ -175,4 +175,5 @@ class LocalizationKeys {
   static const String about = 'about';
   static const String version = 'version';
   static const String githubRepo = 'github_repo';
+  static const String supportProject = 'support_project';
 }

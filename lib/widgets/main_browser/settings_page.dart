@@ -174,6 +174,22 @@ class SettingsPage extends ConsumerWidget {
               }
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.coffee_outlined, size: 32),
+            title: Text(
+              ref
+                  .read(localizationProvider.notifier)
+                  .translate(LocalizationKeys.supportProject),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            subtitle: const Text('https://buymeacoffee.com/franlmsp'),
+            onTap: () async {
+              final url = Uri.parse('https://buymeacoffee.com/franlmsp');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url);
+              }
+            },
+          ),
         ],
       ),
     );
