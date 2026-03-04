@@ -8,6 +8,8 @@ import 'package:yampa/providers/theme_mode_provider.dart';
 import 'package:yampa/providers/localization_provider.dart';
 import 'package:yampa/core/localization/keys.dart';
 import 'package:yampa/widgets/utils.dart';
+import 'package:yampa/providers/package_info_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -123,7 +125,55 @@ class SettingsPage extends ConsumerWidget {
                       .translate(LocalizationKeys.batteryOptimizationSubtitle),
                 ),
               ),
-            ]
+            ],
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Text(
+              ref
+                  .read(localizationProvider.notifier)
+                  .translate(LocalizationKeys.about),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ref.watch(packageInfoProvider).when(
+                data: (info) => ListTile(
+                  leading: const Icon(Icons.info_outline, size: 32),
+                  title: Text(
+                    ref
+                        .read(localizationProvider.notifier)
+                        .translate(LocalizationKeys.version),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(info.version),
+                ),
+                loading: () => const ListTile(
+                  leading: CircularProgressIndicator(),
+                  title: Text('Loading version...'),
+                ),
+                error: (e, s) => ListTile(
+                  leading: const Icon(Icons.error_outline),
+                  title: const Text('Error loading version'),
+                  subtitle: Text(e.toString()),
+                ),
+              ),
+          ListTile(
+            leading: const Icon(Icons.code, size: 32),
+            title: Text(
+              ref
+                  .read(localizationProvider.notifier)
+                  .translate(LocalizationKeys.githubRepo),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            subtitle: const Text('https://github.com/FranLMSP/yampa'),
+            onTap: () async {
+              final url = Uri.parse('https://github.com/FranLMSP/yampa');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url);
+              }
+            },
+          ),
         ],
       ),
     );
