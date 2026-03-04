@@ -3,6 +3,8 @@
 Simple music player app.
 This app is currently in alpha state. Expect bugs and active development.
 
+<a href="https://www.buymeacoffee.com/franlmsp" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
 ## Screenshots
 
 ![1](./screenshots/1.png)
